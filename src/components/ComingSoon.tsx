@@ -82,7 +82,7 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
       zIndex: 2,
     },
     logoContainer: {
-      marginBottom: '0.5rem',
+      marginBottom: '50px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
