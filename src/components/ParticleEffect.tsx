@@ -66,7 +66,7 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
       size,
       opacity: 0.6 + Math.random() * 0.4,
       life: 0,
-      maxLife: 800 + Math.random() * 400, // Ambient particles live 13-20 seconds
+      maxLife: 1500 + Math.random() * 1000, // Ambient particles live 25-42 seconds
       isFloating: true,
       floatAngle,
       floatSpeed,
@@ -76,10 +76,11 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
   // Create a new particle from logo
   const createParticle = useCallback((): Particle => {
     const angle = Math.random() * Math.PI * 2;
-    const speed = particleSpeed + Math.random() * particleSpeed;
+    const baseSpeed = particleSpeed * 2; // Increase base speed
+    const speed = baseSpeed + Math.random() * baseSpeed;
     const size = 2 + Math.random() * 6;
     const maxLife = 100 + Math.random() * 50; // Shorter life before transitioning to floating
-    const totalLife = maxLife + 300 + Math.random() * 200; // Total lifespan including floating phase
+    const totalLife = maxLife + 800 + Math.random() * 400; // Total lifespan including floating phase (15-20 seconds total)
 
     return {
       id: particleIdRef.current++,
