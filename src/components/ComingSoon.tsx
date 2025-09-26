@@ -49,7 +49,7 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
       zIndex: 2,
     },
     logoContainer: {
-      marginBottom: '2rem',
+      marginBottom: '0.5rem',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -80,6 +80,33 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
       fontWeight: '500',
       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
     },
+    footer: {
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: '#FFFFFF',
+      borderTop: '1px solid #E0E0E0',
+      padding: '1rem',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 4,
+    },
+    footerLink: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+      textDecoration: 'none',
+      color: '#000000',
+      fontSize: '0.9rem',
+      fontWeight: '500',
+      transition: 'opacity 0.2s',
+    },
+    baskLogo: {
+      height: '24px',
+      width: 'auto',
+    },
   };
 
   return (
@@ -103,6 +130,25 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
       
       <div style={styles.accent}>
         Bald verfügbar
+      </div>
+      
+      {/* Footer with Bask Tech logo */}
+      <div style={styles.footer}>
+        <a 
+          href="https://www.bask-tech.com/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={styles.footerLink}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        >
+          <span>Powered by</span>
+          <img 
+            src="/assets/bask-tech-logo.svg" 
+            alt="Bask Tech" 
+            style={styles.baskLogo}
+          />
+        </a>
       </div>
     </div>
   );
