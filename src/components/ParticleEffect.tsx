@@ -66,7 +66,7 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
       size,
       opacity: 0.6 + Math.random() * 0.4,
       life: 0,
-      maxLife: Infinity, // Ambient particles don't die
+      maxLife: 800 + Math.random() * 400, // Ambient particles live 13-20 seconds
       isFloating: true,
       floatAngle,
       floatSpeed,
@@ -79,6 +79,7 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
     const speed = particleSpeed + Math.random() * particleSpeed;
     const size = 2 + Math.random() * 6;
     const maxLife = 100 + Math.random() * 50; // Shorter life before transitioning to floating
+    const totalLife = maxLife + 300 + Math.random() * 200; // Total lifespan including floating phase
 
     return {
       id: particleIdRef.current++,
@@ -89,7 +90,7 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
       size,
       opacity: 1,
       life: 0,
-      maxLife,
+      maxLife: totalLife,
       isFloating: false,
       floatAngle: Math.random() * Math.PI * 2,
       floatSpeed: 0.1 + Math.random() * 0.2,
@@ -108,8 +109,8 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
 
   // Update particle positions and properties
   const updateParticle = useCallback((particle: Particle): Particle => {
-    // Transition to floating when life reaches maxLife
-    if (!particle.isFloating && particle.life >= particle.maxLife) {
+    // Transition to floating after initial burst phase (around 100-150 frames)
+    if (!particle.isFloating && particle.life >= 125) {
       particle.isFloating = true;
       particle.vx *= 0.1; // Slow down dramatically
       particle.vy *= 0.1;
@@ -158,12 +159,17 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
     particle.x += particle.vx;
     particle.y += particle.vy;
 
-    // Update life and opacity for spawned particles
-    if (!particle.isFloating || particle.life < particle.maxLife) {
-      particle.life++;
-      if (!particle.isFloating) {
-        particle.opacity = Math.max(0.6, 1 - (particle.life / particle.maxLife) * 0.4);
-      }
+    // Update life and opacity
+    particle.life++;
+    
+    // Fade out particles approaching end of life
+    const fadeStart = particle.maxLife * 0.8; // Start fading at 80% of life
+    if (particle.life > fadeStart) {
+      const fadeProgress = (particle.life - fadeStart) / (particle.maxLife - fadeStart);
+      particle.opacity = Math.max(0, (1 - fadeProgress) * 0.8);
+    } else if (!particle.isFloating) {
+      // Initial spawn phase opacity
+      particle.opacity = Math.max(0.6, 1 - (particle.life / 100) * 0.4);
     }
 
     return particle;
@@ -171,17 +177,18 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
 
   // Check if particle should be removed
   const shouldRemoveParticle = useCallback((particle: Particle): boolean => {
-    // Floating particles stay forever within reasonable bounds
-    if (particle.isFloating) {
-      return (
-        particle.x < -100 ||
-        particle.x > dimensions.width + 100 ||
-        particle.y < -100 ||
-        particle.y > dimensions.height + 100
-      );
+    // Remove particles that exceeded their lifespan
+    if (particle.life >= particle.maxLife) {
+      return true;
     }
-    // Non-floating particles are removed when they transition
-    return false;
+    
+    // Also remove if they go too far out of bounds
+    return (
+      particle.x < -100 ||
+      particle.x > dimensions.width + 100 ||
+      particle.y < -100 ||
+      particle.y > dimensions.height + 100
+    );
   }, [dimensions]);
 
   // Render particles on canvas with subtle glow effect
