@@ -17,6 +17,9 @@ export interface Particle {
   opacity: number;
   life: number;
   maxLife: number;
+  isFloating: boolean;
+  floatAngle: number;
+  floatSpeed: number;
 }
 
 export interface MousePosition {

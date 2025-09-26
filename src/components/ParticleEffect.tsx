@@ -8,6 +8,7 @@ interface ParticleEffectProps {
   particleSpeed?: number;
   repulsionRadius?: number;
   repulsionForce?: number;
+  ambientParticles?: number;
 }
 
 const ParticleEffect: React.FC<ParticleEffectProps> = ({
@@ -17,6 +18,7 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
   particleSpeed = 0.25,
   repulsionRadius = 100,
   repulsionForce = 0.3,
+  ambientParticles = 20,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
@@ -24,6 +26,7 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
   const mousePositionRef = useRef<MousePosition>({ x: 0, y: 0 });
   const lastSpawnTimeRef = useRef<number>(0);
   const particleIdRef = useRef<number>(0);
+  const initializedRef = useRef<boolean>(false);
 
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
@@ -46,12 +49,36 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
     };
   }, []);
 
-  // Create a new particle
+  // Create an ambient floating particle
+  const createAmbientParticle = useCallback((): Particle => {
+    const size = 2 + Math.random() * 6;
+    const x = Math.random() * dimensions.width;
+    const y = Math.random() * dimensions.height;
+    const floatAngle = Math.random() * Math.PI * 2;
+    const floatSpeed = 0.1 + Math.random() * 0.2;
+
+    return {
+      id: particleIdRef.current++,
+      x,
+      y,
+      vx: 0,
+      vy: 0,
+      size,
+      opacity: 0.6 + Math.random() * 0.4,
+      life: 0,
+      maxLife: Infinity, // Ambient particles don't die
+      isFloating: true,
+      floatAngle,
+      floatSpeed,
+    };
+  }, [dimensions]);
+
+  // Create a new particle from logo
   const createParticle = useCallback((): Particle => {
     const angle = Math.random() * Math.PI * 2;
     const speed = particleSpeed + Math.random() * particleSpeed;
     const size = 2 + Math.random() * 6;
-    const maxLife = 200 + Math.random() * 100;
+    const maxLife = 100 + Math.random() * 50; // Shorter life before transitioning to floating
 
     return {
       id: particleIdRef.current++,
@@ -63,11 +90,31 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
       opacity: 1,
       life: 0,
       maxLife,
+      isFloating: false,
+      floatAngle: Math.random() * Math.PI * 2,
+      floatSpeed: 0.1 + Math.random() * 0.2,
     };
   }, [logoPosition, particleSpeed]);
 
+  // Initialize ambient particles
+  const initializeAmbientParticles = useCallback(() => {
+    if (!initializedRef.current) {
+      for (let i = 0; i < ambientParticles; i++) {
+        particlesRef.current.push(createAmbientParticle());
+      }
+      initializedRef.current = true;
+    }
+  }, [ambientParticles, createAmbientParticle]);
+
   // Update particle positions and properties
   const updateParticle = useCallback((particle: Particle): Particle => {
+    // Transition to floating when life reaches maxLife
+    if (!particle.isFloating && particle.life >= particle.maxLife) {
+      particle.isFloating = true;
+      particle.vx *= 0.1; // Slow down dramatically
+      particle.vy *= 0.1;
+    }
+
     // Apply mouse repulsion
     const dx = particle.x - mousePositionRef.current.x;
     const dy = particle.y - mousePositionRef.current.y;
@@ -82,26 +129,59 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
       particle.vy += normalizedDy * force;
     }
 
+    // Apply floating behavior
+    if (particle.isFloating) {
+      // Gentle floating motion like leaves on water
+      particle.floatAngle += particle.floatSpeed * 0.02;
+      particle.vx += Math.cos(particle.floatAngle) * 0.02;
+      particle.vy += Math.sin(particle.floatAngle * 0.7) * 0.015;
+      
+      // Apply drag to floating particles
+      particle.vx *= 0.98;
+      particle.vy *= 0.98;
+      
+      // Keep particles within bounds with soft boundaries
+      const margin = 50;
+      if (particle.x < margin) {
+        particle.vx += 0.1;
+      } else if (particle.x > dimensions.width - margin) {
+        particle.vx -= 0.1;
+      }
+      if (particle.y < margin) {
+        particle.vy += 0.1;
+      } else if (particle.y > dimensions.height - margin) {
+        particle.vy -= 0.1;
+      }
+    }
+
     // Update position
     particle.x += particle.vx;
     particle.y += particle.vy;
 
-    // Update life and opacity
-    particle.life++;
-    particle.opacity = Math.max(0, 1 - (particle.life / particle.maxLife));
+    // Update life and opacity for spawned particles
+    if (!particle.isFloating || particle.life < particle.maxLife) {
+      particle.life++;
+      if (!particle.isFloating) {
+        particle.opacity = Math.max(0.6, 1 - (particle.life / particle.maxLife) * 0.4);
+      }
+    }
 
     return particle;
-  }, [repulsionRadius, repulsionForce]);
+  }, [repulsionRadius, repulsionForce, dimensions]);
 
   // Check if particle should be removed
   const shouldRemoveParticle = useCallback((particle: Particle): boolean => {
-    return (
-      particle.life >= particle.maxLife ||
-      particle.x < -50 ||
-      particle.x > dimensions.width + 50 ||
-      particle.y < -50 ||
-      particle.y > dimensions.height + 50
-    );
+    // Floating particles stay forever within reasonable bounds
+    if (particle.isFloating) {
+      return (
+        particle.x < -100 ||
+        particle.x > dimensions.width + 100 ||
+        particle.y < -100 ||
+        particle.y > dimensions.height + 100
+      );
+    }
+    // Non-floating particles are removed when they transition
+    return false;
   }, [dimensions]);
 
   // Render particles on canvas with subtle glow effect
@@ -147,6 +227,9 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
 
   // Animation loop with performance optimizations
   const animate = useCallback((currentTime: number) => {
+    // Initialize ambient particles on first frame
+    initializeAmbientParticles();
+
     // Throttle spawning to improve performance
     if (
       currentTime - lastSpawnTimeRef.current > 1000 / (spawnRate * 8) &&
@@ -174,7 +257,7 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
 
     // Continue animation
     animationIdRef.current = requestAnimationFrame(animate);
-  }, [createParticle, updateParticle, shouldRemoveParticle, render, spawnRate, maxParticles]);
+  }, [createParticle, updateParticle, shouldRemoveParticle, render, spawnRate, maxParticles, initializeAmbientParticles]);
 
   // Initialize canvas
   useEffect(() => {
@@ -209,6 +292,7 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
       particlesRef.current = [];
+      initializedRef.current = false;
     };
   }, [animate, handleResize, handleMouseMove]);
 

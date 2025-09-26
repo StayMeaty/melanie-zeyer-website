@@ -84,14 +84,14 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
 
   return (
     <div style={styles.container}>
+      {/* Particle Effect - render behind everything */}
+      <ParticleEffect logoPosition={logoPosition} />
+      
       {showLogo && (
-        <div ref={logoRef} style={styles.logoContainer}>
+        <div ref={logoRef} style={{...styles.logoContainer, position: 'relative', zIndex: 3}}>
           <Logo alt="Melanie Logo" size={300} />
         </div>
       )}
-
-      {/* Particle Effect */}
-      <ParticleEffect logoPosition={logoPosition} />
       
       <h1 style={styles.heading}>
         {title}
