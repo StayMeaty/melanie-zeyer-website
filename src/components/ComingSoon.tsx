@@ -17,7 +17,6 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
   const logoRef = useRef<HTMLDivElement>(null);
   const accentRef = useRef<HTMLDivElement>(null);
   const [logoPosition, setLogoPosition] = useState({ x: 0, y: 0 });
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [accentTransform, setAccentTransform] = useState({ x: 0, y: 0 });
 
   // Update logo position for particle effect
@@ -43,8 +42,6 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
   // Handle mouse movement for accent element
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-      
       if (accentRef.current) {
         const rect = accentRef.current.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
