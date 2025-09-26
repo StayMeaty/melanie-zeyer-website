@@ -152,7 +152,7 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
       
       {showLogo && (
         <div ref={logoRef} style={{...styles.logoContainer, position: 'relative', zIndex: 3}}>
-          <Logo alt="Melanie Logo" size={600} />
+          <Logo alt="Melanie Logo" size={480} />
         </div>
       )}
       
