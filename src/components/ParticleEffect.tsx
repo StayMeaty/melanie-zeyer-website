@@ -13,12 +13,12 @@ interface ParticleEffectProps {
 
 const ParticleEffect: React.FC<ParticleEffectProps> = ({
   logoPosition,
-  maxParticles = 75,
-  spawnRate = 0.8,
+  maxParticles = 750,
+  spawnRate = 8,
   particleSpeed = 0.25,
   repulsionRadius = 100,
   repulsionForce = 0.3,
-  ambientParticles = 20,
+  ambientParticles = 200,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
