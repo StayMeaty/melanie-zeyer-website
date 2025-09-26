@@ -14,7 +14,7 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
   logoPosition,
   maxParticles = 75,
   spawnRate = 0.8,
-  particleSpeed = 0.5,
+  particleSpeed = 0.25,
   repulsionRadius = 100,
   repulsionForce = 0.3,
 }) => {

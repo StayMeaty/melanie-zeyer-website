@@ -86,7 +86,7 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
     <div style={styles.container}>
       {showLogo && (
         <div ref={logoRef} style={styles.logoContainer}>
-          <Logo alt="Melanie Logo" />
+          <Logo alt="Melanie Logo" size={300} />
         </div>
       )}
 
