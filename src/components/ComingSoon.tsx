@@ -78,6 +78,7 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
       justifyContent: 'center',
       backgroundColor: APP_CONFIG.colors.background,
       padding: '2rem',
+      paddingBottom: '4rem',
       position: 'relative',
       zIndex: 2,
     },
@@ -117,7 +118,7 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
       userSelect: 'none',
     },
     footer: {
-      position: 'fixed',
+      position: 'absolute',
       bottom: 0,
       left: 0,
       right: 0,
