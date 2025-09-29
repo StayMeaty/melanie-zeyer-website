@@ -346,7 +346,7 @@ const Kurse: React.FC = () => {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                Jetzt buchen
+                Kurs kaufen
               </button>
             </div>
           ))}

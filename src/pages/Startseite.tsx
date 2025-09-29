@@ -149,10 +149,10 @@ const Startseite: React.FC = () => {
           Warum Melanie Zeyer?
         </h2>
         <p style={styles.sectionContent}>
-          Mit über [X] Jahren Erfahrung in der Beratung und einem tiefen Verständnis 
-          für menschliche Entwicklungsprozesse begleite ich Sie auf Ihrem Weg zu 
-          persönlichem und beruflichem Erfolg. Lorem ipsum dolor sit amet, consectetur 
-          adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
+          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.
         </p>
       </section>
 
