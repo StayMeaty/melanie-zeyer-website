@@ -1,17 +1,37 @@
 import React from 'react';
-import { ComingSoon, FontComparison } from './components';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { ComingSoon, FontComparison, PreviewButton, WebsitePreview } from './components';
 
-const App: React.FC = () => {
-  return (
-    <div style={{ 
-      display: 'flex', 
+// Landing page component with coming soon and font comparison
+const LandingPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const styles: Record<string, React.CSSProperties> = {
+    container: {
+      display: 'flex',
       flexDirection: 'column',
-      minHeight: '100vh' 
-    }}>
+      minHeight: '100vh',
+    },
+  };
+
+  return (
+    <div style={styles.container}>
       <ComingSoon />
       <FontComparison />
+      <PreviewButton onClick={() => navigate('/preview')} />
     </div>
   );
 };
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/preview" element={<WebsitePreview />} />
+      </Routes>
+    </Router>
+  );
+}
 
 export default App;
