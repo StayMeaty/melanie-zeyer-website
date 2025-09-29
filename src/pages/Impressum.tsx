@@ -102,7 +102,7 @@ const Impressum: React.FC = () => {
       <div style={styles.contactInfo}>
         <h2 style={styles.contactTitle}>Angaben gemäß § 5 TMG</h2>
         <div style={styles.contactDetails}>
-          <strong style={styles.strong}>[Vollständiger Name]</strong><br />
+          <strong style={styles.strong}>Melanie Zeyer</strong><br />
           [Geschäftsbezeichnung]<br />
           <br />
           [Straße und Hausnummer]<br />
@@ -118,7 +118,7 @@ const Impressum: React.FC = () => {
       <section className="section-padding" style={styles.section}>
         <h2 style={styles.sectionTitle}>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
         <p style={styles.sectionContent}>
-          [Vollständiger Name]<br />
+          Melanie Zeyer<br />
           [Straße und Hausnummer]<br />
           [PLZ Stadt]
         </p>

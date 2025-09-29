@@ -121,7 +121,7 @@ const Startseite: React.FC = () => {
       
       <section className="hero-section" style={styles.hero}>
         <h1 style={styles.title}>
-          Willkommen bei [Ihr Name]
+          Willkommen bei Melanie Zeyer
         </h1>
         <p style={styles.subtitle}>
           Ihre Expertin für professionelle Beratung, individuelles Coaching und 
@@ -146,7 +146,7 @@ const Startseite: React.FC = () => {
 
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>
-          Warum [Ihr Name]?
+          Warum Melanie Zeyer?
         </h2>
         <p style={styles.sectionContent}>
           Mit über [X] Jahren Erfahrung in der Beratung und einem tiefen Verständnis 
