@@ -113,6 +113,32 @@ const FontComparison: React.FC<FontComparisonProps> = ({
       lineHeight: '1.4',
       fontFamily: 'Kodchasan, sans-serif',
     },
+    h1Elegant: {
+      fontSize: isMobile ? '1.4rem' : 'clamp(1.8rem, 3vw, 2.2rem)',
+      fontWeight: '700',
+      color: APP_CONFIG.colors.primary,
+      marginBottom: '1rem',
+      lineHeight: '1.3',
+      fontFamily: 'Sumana, serif',
+      letterSpacing: '-0.02em',
+    },
+    h2Elegant: {
+      fontSize: isMobile ? '1.15rem' : 'clamp(1.3rem, 2.5vw, 1.6rem)',
+      fontWeight: '700',
+      color: APP_CONFIG.colors.primary,
+      marginBottom: '0.8rem',
+      lineHeight: '1.4',
+      fontFamily: 'Sumana, serif',
+      letterSpacing: '-0.01em',
+    },
+    h3Elegant: {
+      fontSize: isMobile ? '0.95rem' : 'clamp(1rem, 2vw, 1.3rem)',
+      fontWeight: '700',
+      color: APP_CONFIG.colors.secondary,
+      marginBottom: '1rem',
+      lineHeight: '1.5',
+      fontFamily: 'Sumana, serif',
+    },
     quote: {
       fontSize: isMobile ? '0.85rem' : 'clamp(1rem, 1.8vw, 1.2rem)',
       fontStyle: 'italic',
@@ -228,6 +254,43 @@ const FontComparison: React.FC<FontComparisonProps> = ({
               <strong>Fließtext:</strong> Arimo<br />
               <strong>Überschriften:</strong> Kodchasan (freundlicher, individueller Charakter)<br />
               → Diese Kombination wirkt etwas „persönlicher" und kreativer, kann aber bei zu verspielter Anwendung weniger professionell erscheinen.
+            </p>
+          </div>
+        </div>
+
+        {/* Option 3: Elegant */}
+        <div
+          style={{
+            ...styles.card,
+            ...(hoveredCard === 'elegant' ? styles.cardHover : {})
+          }}
+          onMouseEnter={() => setHoveredCard('elegant')}
+          onMouseLeave={() => setHoveredCard(null)}
+        >
+          <h1 style={styles.h1Elegant}>Große Überschrift</h1>
+          <h2 style={styles.h2Elegant}>Mittlere Überschrift</h2>
+          <h3 style={styles.h3Elegant}>Kleine Überschrift</h3>
+          
+          <blockquote style={styles.quote}>
+            "Design ist nicht nur, wie es aussieht und sich anfühlt. Design ist, wie es funktioniert."
+            <br />— Steve Jobs
+          </blockquote>
+
+          <p style={styles.paragraph}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+            Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
+            nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in 
+            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+          </p>
+
+          <div style={styles.infoBox}>
+            <h4 style={styles.infoTitle}>Option 3 – Elegant & hochwertig</h4>
+            <p style={styles.infoText}>
+              <strong>Fließtext:</strong> Arimo (neutral, gut lesbar)<br />
+              <strong>Überschriften:</strong> Sumana (Serif, klassisch, hochwertig)<br />
+              <strong>Charakteristik:</strong> Durch die Kombination einer modernen Sans-Serif-Schrift mit einer Serif-Schrift entsteht ein bewusster Kontrast, der sehr professionell und stilvoll wirkt.<br />
+              → Eignet sich besonders für Coaching, Beratung oder hochwertige Dienstleistungen.
             </p>
           </div>
         </div>
