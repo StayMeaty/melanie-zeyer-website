@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { APP_CONFIG } from '../types';
+import { StripeCheckout } from '../components';
 
 const Kurse: React.FC = () => {
+  const [checkoutData, setCheckoutData] = useState<{courseName: string, price: string} | null>(null);
   const styles: Record<string, React.CSSProperties> = {
     hero: {
       textAlign: 'center',
@@ -184,81 +186,81 @@ const Kurse: React.FC = () => {
 
   const courses = [
     {
-      title: 'Achtsamkeit im Alltag',
-      duration: '8 Wochen',
-      price: '299€',
-      description: 'Lernen Sie, wie Sie Achtsamkeit in Ihren täglichen Routinen integrieren und mehr Gelassenheit und Präsenz entwickeln können.',
+      title: 'Kurs 1',
+      duration: '[X] Wochen',
+      price: '[Preis]',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
       features: [
-        'Wöchentliche 90-Minuten Sessions',
-        'Geführte Meditationen',
-        'Praktische Übungen für den Alltag',
-        'Austausch in der Gruppe',
-        'Umfangreiches Arbeitsmaterial'
+        'Feature 1 Lorem ipsum',
+        'Feature 2 Lorem ipsum',
+        'Feature 3 Lorem ipsum',
+        'Feature 4 Lorem ipsum',
+        'Feature 5 Lorem ipsum'
       ]
     },
     {
-      title: 'Selbstvertrauen stärken',
-      duration: '6 Wochen',
-      price: '249€',
-      description: 'Entdecken Sie Ihre Stärken, überwinden Sie Selbstzweifel und entwickeln Sie ein gesundes Selbstbewusstsein für alle Lebensbereiche.',
+      title: 'Kurs 2',
+      duration: '[X] Wochen',
+      price: '[Preis]',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
       features: [
-        'Interaktive Workshops',
-        'Persönlichkeitstests und Reflexion',
-        'Übungen zur Stärkung des Selbstwerts',
-        'Strategien gegen negative Gedanken',
-        'Individuelle Zielsetzung'
+        'Feature 1 Lorem ipsum',
+        'Feature 2 Lorem ipsum',
+        'Feature 3 Lorem ipsum',
+        'Feature 4 Lorem ipsum',
+        'Feature 5 Lorem ipsum'
       ]
     },
     {
-      title: 'Work-Life-Balance',
-      duration: '4 Wochen',
-      price: '199€',
-      description: 'Finden Sie das richtige Gleichgewicht zwischen Beruf und Privatleben und lernen Sie effektive Strategien für nachhaltiges Zeitmanagement.',
+      title: 'Kurs 3',
+      duration: '[X] Wochen',
+      price: '[Preis]',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
       features: [
-        'Analyse der aktuellen Situation',
-        'Prioritäten setzen lernen',
-        'Grenzen ziehen und kommunizieren',
-        'Entspannungstechniken',
-        'Langfristige Strategien entwickeln'
+        'Feature 1 Lorem ipsum',
+        'Feature 2 Lorem ipsum',
+        'Feature 3 Lorem ipsum',
+        'Feature 4 Lorem ipsum',
+        'Feature 5 Lorem ipsum'
       ]
     },
     {
-      title: 'Kommunikation & Konfliktlösung',
-      duration: '10 Wochen',
-      price: '399€',
-      description: 'Verbessern Sie Ihre Kommunikationsfähigkeiten und lernen Sie, Konflikte konstruktiv zu lösen - privat und beruflich.',
+      title: 'Kurs 4',
+      duration: '[X] Wochen',
+      price: '[Preis]',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
       features: [
-        'Gewaltfreie Kommunikation',
-        'Aktives Zuhören',
-        'Körpersprache verstehen',
-        'Konfliktlösungsstrategien',
-        'Rollenspiele und Praxisübungen'
+        'Feature 1 Lorem ipsum',
+        'Feature 2 Lorem ipsum',
+        'Feature 3 Lorem ipsum',
+        'Feature 4 Lorem ipsum',
+        'Feature 5 Lorem ipsum'
       ]
     },
     {
-      title: 'Ziele erreichen & Träume verwirklichen',
-      duration: '12 Wochen',
-      price: '449€',
-      description: 'Ein umfassender Kurs zur Zielfindung, Planung und Umsetzung Ihrer wichtigsten Lebensziele mit bewährten Coaching-Methoden.',
+      title: 'Kurs 5',
+      duration: '[X] Wochen',
+      price: '[Preis]',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
       features: [
-        'Vision und Werte klären',
-        'SMART-Ziele formulieren',
-        'Aktionsplan entwickeln',
-        'Hindernisse überwinden',
-        'Motivation aufrechterhalten'
+        'Feature 1 Lorem ipsum',
+        'Feature 2 Lorem ipsum',
+        'Feature 3 Lorem ipsum',
+        'Feature 4 Lorem ipsum',
+        'Feature 5 Lorem ipsum'
       ]
     },
     {
-      title: 'Stressmanagement',
-      duration: '6 Wochen',
-      price: '279€',
-      description: 'Lernen Sie Ihren Stress zu verstehen, entwickeln Sie persönliche Bewältigungsstrategien und finden Sie zu mehr Ruhe und Ausgeglichenheit.',
+      title: 'Kurs 6',
+      duration: '[X] Wochen',
+      price: '[Preis]',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
       features: [
-        'Stressanalyse und -bewertung',
-        'Entspannungstechniken',
-        'Atemübungen und Meditation',
-        'Mentale Strategien',
-        'Präventive Maßnahmen'
+        'Feature 1 Lorem ipsum',
+        'Feature 2 Lorem ipsum',
+        'Feature 3 Lorem ipsum',
+        'Feature 4 Lorem ipsum',
+        'Feature 5 Lorem ipsum'
       ]
     }
   ];
@@ -272,27 +274,27 @@ const Kurse: React.FC = () => {
           Kurse & Workshops
         </h1>
         <p style={styles.subtitle}>
-          Entdecken Sie unsere vielfältigen Kurse zur Persönlichkeitsentwicklung 
-          und finden Sie den perfekten Weg für Ihr persönliches Wachstum.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua.
         </p>
       </section>
 
       <div style={styles.infoBox}>
         <h3 style={styles.infoTitle}>
-          Warum Gruppenkurse?
+          Warum [Kurstyp]?
         </h3>
         <p style={styles.infoText}>
-          In unseren Kursen profitieren Sie nicht nur von bewährten Methoden und 
-          professioneller Anleitung, sondern auch vom wertvollen Austausch mit 
-          Gleichgesinnten. Gemeinsam wachsen macht Spaß und motiviert nachhaltig.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
+          quis nostrud exercitation ullamco laboris.
         </p>
       </div>
 
       <section className="section-padding" style={styles.section}>
         <h2 style={styles.sectionTitle}>Aktuelle Kursangebote</h2>
         <p style={styles.sectionContent}>
-          Alle Kurse finden in kleinen Gruppen von maximal 8 Teilnehmern statt, 
-          um eine persönliche Atmosphäre und individuellen Raum für jeden zu gewährleisten.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua.
         </p>
         
         <div className="grid-container" style={styles.grid}>
@@ -332,8 +334,8 @@ const Kurse: React.FC = () => {
                 {course.price}
               </div>
               
-              <Link
-                to="/preview/coaching"
+              <button
+                onClick={() => setCheckoutData({courseName: course.title, price: course.price})}
                 style={styles.courseButton}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#d4b86a';
@@ -344,19 +346,19 @@ const Kurse: React.FC = () => {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                Anmelden & Infos
-              </Link>
+                Jetzt buchen
+              </button>
             </div>
           ))}
         </div>
       </section>
 
       <section className="section-padding" style={styles.section}>
-        <h2 style={styles.sectionTitle}>Individuelle Workshops</h2>
+        <h2 style={styles.sectionTitle}>[Weitere Services]</h2>
         <p style={styles.sectionContent}>
-          Neben unseren regulären Kursen bieten wir auch maßgeschneiderte Workshops 
-          für Unternehmen, Teams oder private Gruppen an. Sprechen Sie uns für ein 
-          individuelles Angebot an.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
+          quis nostrud exercitation ullamco laboris.
         </p>
         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
           <Link 
@@ -378,12 +380,12 @@ const Kurse: React.FC = () => {
 
       <div style={styles.infoBox}>
         <h3 style={styles.infoTitle}>
-          Fragen zu den Kursen?
+          Fragen zu den [Services]?
         </h3>
         <p style={styles.infoText}>
-          Sind Sie unsicher, welcher Kurs der richtige für Sie ist? Gerne berate 
-          ich Sie in einem kostenlosen Erstgespräch und finde gemeinsam mit Ihnen 
-          den optimalen Weg für Ihre persönliche Entwicklung.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
+          quis nostrud exercitation ullamco laboris.
         </p>
         <div style={{ marginTop: '1.5rem' }}>
           <Link 
@@ -407,6 +409,14 @@ const Kurse: React.FC = () => {
           </Link>
         </div>
       </div>
+
+      {checkoutData && (
+        <StripeCheckout
+          courseName={checkoutData.courseName}
+          price={checkoutData.price}
+          onClose={() => setCheckoutData(null)}
+        />
+      )}
     </>
   );
 };

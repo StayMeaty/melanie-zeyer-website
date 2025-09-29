@@ -19,11 +19,20 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({ onClick }) => {
       return;
     }
 
-    // Check if user is already authenticated
-    if (isAuthenticated()) {
-      navigate('/preview');
-    } else {
+    // In development mode, always clear auth and show password dialog for testing
+    const isDevelopment = import.meta.env.DEV;
+    
+    if (isDevelopment) {
+      // Clear any existing authentication in development
+      localStorage.removeItem('auth_token');
       setShowPasswordDialog(true);
+    } else {
+      // Check if user is already authenticated (production behavior)
+      if (isAuthenticated()) {
+        navigate('/preview');
+      } else {
+        setShowPasswordDialog(true);
+      }
     }
   };
 

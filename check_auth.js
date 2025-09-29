@@ -1,0 +1,1 @@
+console.log('Auth status:', localStorage.getItem('auth_token')); console.log('Is authenticated:', localStorage.getItem('auth_token') ? JSON.parse(localStorage.getItem('auth_token')).expiry > Date.now() : false);

@@ -120,124 +120,120 @@ const UeberMich: React.FC = () => {
           Über mich
         </h1>
         <p style={styles.subtitle}>
-          Lernen Sie die Person hinter der Beratung kennen und erfahren Sie, 
-          wie meine Leidenschaft für menschliche Entwicklung entstanden ist.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua.
         </p>
       </section>
 
       <section className="section-padding" style={styles.section}>
-        <h2 style={styles.sectionTitle}>Meine Geschichte</h2>
+        <h2 style={styles.sectionTitle}>[Ihre Geschichte hier]</h2>
         <p style={styles.sectionContent}>
-          Schon früh in meinem Leben faszinierte mich die Frage, was Menschen dazu bewegt, 
-          über sich hinauszuwachsen und ihr volles Potenzial zu entfalten. Diese Neugier 
-          führte mich durch verschiedene Lebensstationen und prägte meinen Weg als 
-          <span style={styles.highlight}> Beraterin und Coach</span>.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
+          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea 
+          <span style={styles.highlight}> [Ihr Beruf]</span>.
         </p>
         <p style={styles.sectionContent}>
-          Nach meinem Studium in Psychologie und mehrjähriger Tätigkeit in der 
-          Organisationsentwicklung erkannte ich meine wahre Berufung: Menschen dabei 
-          zu unterstützen, ihre eigenen Antworten zu finden und nachhaltige Veränderungen 
-          in ihrem Leben zu bewirken.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
+          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.
         </p>
         <p style={styles.sectionContent}>
-          Heute blicke ich auf über <span style={styles.highlight}>15 Jahre Erfahrung</span> 
-          in der Begleitung von Einzelpersonen, Teams und Organisationen zurück. Jeder 
-          Klient bringt neue Perspektiven und Lernerfahrungen mit sich, die meine Arbeit 
-          bereichern und weiterentwickeln.
+          Lorem ipsum dolor sit amet consectetur adipiscing elit <span style={styles.highlight}>[X] Jahre Erfahrung</span> 
+          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim 
+          veniam, quis nostrud exercitation ullamco laboris.
         </p>
       </section>
 
       <section className="section-padding" style={styles.section}>
-        <h2 style={styles.sectionTitle}>Meine Qualifikationen</h2>
+        <h2 style={styles.sectionTitle}>[Ihre Qualifikationen]</h2>
         <div className="grid-container" style={styles.grid}>
           <div style={styles.card}>
-            <h3 style={styles.cardTitle}>Ausbildung</h3>
+            <h3 style={styles.cardTitle}>[Qualifikation 1]</h3>
             <p style={styles.cardText}>
-              • Diplom in Psychologie<br />
-              • Systemischer Coach (DVCT zertifiziert)<br />
-              • NLP Master Practitioner<br />
-              • Transaktionsanalyse Grundausbildung
+              • [Abschluss 1]<br />
+              • [Zertifizierung 1]<br />
+              • [Zertifizierung 2]<br />
+              • [Weiterbildung 1]
             </p>
           </div>
 
           <div style={styles.card}>
-            <h3 style={styles.cardTitle}>Weiterbildungen</h3>
+            <h3 style={styles.cardTitle}>[Qualifikation 2]</h3>
             <p style={styles.cardText}>
-              • Gewaltfreie Kommunikation<br />
-              • Achtsamkeitsbasierte Stressreduktion<br />
-              • Organisationsentwicklung<br />
-              • Trauma-informierte Beratung
+              • [Weiterbildung 1]<br />
+              • [Weiterbildung 2]<br />
+              • [Weiterbildung 3]<br />
+              • [Weiterbildung 4]
             </p>
           </div>
 
           <div style={styles.card}>
-            <h3 style={styles.cardTitle}>Mitgliedschaften</h3>
+            <h3 style={styles.cardTitle}>[Qualifikation 3]</h3>
             <p style={styles.cardText}>
-              • Deutscher Verband für Coaching und Training<br />
-              • Berufsverband für Beratung und Coaching<br />
-              • Systemische Gesellschaft<br />
-              • Internationale Coach Federation
+              • [Mitgliedschaft 1]<br />
+              • [Mitgliedschaft 2]<br />
+              • [Mitgliedschaft 3]<br />
+              • [Mitgliedschaft 4]
             </p>
           </div>
 
           <div style={styles.card}>
-            <h3 style={styles.cardTitle}>Erfahrung</h3>
+            <h3 style={styles.cardTitle}>[Qualifikation 4]</h3>
             <p style={styles.cardText}>
-              • 15+ Jahre Coaching-Erfahrung<br />
-              • 200+ erfolgreiche Beratungsprozesse<br />
-              • Workshops für Unternehmen<br />
-              • Supervision und Coaching-Ausbildung
+              • [X]+ Jahre Erfahrung<br />
+              • [X]+ erfolgreiche Projekte<br />
+              • [Leistung 1]<br />
+              • [Leistung 2]
             </p>
           </div>
         </div>
       </section>
 
       <section className="section-padding" style={styles.section}>
-        <h2 style={styles.sectionTitle}>Mein Ansatz</h2>
+        <h2 style={styles.sectionTitle}>[Ihr Ansatz]</h2>
         <p style={styles.sectionContent}>
-          Meine Arbeit basiert auf der Überzeugung, dass jeder Mensch bereits alle 
-          Ressourcen in sich trägt, die er für positive Veränderungen benötigt. 
-          Als Coach sehe ich mich als <span style={styles.highlight}>Wegbegleiterin</span>, 
-          die dabei hilft, diese Ressourcen zu entdecken und zu aktivieren.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
+          quis nostrud <span style={styles.highlight}>[Ihre Rolle]</span> 
+          exercitation ullamco laboris nisi ut aliquip ex ea commodo.
         </p>
         <p style={styles.sectionContent}>
-          Ich arbeite systemisch, lösungsorientiert und immer mit dem Fokus auf die 
-          individuellen Bedürfnisse meiner Klienten. Dabei verbinde ich bewährte 
-          Coaching-Methoden mit modernen Erkenntnissen aus der Neurowissenschaft 
-          und Positiven Psychologie.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
+          quis nostrud exercitation ullamco laboris nisi ut aliquip.
         </p>
         <p style={styles.sectionContent}>
-          Besonders wichtig ist mir ein Umfeld des Vertrauens und der Wertschätzung, 
-          in dem sich Menschen öffnen und wachsen können. Authentizität, Empathie 
-          und professionelle Kompetenz bilden das Fundament meiner Arbeit.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
+          quis nostrud exercitation ullamco laboris.
         </p>
       </section>
 
       <section className="section-padding" style={styles.section}>
-        <h2 style={styles.sectionTitle}>Persönliches</h2>
+        <h2 style={styles.sectionTitle}>[Persönliches]</h2>
         <p style={styles.sectionContent}>
-          Wenn ich nicht in meiner Praxis bin, finde ich Ausgleich und Inspiration 
-          in der Natur. Wandern, Yoga und Meditation sind nicht nur private 
-          Leidenschaften, sondern fließen auch in meine professionelle Arbeit ein.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. [Hobbys] sunt in culpa 
+          qui officia deserunt mollit anim id est laborum.
         </p>
         <p style={styles.sectionContent}>
-          Als Mutter von zwei Kindern kenne ich die Herausforderungen des Alltags 
-          und die Kunst des Gleichgewichts zwischen verschiedenen Lebensbereichen. 
-          Diese persönlichen Erfahrungen bereichern meine Arbeit und helfen mir, 
-          authentisch und nahbar zu bleiben.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit [persönliche Details], 
+          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad 
+          minim veniam, quis nostrud exercitation ullamco laboris.
         </p>
         <p style={styles.sectionContent}>
-          Ich glaube fest daran, dass Wachstum ein lebenslanger Prozess ist. 
-          Deshalb investiere ich kontinuierlich in meine eigene Weiterentwicklung 
-          und nehme regelmäßig an Supervisionen und Fortbildungen teil.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. [Philosophie] 
+          exercitation ullamco laboris nisi ut aliquip.
         </p>
       </section>
 
       <div style={styles.ctaSection}>
         <h2 style={styles.sectionTitle}>Lassen Sie uns kennenlernen</h2>
         <p style={styles.sectionContent}>
-          Haben Sie Fragen zu meiner Arbeitsweise oder möchten Sie mehr über 
-          meine Angebote erfahren? Ich freue mich auf ein persönliches Gespräch.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua.
         </p>
         <Link 
           to="/preview/coaching" 

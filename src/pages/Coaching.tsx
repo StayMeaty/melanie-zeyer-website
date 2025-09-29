@@ -253,105 +253,105 @@ const Coaching: React.FC = () => {
 
   const services = [
     {
-      icon: '👤',
-      title: 'Einzelcoaching',
-      description: 'Individuelle Begleitung für persönliche und berufliche Herausforderungen. Vertraulich, intensiv und ganz auf Ihre Bedürfnisse zugeschnitten.',
+      icon: '📋',
+      title: 'Coaching Paket 1',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
       features: [
-        'Persönliche 1:1 Sitzungen',
-        'Flexible Termingestaltung',
-        'Individuelle Methoden und Ansätze',
-        'Begleitende Materialien',
-        'Follow-up Sessions nach Bedarf'
+        'Feature 1 Lorem ipsum',
+        'Feature 2 Lorem ipsum',
+        'Feature 3 Lorem ipsum',
+        'Feature 4 Lorem ipsum',
+        'Feature 5 Lorem ipsum'
       ],
-      price: 'Ab 120€ pro Sitzung'
+      price: '[Preis] pro [Einheit]'
     },
     {
-      icon: '👥',
-      title: 'Team Coaching',
-      description: 'Stärken Sie Ihr Team durch professionelle Begleitung bei Veränderungsprozessen, Konfliktlösung und Teambildung.',
+      icon: '📊',
+      title: 'Coaching Paket 2',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
       features: [
-        'Teamdynamik-Analyse',
-        'Kommunikationsverbesserung',
-        'Konfliktlösung im Team',
-        'Zielfindung und -erreichung',
-        'Nachhaltige Strategien'
+        'Feature 1 Lorem ipsum',
+        'Feature 2 Lorem ipsum',
+        'Feature 3 Lorem ipsum',
+        'Feature 4 Lorem ipsum',
+        'Feature 5 Lorem ipsum'
       ],
-      price: 'Individuelles Angebot'
+      price: '[Individueller Preis]'
     },
     {
-      icon: '🏢',
-      title: 'Business Coaching',
-      description: 'Führungskräfte-Coaching und Organisationsentwicklung für nachhaltigen Unternehmenserfolg und zufriedene Mitarbeiter.',
+      icon: '📈',
+      title: 'Coaching Paket 3',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
       features: [
-        'Führungskompetenz entwickeln',
-        'Change Management',
-        'Strategische Planung',
-        'Mitarbeitermotivation',
-        'Unternehmenskultur gestalten'
+        'Feature 1 Lorem ipsum',
+        'Feature 2 Lorem ipsum',
+        'Feature 3 Lorem ipsum',
+        'Feature 4 Lorem ipsum',
+        'Feature 5 Lorem ipsum'
       ],
-      price: 'Ab 150€ pro Sitzung'
+      price: '[Preis] pro [Einheit]'
     },
     {
       icon: '🎯',
-      title: 'Zielerreichungs-Coaching',
-      description: 'Systematische Begleitung auf dem Weg zu Ihren wichtigsten Lebens- und Karrierezielen mit bewährten Coaching-Methoden.',
+      title: 'Coaching Paket 4',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
       features: [
-        'Klare Zieldefinition',
-        'Strategische Planung',
-        'Hindernisse überwinden',
-        'Motivation aufrechterhalten',
-        'Erfolg messbar machen'
+        'Feature 1 Lorem ipsum',
+        'Feature 2 Lorem ipsum',
+        'Feature 3 Lorem ipsum',
+        'Feature 4 Lorem ipsum',
+        'Feature 5 Lorem ipsum'
       ],
-      price: 'Paket ab 600€'
+      price: '[Paket Preis]'
     },
     {
-      icon: '🌱',
-      title: 'Persönlichkeitsentwicklung',
-      description: 'Entdecken Sie Ihr volles Potenzial und entwickeln Sie eine starke, authentische Persönlichkeit für alle Lebensbereiche.',
+      icon: '💡',
+      title: 'Coaching Paket 5',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
       features: [
-        'Selbstreflexion und -erkenntnis',
-        'Stärken identifizieren',
-        'Selbstvertrauen aufbauen',
-        'Authentizität entwickeln',
-        'Lebensqualität verbessern'
+        'Feature 1 Lorem ipsum',
+        'Feature 2 Lorem ipsum',
+        'Feature 3 Lorem ipsum',
+        'Feature 4 Lorem ipsum',
+        'Feature 5 Lorem ipsum'
       ],
-      price: 'Ab 100€ pro Sitzung'
+      price: '[Preis] pro [Einheit]'
     },
     {
-      icon: '⚖️',
-      title: 'Work-Life-Balance',
-      description: 'Finden Sie das richtige Gleichgewicht zwischen Beruf, Familie und persönlichen Bedürfnissen für ein erfülltes Leben.',
+      icon: '⚡',
+      title: 'Coaching Paket 6',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
       features: [
-        'Prioritäten klären',
-        'Zeitmanagement optimieren',
-        'Grenzen setzen lernen',
-        'Stress reduzieren',
-        'Lebenszufriedenheit steigern'
+        'Feature 1 Lorem ipsum',
+        'Feature 2 Lorem ipsum',
+        'Feature 3 Lorem ipsum',
+        'Feature 4 Lorem ipsum',
+        'Feature 5 Lorem ipsum'
       ],
-      price: 'Paket ab 450€'
+      price: '[Paket Preis]'
     }
   ];
 
   const processSteps = [
     {
       number: '1',
-      title: 'Erstgespräch',
-      description: 'Kostenloses 30-minütiges Kennenlerngespräch zum Klären Ihrer Anliegen und Ziele.'
+      title: 'Schritt 1',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
     },
     {
       number: '2',
-      title: 'Auftragsklärung',
-      description: 'Gemeinsame Definition der Coaching-Ziele und des passenden Vorgehens.'
+      title: 'Schritt 2',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
     },
     {
       number: '3',
-      title: 'Coaching-Prozess',
-      description: 'Regelmäßige Sitzungen mit bewährten Methoden und individueller Begleitung.'
+      title: 'Schritt 3',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
     },
     {
       number: '4',
-      title: 'Integration',
-      description: 'Nachhaltiges Verankern der Erkenntnisse und Veränderungen im Alltag.'
+      title: 'Schritt 4',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
     }
   ];
 
@@ -364,16 +364,16 @@ const Coaching: React.FC = () => {
           Coaching & Beratung
         </h1>
         <p style={styles.subtitle}>
-          Professionelle Begleitung für Ihre persönliche und berufliche Entwicklung. 
-          Entdecken Sie Ihr Potenzial und erreichen Sie Ihre Ziele.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua.
         </p>
       </section>
 
       <section className="section-padding" style={styles.section}>
-        <h2 style={styles.sectionTitle}>Meine Coaching-Angebote</h2>
+        <h2 style={styles.sectionTitle}>[Coaching] Angebote</h2>
         <p style={styles.sectionContent}>
-          Jeder Mensch ist einzigartig - deshalb gestalte ich jeden Coaching-Prozess 
-          individuell und passend zu Ihren spezifischen Bedürfnissen und Zielen.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua.
         </p>
         
         <div className="grid-container" style={styles.grid}>
@@ -434,9 +434,9 @@ const Coaching: React.FC = () => {
       </section>
 
       <div style={styles.processSection}>
-        <h2 style={styles.sectionTitle}>Wie läuft ein Coaching ab?</h2>
+        <h2 style={styles.sectionTitle}>Wie läuft [Service] ab?</h2>
         <p style={styles.sectionContent}>
-          Ein strukturierter Prozess für nachhaltige Veränderungen
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit
         </p>
         
         <div className="process-grid" style={styles.processGrid}>
@@ -451,43 +451,40 @@ const Coaching: React.FC = () => {
       </div>
 
       <section className="section-padding" style={styles.section}>
-        <h2 style={styles.sectionTitle}>Warum Coaching mit mir?</h2>
+        <h2 style={styles.sectionTitle}>Warum [Service] mit [uns]?</h2>
         <p style={styles.sectionContent}>
-          Als systemischer Coach mit über 15 Jahren Erfahrung bringe ich eine 
-          einzigartige Kombination aus fachlicher Kompetenz, menschlicher Wärme 
-          und bewährten Methoden mit. Mein Fokus liegt darauf, Sie dabei zu unterstützen, 
-          Ihre eigenen Lösungen zu finden und nachhaltige Veränderungen zu bewirken.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. [X] Jahren Erfahrung 
+          ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
         </p>
         <p style={styles.sectionContent}>
-          Ich arbeite ressourcenorientiert, lösungsfokussiert und immer mit dem 
-          Respekt vor Ihrer Autonomie und Ihren individuellen Werten. Vertraulichkeit, 
-          Professionalität und eine vertrauensvolle Atmosphäre sind die Grundlage 
-          unserer Zusammenarbeit.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
+          quis nostrud exercitation ullamco laboris nisi ut aliquip.
         </p>
       </section>
 
       <div style={styles.contactSection}>
         <h2 style={styles.contactTitle}>
-          Bereit für den ersten Schritt?
+          Bereit für [Call-to-Action]?
         </h2>
         <p style={styles.contactText}>
-          Ich freue mich darauf, Sie kennenzulernen und gemeinsam herauszufinden, 
-          wie ich Sie auf Ihrem Weg unterstützen kann. Vereinbaren Sie noch heute 
-          Ihr kostenloses Erstgespräch.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
         </p>
         
         <div className="contact-info" style={styles.contactInfo}>
           <div style={styles.contactItem}>
             <div style={styles.contactLabel}>E-Mail</div>
-            <div style={styles.contactValue}>kontakt@melaniezeyer.de</div>
+            <div style={styles.contactValue}>[email@domain.de]</div>
           </div>
           <div style={styles.contactItem}>
             <div style={styles.contactLabel}>Telefon</div>
-            <div style={styles.contactValue}>+49 (0) 123 456 789</div>
+            <div style={styles.contactValue}>[Telefonnummer]</div>
           </div>
           <div style={styles.contactItem}>
-            <div style={styles.contactLabel}>Erstgespräch</div>
-            <div style={styles.contactValue}>Kostenlos & unverbindlich</div>
+            <div style={styles.contactLabel}>[Service]</div>
+            <div style={styles.contactValue}>[Details & Konditionen]</div>
           </div>
         </div>
         

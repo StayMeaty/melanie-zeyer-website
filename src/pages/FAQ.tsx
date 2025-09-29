@@ -181,87 +181,35 @@ const FAQ: React.FC = () => {
   `;
 
   const faqData: FAQItem[] = [
-    // Allgemeine Fragen
     {
-      category: 'Allgemeine Fragen',
-      question: 'Was ist der Unterschied zwischen Coaching und Therapie?',
-      answer: 'Coaching ist zukunftsorientiert und fokussiert sich auf die Erreichung spezifischer Ziele. Während Therapie oft traumatische Erfahrungen oder psychische Erkrankungen behandelt, arbeitet Coaching mit gesunden Menschen, die ihre Potenziale entfalten und konkrete Veränderungen erreichen möchten. Als Coach gebe ich keine Ratschläge, sondern helfe Ihnen dabei, Ihre eigenen Lösungen zu finden.'
+      category: 'Häufige Fragen',
+      question: 'Häufige Frage 1?',
+      answer: 'Antwort zu Frage 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.'
     },
     {
-      category: 'Allgemeine Fragen',
-      question: 'Wie lange dauert ein Coaching-Prozess?',
-      answer: 'Die Dauer variiert je nach Ihren Zielen und der Komplexität des Themas. Ein typischer Coaching-Prozess umfasst 6-12 Sitzungen über einen Zeitraum von 3-6 Monaten. Manche Anliegen können bereits in wenigen Sitzungen bearbeitet werden, während andere eine längere Begleitung benötigen. Wir besprechen dies ausführlich in unserem Erstgespräch.'
+      category: 'Häufige Fragen',
+      question: 'Häufige Frage 2?',
+      answer: 'Antwort zu Frage 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.'
     },
     {
-      category: 'Allgemeine Fragen',
-      question: 'Kann Coaching auch online stattfinden?',
-      answer: 'Ja, ich biete sowohl Präsenz- als auch Online-Coaching an. Online-Coaching über Videokonferenz ist genauso effektiv wie persönliche Treffen und bietet mehr Flexibilität. Sie können bequem von zu Hause oder Ihrem Büro aus teilnehmen. Die technischen Voraussetzungen sind minimal - Sie benötigen lediglich eine stabile Internetverbindung und ein Gerät mit Kamera und Mikrofon.'
-    },
-    {
-      category: 'Allgemeine Fragen',
-      question: 'Für wen ist Coaching geeignet?',
-      answer: 'Coaching ist für alle Menschen geeignet, die Veränderungen in ihrem Leben bewirken möchten - sei es beruflich oder privat. Ob Sie vor einer wichtigen Entscheidung stehen, Ihre Kommunikation verbessern möchten, berufliche Ziele verfolgen oder Ihre Work-Life-Balance optimieren wollen - Coaching unterstützt Sie dabei, Klarheit zu gewinnen und erfolgreich zu handeln.'
-    },
-
-    // Praktische Fragen
-    {
-      category: 'Praktische Fragen',
-      question: 'Wie viel kostet eine Coaching-Sitzung?',
-      answer: 'Die Kosten variieren je nach Art des Coachings. Einzelsitzungen beginnen bei 100€ für Persönlichkeitsentwicklung und 120€ für Business Coaching. Für Pakete und längerfristige Begleitung biete ich attraktive Konditionen. Das Erstgespräch (30 Minuten) ist immer kostenlos und unverbindlich, damit wir uns kennenlernen und klären können, ob die Chemie stimmt.'
+      category: 'Häufige Fragen',
+      question: 'Häufige Frage 3?',
+      answer: 'Antwort zu Frage 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
     },
     {
       category: 'Praktische Fragen',
-      question: 'Wie lange dauert eine Coaching-Sitzung?',
-      answer: 'Eine reguläre Coaching-Sitzung dauert 90 Minuten. Diese Zeit ermöglicht es, tief in Themen einzusteigen und nachhaltige Erkenntnisse zu entwickeln. Für spezielle Anliegen oder Intensiv-Sessions können wir auch längere Termine vereinbaren. Das kostenlose Erstgespräch dauert 30 Minuten.'
+      question: 'Praktische Frage 1?',
+      answer: 'Antwort zu praktischer Frage 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
     },
     {
       category: 'Praktische Fragen',
-      question: 'Wie häufig finden die Termine statt?',
-      answer: 'Typischerweise finden Coaching-Sitzungen alle 2-3 Wochen statt. Dieser Rhythmus ermöglicht es Ihnen, zwischen den Terminen an Ihren Themen zu arbeiten und neue Erkenntnisse zu integrieren. Je nach Intensität Ihres Anliegens können wir auch wöchentliche Termine oder längere Abstände vereinbaren.'
+      question: 'Praktische Frage 2?',
+      answer: 'Antwort zu praktischer Frage 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.'
     },
     {
-      category: 'Praktische Fragen',
-      question: 'Kann ich einen Termin absagen oder verschieben?',
-      answer: 'Ja, Termine können bis 24 Stunden vor dem vereinbarten Zeitpunkt kostenfrei verschoben werden. Bei kurzfristigeren Absagen (unter 24 Stunden) berechne ich eine Ausfallgebühr von 50% des Sitzungspreises, da der Termin nicht mehr anderweitig vergeben werden kann. In Notfällen finden wir immer eine kulante Lösung.'
-    },
-
-    // Über den Prozess
-    {
-      category: 'Über den Coaching-Prozess',
-      question: 'Wie läuft das erste Gespräch ab?',
-      answer: 'Das kostenlose Erstgespräch dient dem gegenseitigen Kennenlernen. Wir sprechen über Ihr Anliegen, Ihre Ziele und klären, ob Coaching der richtige Weg für Sie ist. Ich erkläre Ihnen meine Arbeitsweise und Sie können alle Fragen stellen, die Sie haben. Erst wenn Sie sich wohlfühlen und überzeugt sind, vereinbaren wir weitere Termine.'
-    },
-    {
-      category: 'Über den Coaching-Prozess',
-      question: 'Welche Methoden verwenden Sie?',
-      answer: 'Ich arbeite systemisch und integrativ, das heißt ich kombiniere verschiedene bewährte Methoden je nach Ihrem Bedarf: systemische Fragetechniken, NLP, Transaktionsanalyse, Achtsamkeitsübungen und ressourcenorientierte Ansätze. Wichtig ist mir, dass die Methoden zu Ihnen passen - wir besprechen gemeinsam, was für Sie stimmig ist.'
-    },
-    {
-      category: 'Über den Coaching-Prozess',
-      question: 'Ist alles vertraulich?',
-      answer: 'Absolut. Alles was in unseren Sitzungen besprochen wird, unterliegt der vollständigen Vertraulichkeit. Ich bin an die Schweigepflicht gebunden und gebe ohne Ihre ausdrückliche Zustimmung keinerlei Informationen weiter. Diese Vertraulichkeit ist die Grundlage für eine vertrauensvolle Zusammenarbeit.'
-    },
-    {
-      category: 'Über den Coaching-Prozess',
-      question: 'Was passiert zwischen den Sitzungen?',
-      answer: 'Zwischen den Sitzungen bekommen Sie oft kleine "Hausaufgaben" oder Reflexionsfragen mit, die Ihnen helfen, das Besprochene zu vertiefen und in Ihren Alltag zu integrieren. Dies können Beobachtungsaufgaben, neue Verhaltensweisen oder Reflexionsübungen sein. Sie bestimmen selbst, wie intensiv Sie zwischen den Terminen arbeiten möchten.'
-    },
-
-    // Erfolgschancen
-    {
-      category: 'Erfolgschancen',
-      question: 'Wie hoch sind die Erfolgschancen?',
-      answer: 'Der Erfolg hängt maßgeblich von Ihrer Motivation und Bereitschaft zur Veränderung ab. Coaching ist ein aktiver Prozess, bei dem Sie selbst die Hauptarbeit leisten. Bei entsprechender Mitarbeit erreichen die meisten meiner Klienten ihre Ziele oder kommen ihnen deutlich näher. Wichtig ist, dass die Ziele realistisch und von Ihnen selbst bestimmt sind.'
-    },
-    {
-      category: 'Erfolgschancen',
-      question: 'Was passiert, wenn das Coaching nicht den gewünschten Erfolg bringt?',
-      answer: 'Sollten Sie nach einigen Sitzungen das Gefühl haben, dass wir nicht vorankommen, besprechen wir dies offen. Manchmal braucht es eine Anpassung der Methoden oder Ziele. In seltenen Fällen kann es auch sinnvoll sein, das Coaching zu beenden oder Sie an einen Kollegen zu verweisen. Ihr Erfolg steht für mich im Mittelpunkt.'
-    },
-    {
-      category: 'Erfolgschancen',
-      question: 'Kann ich jederzeit aufhören?',
-      answer: 'Selbstverständlich. Coaching ist ein freiwilliger Prozess und Sie können jederzeit entscheiden, ihn zu beenden. Es gibt keine langfristigen Vertragsbindungen. Wir arbeiten von Termin zu Termin und Sie entscheiden nach jeder Sitzung, ob Sie weitermachen möchten. Ein offenes Abschlussgespräch ist dabei immer sinnvoll.'
+      category: 'Service Fragen',
+      question: 'Service Frage 1?',
+      answer: 'Antwort zu Service Frage 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
     }
   ];
 
@@ -284,8 +232,8 @@ const FAQ: React.FC = () => {
           Häufig gestellte Fragen
         </h1>
         <p style={styles.subtitle}>
-          Hier finden Sie Antworten auf die wichtigsten Fragen rund um Coaching 
-          und meine Arbeitsweise. Sollten Sie weitere Fragen haben, kontaktieren Sie mich gerne.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua.
         </p>
       </section>
 
@@ -355,9 +303,8 @@ const FAQ: React.FC = () => {
           Noch Fragen offen?
         </h2>
         <p style={styles.contactText}>
-          Falls Sie hier nicht die Antwort auf Ihre Frage gefunden haben, 
-          kontaktieren Sie mich gerne direkt. Ich nehme mir gerne Zeit für 
-          ein persönliches Gespräch und beantworte alle Ihre Fragen ausführlich.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
         </p>
         
         <Link
@@ -376,8 +323,8 @@ const FAQ: React.FC = () => {
         </Link>
         
         <div style={{ marginTop: '2rem', fontSize: '1rem' }}>
-          <strong>E-Mail:</strong> kontakt@melaniezeyer.de<br />
-          <strong>Telefon:</strong> +49 (0) 123 456 789
+          <strong>E-Mail:</strong> [email@domain.de]<br />
+          <strong>Telefon:</strong> [Telefonnummer]
         </div>
       </div>
     </>

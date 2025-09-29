@@ -121,12 +121,12 @@ const Startseite: React.FC = () => {
       
       <section className="hero-section" style={styles.hero}>
         <h1 style={styles.title}>
-          Willkommen bei Melanie Zeyer
+          Willkommen bei [Ihr Name]
         </h1>
         <p style={styles.subtitle}>
           Ihre Expertin für professionelle Beratung, individuelles Coaching und 
-          transformative Persönlichkeitsentwicklung. Entdecken Sie Ihr volles Potenzial 
-          und erreichen Sie Ihre Ziele mit maßgeschneiderten Lösungen.
+          transformative Persönlichkeitsentwicklung. Lorem ipsum dolor sit amet, 
+          consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.
         </p>
         <Link 
           to="/preview/coaching" 
@@ -146,13 +146,13 @@ const Startseite: React.FC = () => {
 
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>
-          Warum Melanie Zeyer?
+          Warum [Ihr Name]?
         </h2>
         <p style={styles.sectionContent}>
-          Mit über 15 Jahren Erfahrung in der Beratung und einem tiefen Verständnis 
+          Mit über [X] Jahren Erfahrung in der Beratung und einem tiefen Verständnis 
           für menschliche Entwicklungsprozesse begleite ich Sie auf Ihrem Weg zu 
-          persönlichem und beruflichem Erfolg. Mein ganzheitlicher Ansatz kombiniert 
-          bewährte Methoden mit innovativen Strategien.
+          persönlichem und beruflichem Erfolg. Lorem ipsum dolor sit amet, consectetur 
+          adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </p>
       </section>
 
@@ -173,10 +173,10 @@ const Startseite: React.FC = () => {
               e.currentTarget.style.boxShadow = 'none';
             }}
           >
-            <h3 style={styles.cardTitle}>Einzelcoaching</h3>
+            <h3 style={styles.cardTitle}>Service 1</h3>
             <p style={styles.cardText}>
-              Individuelle Begleitung bei persönlichen Herausforderungen, 
-              Zielfindung und Persönlichkeitsentwicklung.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+              Sed do eiusmod tempor incididunt ut labore et dolore.
             </p>
             <Link 
               to="/preview/coaching" 
@@ -204,10 +204,10 @@ const Startseite: React.FC = () => {
               e.currentTarget.style.boxShadow = 'none';
             }}
           >
-            <h3 style={styles.cardTitle}>Kurse & Workshops</h3>
+            <h3 style={styles.cardTitle}>Service 2</h3>
             <p style={styles.cardText}>
-              Praxisorientierte Weiterbildungen zu verschiedenen Themen der 
-              Persönlichkeitsentwicklung und Lebensgestaltung.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+              Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </p>
             <Link 
               to="/preview/kurse" 
@@ -235,10 +235,10 @@ const Startseite: React.FC = () => {
               e.currentTarget.style.boxShadow = 'none';
             }}
           >
-            <h3 style={styles.cardTitle}>Business Coaching</h3>
+            <h3 style={styles.cardTitle}>Service 3</h3>
             <p style={styles.cardText}>
-              Professionelle Unterstützung für Führungskräfte und Teams in 
-              Veränderungsprozessen und Organisationsentwicklung.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+              Sed do eiusmod tempor incididunt ut labore et dolore magna.
             </p>
             <Link 
               to="/preview/coaching" 
@@ -261,9 +261,9 @@ const Startseite: React.FC = () => {
           Bereit für Veränderung?
         </h2>
         <p style={styles.sectionContent}>
-          Jeder Weg beginnt mit dem ersten Schritt. Lassen Sie uns gemeinsam 
-          herausfinden, wie Sie Ihre Ziele erreichen können. Vereinbaren Sie 
-          noch heute ein kostenloses Erstgespräch.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod 
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim 
+          veniam, quis nostrud exercitation ullamco laboris.
         </p>
         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
           <Link 

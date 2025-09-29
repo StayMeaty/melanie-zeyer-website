@@ -102,40 +102,40 @@ const Impressum: React.FC = () => {
       <div style={styles.contactInfo}>
         <h2 style={styles.contactTitle}>Angaben gemäß § 5 TMG</h2>
         <div style={styles.contactDetails}>
-          <strong style={styles.strong}>Melanie Zeyer</strong><br />
-          Beratung & Coaching<br />
+          <strong style={styles.strong}>[Vollständiger Name]</strong><br />
+          [Geschäftsbezeichnung]<br />
           <br />
-          Musterstraße 123<br />
-          12345 Musterstadt<br />
+          [Straße und Hausnummer]<br />
+          [PLZ Stadt]<br />
           Deutschland<br />
           <br />
-          <strong style={styles.strong}>Telefon:</strong> +49 (0) 123 456 789<br />
-          <strong style={styles.strong}>E-Mail:</strong> <a href="mailto:kontakt@melaniezeyer.de" style={styles.link}>kontakt@melaniezeyer.de</a><br />
-          <strong style={styles.strong}>Website:</strong> <a href="https://www.melaniezeyer.de" style={styles.link}>www.melaniezeyer.de</a>
+          <strong style={styles.strong}>Telefon:</strong> [Telefonnummer]<br />
+          <strong style={styles.strong}>E-Mail:</strong> <a href="mailto:[email@domain.de]" style={styles.link}>[email@domain.de]</a><br />
+          <strong style={styles.strong}>Website:</strong> <a href="https://[www.domain.de]" style={styles.link}>[www.domain.de]</a>
         </div>
       </div>
 
       <section className="section-padding" style={styles.section}>
         <h2 style={styles.sectionTitle}>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
         <p style={styles.sectionContent}>
-          Melanie Zeyer<br />
-          Musterstraße 123<br />
-          12345 Musterstadt
+          [Vollständiger Name]<br />
+          [Straße und Hausnummer]<br />
+          [PLZ Stadt]
         </p>
       </section>
 
       <section className="section-padding" style={styles.section}>
         <h2 style={styles.sectionTitle}>Berufliche Qualifikationen</h2>
         <p style={styles.sectionContent}>
-          <strong style={styles.strong}>Ausbildung:</strong> Diplom-Psychologin<br />
-          <strong style={styles.strong}>Zertifizierung:</strong> Systemischer Coach (DVCT)<br />
-          <strong style={styles.strong}>Weitere Qualifikationen:</strong> NLP Master Practitioner, Transaktionsanalyse
+          <strong style={styles.strong}>Ausbildung:</strong> [Ausbildung/Studium]<br />
+          <strong style={styles.strong}>Zertifizierung:</strong> [Zertifizierung 1]<br />
+          <strong style={styles.strong}>Weitere Qualifikationen:</strong> [Qualifikation 1], [Qualifikation 2]
         </p>
         <p style={styles.sectionContent}>
           <strong style={styles.strong}>Mitgliedschaften:</strong><br />
-          • Deutscher Verband für Coaching und Training (DVCT)<br />
-          • Berufsverband für Beratung und Coaching e.V.<br />
-          • Systemische Gesellschaft (SG)
+          • [Verband/Organisation 1]<br />
+          • [Verband/Organisation 2]<br />
+          • [Verband/Organisation 3]
         </p>
       </section>
 
@@ -207,22 +207,22 @@ const Impressum: React.FC = () => {
       </section>
 
       <section className="section-padding" style={styles.section}>
-        <h2 style={styles.sectionTitle}>Coaching-Hinweise</h2>
+        <h2 style={styles.sectionTitle}>[Service] Hinweise</h2>
         <p style={styles.sectionContent}>
-          <strong style={styles.strong}>Wichtiger Hinweis:</strong> Coaching ersetzt keine Psychotherapie 
-          oder medizinische Behandlung. Es richtet sich an gesunde Menschen, die ihre Potenziale entfalten 
-          und konkrete Ziele erreichen möchten.
+          <strong style={styles.strong}>Wichtiger Hinweis:</strong> [Service] ersetzt keine professionelle 
+          medizinische oder psychologische Behandlung. Lorem ipsum dolor sit amet, consectetur 
+          adipiscing elit, sed do eiusmod tempor incididunt.
         </p>
         <p style={styles.sectionContent}>
-          Bei psychischen Erkrankungen, Depressionen oder anderen behandlungsbedürftigen Störungen empfehle 
-          ich Ihnen, sich an einen Arzt oder Psychotherapeuten zu wenden. Coaching kann eine solche Behandlung 
-          nicht ersetzen, sondern höchstens begleitend eingesetzt werden.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud 
+          exercitation ullamco laboris nisi ut aliquip.
         </p>
         
         <div style={styles.disclaimer}>
-          <strong>Schweigepflicht:</strong> Alle Inhalte unserer Coaching-Gespräche unterliegen der 
-          vollständigen Verschwiegenheit. Als Mitglied des DVCT bin ich zur Einhaltung der ethischen 
-          Richtlinien und zur Schweigepflicht verpflichtet.
+          <strong>Schweigepflicht:</strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+          [Berufsverband] sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+          Vertraulichkeit und ethische Richtlinien.
         </div>
       </section>
 
@@ -241,9 +241,9 @@ const Impressum: React.FC = () => {
       </section>
 
       <div style={styles.disclaimer}>
-        <strong>Stand des Impressums:</strong> September 2024<br />
+        <strong>Stand des Impressums:</strong> [Datum]<br />
         Änderungen vorbehalten. Bei Fragen zum Impressum oder Datenschutz kontaktieren Sie uns gerne 
-        unter <a href="mailto:kontakt@melaniezeyer.de" style={styles.link}>kontakt@melaniezeyer.de</a>
+        unter <a href="mailto:[email@domain.de]" style={styles.link}>[email@domain.de]</a>
       </div>
     </>
   );
