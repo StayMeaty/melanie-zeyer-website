@@ -30,14 +30,14 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
 
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
-    height: window.innerHeight,
+    height: Math.max(window.innerHeight * 2, document.body.scrollHeight),
   });
 
   // Handle window resize
   const handleResize = useCallback(() => {
     setDimensions({
       width: window.innerWidth,
-      height: window.innerHeight,
+      height: Math.max(window.innerHeight * 2, document.body.scrollHeight),
     });
   }, []);
 
@@ -53,7 +53,7 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
   const createAmbientParticle = useCallback((): Particle => {
     const size = 2 + Math.random() * 11.2; // Max size reduced by 20% (was 16px, now 13.2px)
     const x = Math.random() * dimensions.width;
-    const y = Math.random() * dimensions.height;
+    const y = Math.random() * Math.min(dimensions.height, window.innerHeight * 1.5); // Limit initial spawn area
     const floatAngle = Math.random() * Math.PI * 2;
     const floatSpeed = 0.1 + Math.random() * 0.2;
 
@@ -310,13 +310,13 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
       aria-hidden="true"
       role="presentation"
       style={{
-        position: 'fixed',
+        position: 'absolute',
         top: 0,
         left: 0,
         width: '100%',
-        height: '100%',
+        minHeight: '200vh', // Make canvas tall enough for scrolling
         pointerEvents: 'none',
-        zIndex: 1,
+        zIndex: -1, // Lowest z-index so particles are always behind content
       }}
       width={dimensions.width}
       height={dimensions.height}

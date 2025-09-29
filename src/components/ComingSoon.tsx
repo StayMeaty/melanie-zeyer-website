@@ -33,11 +33,9 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
 
     updateLogoPosition();
     window.addEventListener('resize', updateLogoPosition);
-    window.addEventListener('scroll', updateLogoPosition);
     
     return () => {
       window.removeEventListener('resize', updateLogoPosition);
-      window.removeEventListener('scroll', updateLogoPosition);
     };
   }, []);
 
