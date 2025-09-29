@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { APP_CONFIG } from '../types';
 import Logo from './Logo';
 import ParticleEffect from './ParticleEffect';
+import SparkleButton from './SparkleButton';
 
 interface ComingSoonProps {
   title?: string;
@@ -15,9 +16,7 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
   showLogo = true
 }) => {
   const logoRef = useRef<HTMLDivElement>(null);
-  const accentRef = useRef<HTMLDivElement>(null);
   const [logoPosition, setLogoPosition] = useState({ x: 0, y: 0 });
-  const [accentTransform, setAccentTransform] = useState({ x: 0, y: 0 });
 
   // Update logo position for particle effect
   useEffect(() => {
@@ -37,37 +36,6 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
     return () => {
       window.removeEventListener('resize', updateLogoPosition);
     };
-  }, []);
-
-  // Handle mouse movement for accent element
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (accentRef.current) {
-        const rect = accentRef.current.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        
-        // Calculate distance from mouse to element center
-        const deltaX = e.clientX - centerX;
-        const deltaY = e.clientY - centerY;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        const maxDistance = 200;
-        
-        // Only apply transform if mouse is within range
-        if (distance < maxDistance) {
-          const factor = (1 - distance / maxDistance) * 0.2;
-          setAccentTransform({
-            x: deltaX * factor,
-            y: deltaY * factor
-          });
-        } else {
-          setAccentTransform({ x: 0, y: 0 });
-        }
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
   const styles: Record<string, React.CSSProperties> = {
     container: {
@@ -102,20 +70,6 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
       textAlign: 'center',
       maxWidth: '600px',
       lineHeight: '1.5',
-    },
-    accent: {
-      display: 'inline-block',
-      padding: '1rem 2rem',
-      backgroundColor: APP_CONFIG.colors.accent,
-      borderRadius: '0.75rem',
-      marginTop: '2rem',
-      color: '#333',
-      fontSize: '1.25rem',
-      fontWeight: '600',
-      boxShadow: '0 4px 16px rgba(232, 205, 140, 0.3)',
-      transition: 'transform 0.15s ease-out, box-shadow 0.15s ease-out',
-      cursor: 'default',
-      userSelect: 'none',
     },
     footer: {
       position: 'fixed',
@@ -165,15 +119,10 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
         {subtitle}
       </p>
       
-      <div 
-        ref={accentRef}
-        style={{
-          ...styles.accent,
-          transform: `translate(${accentTransform.x}px, ${accentTransform.y}px) scale(${1 + Math.abs(accentTransform.x + accentTransform.y) * 0.001})`,
-          boxShadow: `0 ${4 + Math.abs(accentTransform.y) * 0.1}px ${16 + Math.abs(accentTransform.x + accentTransform.y) * 0.2}px rgba(232, 205, 140, ${0.3 + Math.abs(accentTransform.x + accentTransform.y) * 0.002})`
-        }}
-      >
-        Bald verfügbar
+      <div style={{ marginTop: '2rem' }}>
+        <SparkleButton variant="accent">
+          Bald verfügbar
+        </SparkleButton>
       </div>
       
       {/* Footer with Bask Tech logo */}
