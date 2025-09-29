@@ -65,10 +65,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ onClose }) => {
 
   const styles: Record<string, React.CSSProperties> = {
     container: {
-      backgroundColor: '#FFFFFF',
-      borderRadius: '1rem',
-      padding: '3rem',
-      boxShadow: '0 2px 20px rgba(0, 0, 0, 0.05)',
       width: '100%',
       height: '100%',
       display: 'flex',
@@ -167,13 +163,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onClose }) => {
     },
   };
 
-  const mobileStyles = `
-    @media (max-width: 768px) {
-      .contact-form-container {
-        padding: 2rem !important;
-      }
-    }
-  `;
+  const mobileStyles = ``;
 
   return (
     <>

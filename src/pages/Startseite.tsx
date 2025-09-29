@@ -113,6 +113,9 @@ const Startseite: React.FC = () => {
         grid-template-columns: 1fr !important;
         gap: 1.5rem !important;
       }
+      .contact-grid {
+        grid-template-columns: 1fr !important;
+      }
     }
   `;
 
@@ -259,21 +262,28 @@ const Startseite: React.FC = () => {
 
       <section style={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+        gridTemplateColumns: '1fr 1fr',
         gap: '2rem',
         marginBottom: '4rem',
         alignItems: 'stretch'
-      }}>
-        <div style={styles.section}>
-          <h2 style={styles.sectionTitle}>
-            Bereit für Veränderung?
-          </h2>
-          <p style={styles.sectionContent}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod 
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim 
-            veniam, quis nostrud exercitation ullamco laboris.
-          </p>
-          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+      }} className="contact-grid">
+        <div style={{
+          ...styles.section,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between'
+        }}>
+          <div>
+            <h2 style={styles.sectionTitle}>
+              Bereit für Veränderung?
+            </h2>
+            <p style={styles.sectionContent}>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod 
+              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim 
+              veniam, quis nostrud exercitation ullamco laboris.
+            </p>
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 'auto', paddingTop: '2rem' }}>
             <Link 
               to="/preview/coaching" 
               style={styles.ctaButton}
@@ -291,7 +301,9 @@ const Startseite: React.FC = () => {
           </div>
         </div>
 
-        <ContactForm />
+        <div style={styles.section}>
+          <ContactForm />
+        </div>
       </section>
     </>
   );
