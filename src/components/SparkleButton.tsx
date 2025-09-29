@@ -1,256 +1,287 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { APP_CONFIG } from '../types';
 
-interface Spark {
+interface Sparkle {
   id: number;
   x: number;
   y: number;
-  vx: number;
-  vy: number;
-  life: number;
-  maxLife: number;
+  vx: number;  // velocity x
+  vy: number;  // velocity y
   size: number;
   opacity: number;
+  life: number;
+  maxLife: number;
 }
 
 interface SparkleButtonProps {
-  children: React.ReactNode;
   onClick?: () => void;
-  style?: React.CSSProperties;
+  children: React.ReactNode;
   className?: string;
+  variant?: 'primary' | 'secondary' | 'accent';
   disabled?: boolean;
-  type?: 'button' | 'submit' | 'reset';
 }
 
 const SparkleButton: React.FC<SparkleButtonProps> = ({
-  children,
   onClick,
-  style = {},
+  children,
   className = '',
-  disabled = false,
-  type = 'button'
+  variant = 'primary',
+  disabled = false
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [sparks, setSparks] = useState<Spark[]>([]);
-  const buttonRef = useRef<HTMLButtonElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
-  const sparkIdRef = useRef(0);
-
-  const baseStyles: React.CSSProperties = {
-    position: 'relative',
-    backgroundColor: APP_CONFIG.colors.accent,
-    color: '#333',
-    padding: '1rem 2rem',
-    borderRadius: '2rem',
-    border: 'none',
-    fontWeight: '600',
-    fontSize: '1.1rem',
-    fontFamily: "'Arimo', sans-serif",
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    transition: 'all 0.3s ease',
-    boxShadow: '0 4px 15px rgba(232, 205, 140, 0.3)',
-    opacity: disabled ? 0.6 : 1,
-    overflow: 'hidden',
-    ...style,
-  };
-
-  const canvasStyles: React.CSSProperties = {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    pointerEvents: 'none',
-    zIndex: 1,
-  };
-
-  const contentStyles: React.CSSProperties = {
-    position: 'relative',
-    zIndex: 2,
-  };
-
-  // Create new sparks around mouse position
-  const createSparks = (mouseX: number, mouseY: number) => {
-    if (disabled) return;
+  const buttonRef = useRef<HTMLDivElement>(null);
+  const sparklesRef = useRef<Sparkle[]>([]);
+  const animationIdRef = useRef<number>();
+  const mousePositionRef = useRef({ x: 0, y: 0 });
+  const nextIdRef = useRef(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isClicked, setIsClicked] = useState(false);
+  const lastEmitRef = useRef(0);
+  
+  // Physics constants
+  const GRAVITY = 0.3;
+  const EMIT_RATE = 100; // ms between hover emissions
+  const HOVER_PARTICLES = 3; // particles per hover emission
+  const CLICK_PARTICLES = 25; // particles on click explosion
+  
+  // Create sparkle at position
+  const createSparkle = useCallback((x: number, y: number, explosive: boolean = false) => {
+    const angleRange = explosive ? Math.PI * 2 : Math.PI; // Full circle for explosion, half for hover
+    const angle = explosive 
+      ? Math.random() * angleRange 
+      : -Math.PI/2 - angleRange/4 + Math.random() * angleRange/2; // Upward bias for hover
     
-    const newSparks: Spark[] = [];
-    const sparkCount = 3; // Create 3 sparks per frame when hovering
+    const speed = explosive 
+      ? 2 + Math.random() * 6  // Higher speed for explosion
+      : 1 + Math.random() * 3; // Gentler for hover
     
-    for (let i = 0; i < sparkCount; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 3 + 1; // Random speed between 1-4
-      const size = Math.random() * 3 + 1; // Random size between 1-4px
-      
-      newSparks.push({
-        id: sparkIdRef.current++,
-        x: mouseX + (Math.random() - 0.5) * 20, // Spread around mouse
-        y: mouseY + (Math.random() - 0.5) * 20,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        life: 0,
-        maxLife: 30 + Math.random() * 20, // 30-50 frames
-        size: size,
-        opacity: 1,
-      });
-    }
-    
-    setSparks(prevSparks => [...prevSparks, ...newSparks]);
-  };
-
-  // Animation loop
-  const animate = () => {
-    setSparks(prevSparks => {
-      return prevSparks
-        .map(spark => ({
-          ...spark,
-          x: spark.x + spark.vx,
-          y: spark.y + spark.vy,
-          vx: spark.vx * 0.98, // Slow down over time
-          vy: spark.vy * 0.98,
-          life: spark.life + 1,
-          opacity: Math.max(0, 1 - (spark.life / spark.maxLife)),
-        }))
-        .filter(spark => spark.life < spark.maxLife && spark.opacity > 0);
-    });
-
-    if (isHovered) {
-      animationRef.current = requestAnimationFrame(animate);
-    }
-  };
-
-  // Draw sparks on canvas
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Set canvas size to match button
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
-
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw sparks
-    sparks.forEach(spark => {
-      if (spark.opacity <= 0) return;
-
-      ctx.save();
-      ctx.globalAlpha = spark.opacity;
-      ctx.fillStyle = APP_CONFIG.colors.accent;
-      
-      // Create a glowing effect
-      ctx.shadowColor = APP_CONFIG.colors.accent;
-      ctx.shadowBlur = spark.size * 2;
-      
-      ctx.beginPath();
-      ctx.arc(spark.x, spark.y, spark.size, 0, Math.PI * 2);
-      ctx.fill();
-      
-      ctx.restore();
-    });
-  }, [sparks]);
-
-  // Handle mouse move
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!buttonRef.current || disabled) return;
-    
+    return {
+      id: nextIdRef.current++,
+      x,
+      y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - (explosive ? 3 : 1), // Initial upward boost
+      size: explosive ? 2 + Math.random() * 4 : 1 + Math.random() * 2,
+      opacity: 1,
+      life: 0,
+      maxLife: explosive ? 40 + Math.random() * 20 : 20 + Math.random() * 20
+    };
+  }, []);
+  
+  // Handle mouse move on hover
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!buttonRef.current || !isHovered) return;
     const rect = buttonRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    if (isHovered) {
-      createSparks(x, y);
-    }
-  };
-
-  // Handle mouse enter
-  const handleMouseEnter = () => {
-    if (disabled) return;
-    
-    setIsHovered(true);
-    
-    // Start animation
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-    }
-    animationRef.current = requestAnimationFrame(animate);
-  };
-
-  // Handle mouse leave
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    
-    // Stop creating new sparks, let existing ones fade out
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-    }
-    
-    // Continue animation for a bit to let sparks fade
-    const fadeOut = () => {
-      setSparks(prevSparks => {
-        const updatedSparks = prevSparks
-          .map(spark => ({
-            ...spark,
-            x: spark.x + spark.vx,
-            y: spark.y + spark.vy,
-            vx: spark.vx * 0.95,
-            vy: spark.vy * 0.95,
-            life: spark.life + 1,
-            opacity: Math.max(0, spark.opacity - 0.05),
-          }))
-          .filter(spark => spark.opacity > 0);
-        
-        if (updatedSparks.length > 0) {
-          requestAnimationFrame(fadeOut);
-        }
-        
-        return updatedSparks;
-      });
+    mousePositionRef.current = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
     };
     
-    requestAnimationFrame(fadeOut);
-  };
-
-  // Cleanup animation on unmount
+    // Emit particles on hover at controlled rate
+    const now = Date.now();
+    if (now - lastEmitRef.current > EMIT_RATE) {
+      for (let i = 0; i < HOVER_PARTICLES; i++) {
+        sparklesRef.current.push(
+          createSparkle(mousePositionRef.current.x, mousePositionRef.current.y, false)
+        );
+      }
+      lastEmitRef.current = now;
+    }
+  }, [isHovered, createSparkle]);
+  
+  // Handle click explosion
+  const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    if (disabled) return;
+    
+    setIsClicked(true);
+    setTimeout(() => setIsClicked(false), 300);
+    
+    // Get click position relative to button
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      // Create explosion of sparkles
+      for (let i = 0; i < CLICK_PARTICLES; i++) {
+        sparklesRef.current.push(createSparkle(x, y, true));
+      }
+    }
+    
+    onClick?.();
+  }, [onClick, disabled, createSparkle]);
+  
+  // Animation loop
+  const animate = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Update and draw sparkles
+    sparklesRef.current = sparklesRef.current.filter(sparkle => {
+      // Apply gravity
+      sparkle.vy += GRAVITY;
+      
+      // Update position
+      sparkle.x += sparkle.vx;
+      sparkle.y += sparkle.vy;
+      
+      // Update life
+      sparkle.life++;
+      
+      // Calculate opacity based on life
+      sparkle.opacity = 1 - (sparkle.life / sparkle.maxLife);
+      
+      // Remove if dead or out of bounds
+      if (sparkle.opacity <= 0 || sparkle.y > canvas.height + 10) {
+        return false;
+      }
+      
+      // Draw sparkle with glow effect
+      const gradient = ctx.createRadialGradient(
+        sparkle.x, sparkle.y, 0,
+        sparkle.x, sparkle.y, sparkle.size * 2
+      );
+      gradient.addColorStop(0, `rgba(232, 205, 140, ${sparkle.opacity})`);
+      gradient.addColorStop(0.6, `rgba(232, 205, 140, ${sparkle.opacity * 0.5})`);
+      gradient.addColorStop(1, 'rgba(232, 205, 140, 0)');
+      
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(sparkle.x, sparkle.y, sparkle.size * 2, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Draw solid center
+      ctx.fillStyle = `rgba(232, 205, 140, ${sparkle.opacity})`;
+      ctx.beginPath();
+      ctx.arc(sparkle.x, sparkle.y, sparkle.size, 0, Math.PI * 2);
+      ctx.fill();
+      
+      return true;
+    });
+    
+    animationIdRef.current = requestAnimationFrame(animate);
+  }, []);
+  
+  // Handle canvas resize
+  useEffect(() => {
+    const updateCanvasSize = () => {
+      if (canvasRef.current && buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        canvasRef.current.width = rect.width;
+        canvasRef.current.height = rect.height;
+      }
+    };
+    
+    updateCanvasSize();
+    window.addEventListener('resize', updateCanvasSize);
+    
+    return () => window.removeEventListener('resize', updateCanvasSize);
+  }, []);
+  
+  // Start/stop animation
+  useEffect(() => {
+    if (sparklesRef.current.length > 0 || isHovered) {
+      if (!animationIdRef.current) {
+        animate();
+      }
+    } else if (animationIdRef.current && sparklesRef.current.length === 0) {
+      cancelAnimationFrame(animationIdRef.current);
+      animationIdRef.current = undefined;
+    }
+  }, [isHovered, animate]);
+  
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
+      if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current);
       }
     };
   }, []);
-
+  
+  // Button colors based on variant
+  const getButtonColor = () => {
+    switch (variant) {
+      case 'secondary':
+        return APP_CONFIG.colors.secondary;
+      case 'accent':
+        return APP_CONFIG.colors.accent;
+      default:
+        return APP_CONFIG.colors.primary;
+    }
+  };
+  
+  const styles: Record<string, React.CSSProperties> = {
+    container: {
+      position: 'relative',
+      display: 'inline-block',
+    },
+    button: {
+      backgroundColor: getButtonColor(),
+      color: variant === 'accent' ? '#333' : '#FFFFFF',
+      border: 'none',
+      borderRadius: '2rem',
+      padding: '1rem 2rem',
+      fontSize: '1rem',
+      fontWeight: '600',
+      fontFamily: 'Arimo, sans-serif',
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      transform: isClicked 
+        ? 'scale(0.95)' 
+        : isHovered 
+          ? 'scale(1.05) translateY(-2px)' 
+          : 'scale(1)',
+      boxShadow: isHovered 
+        ? '0 8px 24px rgba(0, 151, 178, 0.4)' 
+        : '0 4px 16px rgba(0, 151, 178, 0.3)',
+      opacity: disabled ? 0.6 : 1,
+      position: 'relative',
+      zIndex: 1,
+    },
+    canvas: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'none',
+      zIndex: 2,
+    }
+  };
+  
   return (
-    <button
+    <div 
       ref={buttonRef}
-      type={type}
-      onClick={onClick}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        ...baseStyles,
-        transform: isHovered && !disabled ? 'translateY(-2px)' : 'translateY(0)',
-        boxShadow: isHovered && !disabled 
-          ? '0 6px 20px rgba(232, 205, 140, 0.4)' 
-          : '0 4px 15px rgba(232, 205, 140, 0.3)',
-      }}
+      style={styles.container}
       className={className}
-      disabled={disabled}
     >
+      <button
+        style={styles.button}
+        onClick={handleClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => {
+          setIsHovered(false);
+          // Clear hover sparkles quickly when leaving
+          sparklesRef.current = sparklesRef.current.filter(s => s.maxLife > 30);
+        }}
+        onMouseMove={handleMouseMove}
+        disabled={disabled}
+      >
+        {children}
+      </button>
       <canvas
         ref={canvasRef}
-        style={canvasStyles}
+        style={styles.canvas}
+        aria-hidden="true"
       />
-      <span style={contentStyles}>
-        {children}
-      </span>
-    </button>
+    </div>
   );
 };
 
