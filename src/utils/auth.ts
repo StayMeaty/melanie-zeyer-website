@@ -53,8 +53,9 @@ export const checkPassword = (input: string): boolean => {
   const correctPassword = import.meta.env.VITE_WEBSITE_PASSWORD;
   
   if (!correctPassword) {
-    console.warn('VITE_WEBSITE_PASSWORD environment variable not set');
-    return false;
+    console.warn('VITE_WEBSITE_PASSWORD environment variable not set. Using default password for development.');
+    // In development, if no password is set, require a password
+    return input === 'preview2024'; // Default dev password
   }
   
   return input === correctPassword;
