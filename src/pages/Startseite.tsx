@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { APP_CONFIG } from '../types';
 import { ContactForm } from '../components';
 
 const Startseite: React.FC = () => {
-  const [showContactForm, setShowContactForm] = useState(false);
   const styles: Record<string, React.CSSProperties> = {
     hero: {
       textAlign: 'center',
@@ -258,58 +257,42 @@ const Startseite: React.FC = () => {
         </div>
       </section>
 
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>
-          Bereit für Veränderung?
-        </h2>
-        <p style={styles.sectionContent}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod 
-          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim 
-          veniam, quis nostrud exercitation ullamco laboris.
-        </p>
-        <div style={{ textAlign: 'center', marginTop: '2rem', display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link 
-            to="/preview/coaching" 
-            style={styles.ctaButton}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(232, 205, 140, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(232, 205, 140, 0.3)';
-            }}
-          >
-            Kostenloses Erstgespräch vereinbaren
-          </Link>
-          <button
-            onClick={() => setShowContactForm(!showContactForm)}
-            style={{
-              ...styles.ctaButton,
-              backgroundColor: APP_CONFIG.colors.primary,
-              color: '#FFFFFF',
-              cursor: 'pointer',
-              border: 'none',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 151, 178, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 151, 178, 0.3)';
-            }}
-          >
-            {showContactForm ? 'Formular schließen' : 'Kontaktformular öffnen'}
-          </button>
+      <section style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+        gap: '2rem',
+        marginBottom: '4rem',
+        alignItems: 'stretch'
+      }}>
+        <div style={styles.section}>
+          <h2 style={styles.sectionTitle}>
+            Bereit für Veränderung?
+          </h2>
+          <p style={styles.sectionContent}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod 
+            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim 
+            veniam, quis nostrud exercitation ullamco laboris.
+          </p>
+          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <Link 
+              to="/preview/coaching" 
+              style={styles.ctaButton}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(232, 205, 140, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(232, 205, 140, 0.3)';
+              }}
+            >
+              Kostenloses Erstgespräch vereinbaren
+            </Link>
+          </div>
         </div>
-      </section>
 
-      {showContactForm && (
-        <section style={{ marginBottom: '4rem' }}>
-          <ContactForm onClose={() => setShowContactForm(false)} />
-        </section>
-      )}
+        <ContactForm />
+      </section>
     </>
   );
 };

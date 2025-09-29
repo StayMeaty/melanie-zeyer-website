@@ -68,10 +68,11 @@ const ContactForm: React.FC<ContactFormProps> = ({ onClose }) => {
       backgroundColor: '#FFFFFF',
       borderRadius: '1rem',
       padding: '3rem',
-      boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
-      maxWidth: '600px',
+      boxShadow: '0 2px 20px rgba(0, 0, 0, 0.05)',
       width: '100%',
-      margin: '0 auto',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
     },
     title: {
       fontSize: 'clamp(1.8rem, 4vw, 2.2rem)',
@@ -130,7 +131,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ onClose }) => {
     },
     buttonGroup: {
       display: 'flex',
-      gap: '1rem',
       justifyContent: 'center',
       marginTop: '1rem',
     },
@@ -146,18 +146,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ onClose }) => {
       cursor: isSubmitting ? 'not-allowed' : 'pointer',
       transition: 'all 0.3s ease',
       opacity: isSubmitting ? 0.7 : 1,
-    },
-    cancelButton: {
-      padding: '0.75rem 2rem',
-      backgroundColor: 'transparent',
-      color: APP_CONFIG.colors.secondary,
-      border: `1px solid ${APP_CONFIG.colors.secondary}30`,
-      borderRadius: '2rem',
-      fontSize: '1rem',
-      fontWeight: '600',
-      fontFamily: "'Arimo', sans-serif",
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
     },
     statusMessage: {
       textAlign: 'center',
@@ -307,23 +295,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ onClose }) => {
             >
               {isSubmitting ? 'Wird gesendet...' : 'Nachricht senden'}
             </button>
-            {onClose && (
-              <button
-                type="button"
-                style={styles.cancelButton}
-                onClick={onClose}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = APP_CONFIG.colors.secondary;
-                  e.currentTarget.style.backgroundColor = `${APP_CONFIG.colors.secondary}05`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = `${APP_CONFIG.colors.secondary}30`;
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }}
-              >
-                Abbrechen
-              </button>
-            )}
           </div>
         </form>
 
