@@ -120,7 +120,7 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
       </p>
       
       <div style={{ marginTop: '2rem' }}>
-        <SparkleButton variant="accent">
+        <SparkleButton variant="secondary">
           Bald verfügbar
         </SparkleButton>
       </div>

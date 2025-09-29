@@ -35,7 +35,7 @@ const SparkleButton: React.FC<SparkleButtonProps> = ({
   const mousePositionRef = useRef({ x: 0, y: 0 });
   const nextIdRef = useRef(0);
   const [isHovered, setIsHovered] = useState(false);
-  const [isClicked, setIsClicked] = useState(false);
+  const [clickPhase, setClickPhase] = useState<'idle' | 'inflate' | 'explode'>('idle');
   const lastEmitRef = useRef(0);
   
   // Physics constants
@@ -44,7 +44,7 @@ const SparkleButton: React.FC<SparkleButtonProps> = ({
   const HOVER_PARTICLES = 3; // particles per hover emission
   const CLICK_PARTICLES = 25; // particles on click explosion
   
-  // Create sparkle at position
+  // Create sparkle at position (with canvas offset compensation)
   const createSparkle = useCallback((x: number, y: number, explosive: boolean = false) => {
     const angleRange = explosive ? Math.PI * 2 : Math.PI; // Full circle for explosion, half for hover
     const angle = explosive 
@@ -57,8 +57,8 @@ const SparkleButton: React.FC<SparkleButtonProps> = ({
     
     return {
       id: nextIdRef.current++,
-      x,
-      y,
+      x: x + 100, // Add padding offset
+      y: y + 100, // Add padding offset
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed - (explosive ? 3 : 1), // Initial upward boost
       size: explosive ? 2 + Math.random() * 4 : 1 + Math.random() * 2,
@@ -89,12 +89,14 @@ const SparkleButton: React.FC<SparkleButtonProps> = ({
     }
   }, [isHovered, createSparkle]);
   
-  // Handle click explosion
-  const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+  // Handle click explosion with enhanced animation
+  const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (disabled) return;
     
-    setIsClicked(true);
-    setTimeout(() => setIsClicked(false), 300);
+    // Start inflation phase
+    setClickPhase('inflate');
+    setTimeout(() => setClickPhase('explode'), 150);
+    setTimeout(() => setClickPhase('idle'), 300);
     
     // Get click position relative to button
     if (buttonRef.current) {
@@ -168,13 +170,14 @@ const SparkleButton: React.FC<SparkleButtonProps> = ({
     animationIdRef.current = requestAnimationFrame(animate);
   }, []);
   
-  // Handle canvas resize
+  // Handle canvas resize with padding for particle overflow
   useEffect(() => {
     const updateCanvasSize = () => {
       if (canvasRef.current && buttonRef.current) {
         const rect = buttonRef.current.getBoundingClientRect();
-        canvasRef.current.width = rect.width;
-        canvasRef.current.height = rect.height;
+        const padding = 100; // Extra space for particles
+        canvasRef.current.width = rect.width + padding * 2;
+        canvasRef.current.height = rect.height + padding * 2;
       }
     };
     
@@ -186,7 +189,7 @@ const SparkleButton: React.FC<SparkleButtonProps> = ({
   
   // Start/stop animation
   useEffect(() => {
-    if (sparklesRef.current.length > 0 || isHovered) {
+    if (sparklesRef.current.length > 0 || isHovered || clickPhase !== 'idle') {
       if (!animationIdRef.current) {
         animate();
       }
@@ -194,7 +197,7 @@ const SparkleButton: React.FC<SparkleButtonProps> = ({
       cancelAnimationFrame(animationIdRef.current);
       animationIdRef.current = undefined;
     }
-  }, [isHovered, animate]);
+  }, [isHovered, clickPhase, animate]);
   
   // Cleanup on unmount
   useEffect(() => {
@@ -221,6 +224,7 @@ const SparkleButton: React.FC<SparkleButtonProps> = ({
     container: {
       position: 'relative',
       display: 'inline-block',
+      overflow: 'visible', // Allow particles to escape bounds
     },
     button: {
       backgroundColor: getButtonColor(),
@@ -232,12 +236,14 @@ const SparkleButton: React.FC<SparkleButtonProps> = ({
       fontWeight: '600',
       fontFamily: 'Arimo, sans-serif',
       cursor: disabled ? 'not-allowed' : 'pointer',
-      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      transform: isClicked 
-        ? 'scale(0.95)' 
-        : isHovered 
-          ? 'scale(1.05) translateY(-2px)' 
-          : 'scale(1)',
+      transition: 'all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)', // Spring effect
+      transform: clickPhase === 'inflate' 
+        ? 'scale(1.15)' 
+        : clickPhase === 'explode'
+          ? 'scale(1.0)'
+          : isHovered 
+            ? 'scale(1.05) translateY(-2px)' 
+            : 'scale(1)',
       boxShadow: isHovered 
         ? '0 8px 24px rgba(0, 151, 178, 0.4)' 
         : '0 4px 16px rgba(0, 151, 178, 0.3)',
@@ -247,10 +253,10 @@ const SparkleButton: React.FC<SparkleButtonProps> = ({
     },
     canvas: {
       position: 'absolute',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
+      top: '-100px',  // Offset by padding
+      left: '-100px', // Offset by padding
+      width: 'calc(100% + 200px)',
+      height: 'calc(100% + 200px)',
       pointerEvents: 'none',
       zIndex: 2,
     }
@@ -262,7 +268,7 @@ const SparkleButton: React.FC<SparkleButtonProps> = ({
       style={styles.container}
       className={className}
     >
-      <button
+      <div
         style={styles.button}
         onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
@@ -272,10 +278,22 @@ const SparkleButton: React.FC<SparkleButtonProps> = ({
           sparklesRef.current = sparklesRef.current.filter(s => s.maxLife > 30);
         }}
         onMouseMove={handleMouseMove}
-        disabled={disabled}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        onKeyDown={(e) => {
+          if ((e.key === 'Enter' || e.key === ' ') && !disabled) {
+            e.preventDefault();
+            const mouseEvent = {
+              clientX: buttonRef.current?.getBoundingClientRect().left || 0,
+              clientY: buttonRef.current?.getBoundingClientRect().top || 0,
+              currentTarget: e.currentTarget
+            } as React.MouseEvent<HTMLDivElement>;
+            handleClick(mouseEvent);
+          }
+        }}
       >
         {children}
-      </button>
+      </div>
       <canvas
         ref={canvasRef}
         style={styles.canvas}
