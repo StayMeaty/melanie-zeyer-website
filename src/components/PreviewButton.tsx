@@ -1,12 +1,40 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { APP_CONFIG } from '../types';
+import { isAuthenticated } from '../utils/auth';
+import PasswordDialog from './PasswordDialog';
 
 interface PreviewButtonProps {
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 const PreviewButton: React.FC<PreviewButtonProps> = ({ onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+      return;
+    }
+
+    // Check if user is already authenticated
+    if (isAuthenticated()) {
+      navigate('/preview');
+    } else {
+      setShowPasswordDialog(true);
+    }
+  };
+
+  const handlePasswordSuccess = () => {
+    setShowPasswordDialog(false);
+    navigate('/preview');
+  };
+
+  const handlePasswordClose = () => {
+    setShowPasswordDialog(false);
+  };
 
   const styles: Record<string, React.CSSProperties> = {
     button: {
@@ -42,15 +70,23 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({ onClick }) => {
   };
 
   return (
-    <button
-      style={styles.button}
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      Preview
-      <span style={styles.arrow}></span>
-    </button>
+    <>
+      <button
+        style={styles.button}
+        onClick={handleClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        Preview
+        <span style={styles.arrow}></span>
+      </button>
+      
+      <PasswordDialog
+        isOpen={showPasswordDialog}
+        onClose={handlePasswordClose}
+        onSuccess={handlePasswordSuccess}
+      />
+    </>
   );
 };
 

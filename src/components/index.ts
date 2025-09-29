@@ -1,6 +1,10 @@
 export { default as Logo } from './Logo';
 export { default as ComingSoon } from './ComingSoon';
 export { default as ParticleEffect } from './ParticleEffect';
-export { default as FontComparison } from './FontComparison';
 export { default as PreviewButton } from './PreviewButton';
 export { default as WebsitePreview } from './WebsitePreview';
+export { default as PasswordDialog } from './PasswordDialog';
+export { default as Navigation } from './Navigation';
+export { default as Footer } from './Footer';
+export { default as Layout } from './Layout';
+export { default as SparkleButton } from './SparkleButton';
