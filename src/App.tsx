@@ -1,12 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import { ComingSoon, PreviewButton, Layout } from './components';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ComingSoon, Layout } from './components';
 import { Startseite, UeberMich, Kurse, Coaching, FAQ, Impressum } from './pages';
 
-// Landing page component with coming soon (removed FontComparison)
+// Landing page component with coming soon
 const LandingPage: React.FC = () => {
-  const navigate = useNavigate();
-
   const styles: Record<string, React.CSSProperties> = {
     container: {
       display: 'flex',
@@ -18,7 +16,6 @@ const LandingPage: React.FC = () => {
   return (
     <div style={styles.container}>
       <ComingSoon />
-      <PreviewButton onClick={() => navigate('/preview')} />
     </div>
   );
 };
