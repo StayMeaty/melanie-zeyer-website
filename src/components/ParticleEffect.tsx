@@ -51,7 +51,7 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
 
   // Create an ambient floating particle
   const createAmbientParticle = useCallback((): Particle => {
-    const size = 2 + Math.random() * 14; // Max size now 16px instead of 8px
+    const size = 2 + Math.random() * 11.2; // Max size reduced by 20% (was 16px, now 13.2px)
     const x = Math.random() * dimensions.width;
     const y = Math.random() * dimensions.height;
     const floatAngle = Math.random() * Math.PI * 2;
@@ -78,7 +78,7 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
     const angle = Math.random() * Math.PI * 2;
     const baseSpeed = particleSpeed * 2; // Increase base speed
     const speed = baseSpeed + Math.random() * baseSpeed;
-    const size = 2 + Math.random() * 14; // Max size now 16px instead of 8px
+    const size = 2 + Math.random() * 11.2; // Max size reduced by 20% (was 16px, now 13.2px)
     const maxLife = 100 + Math.random() * 50; // Shorter life before transitioning to floating
     const totalLife = maxLife + 800 + Math.random() * 400; // Total lifespan including floating phase (15-20 seconds total)
 

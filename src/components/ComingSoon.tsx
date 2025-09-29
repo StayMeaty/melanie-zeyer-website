@@ -33,9 +33,11 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
 
     updateLogoPosition();
     window.addEventListener('resize', updateLogoPosition);
+    window.addEventListener('scroll', updateLogoPosition);
     
     return () => {
       window.removeEventListener('resize', updateLogoPosition);
+      window.removeEventListener('scroll', updateLogoPosition);
     };
   }, []);
 
@@ -118,7 +120,7 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
       userSelect: 'none',
     },
     footer: {
-      position: 'absolute',
+      position: 'fixed',
       bottom: 0,
       left: 0,
       right: 0,
