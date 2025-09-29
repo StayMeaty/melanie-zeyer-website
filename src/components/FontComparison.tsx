@@ -195,7 +195,7 @@ const FontComparison: React.FC<FontComparisonProps> = ({
           onMouseEnter={() => setHoveredCard('professional')}
           onMouseLeave={() => setHoveredCard(null)}
         >
-          <h1 style={styles.h1Professional}>Große Überschrift</h1>
+          <h1 style={styles.h1Professional}>Alan Sans & Arimo</h1>
           <h2 style={styles.h2Professional}>Mittlere Überschrift</h2>
           <h3 style={styles.h3Professional}>Kleine Überschrift</h3>
           
@@ -231,7 +231,7 @@ const FontComparison: React.FC<FontComparisonProps> = ({
           onMouseEnter={() => setHoveredCard('creative')}
           onMouseLeave={() => setHoveredCard(null)}
         >
-          <h1 style={styles.h1Creative}>Große Überschrift</h1>
+          <h1 style={styles.h1Creative}>Kodchasan & Arimo</h1>
           <h2 style={styles.h2Creative}>Mittlere Überschrift</h2>
           <h3 style={styles.h3Creative}>Kleine Überschrift</h3>
           
@@ -251,7 +251,7 @@ const FontComparison: React.FC<FontComparisonProps> = ({
           <div style={styles.infoBox}>
             <h4 style={styles.infoTitle}>Option 2 – Etwas kreativer & individueller</h4>
             <p style={styles.infoText}>
-              <strong>Fließtext:</strong> Arimo<br />
+              <strong>Fließtext:</strong> Arimo (gut lesbar, neutral, ideal für längere Texte)<br />
               <strong>Überschriften:</strong> Kodchasan (freundlicher, individueller Charakter)<br />
               → Diese Kombination wirkt etwas „persönlicher" und kreativer, kann aber bei zu verspielter Anwendung weniger professionell erscheinen.
             </p>
@@ -267,7 +267,7 @@ const FontComparison: React.FC<FontComparisonProps> = ({
           onMouseEnter={() => setHoveredCard('elegant')}
           onMouseLeave={() => setHoveredCard(null)}
         >
-          <h1 style={styles.h1Elegant}>Große Überschrift</h1>
+          <h1 style={styles.h1Elegant}>Sumana & Arimo</h1>
           <h2 style={styles.h2Elegant}>Mittlere Überschrift</h2>
           <h3 style={styles.h3Elegant}>Kleine Überschrift</h3>
           
@@ -287,7 +287,7 @@ const FontComparison: React.FC<FontComparisonProps> = ({
           <div style={styles.infoBox}>
             <h4 style={styles.infoTitle}>Option 3 – Elegant & hochwertig</h4>
             <p style={styles.infoText}>
-              <strong>Fließtext:</strong> Arimo (neutral, gut lesbar)<br />
+              <strong>Fließtext:</strong> Arimo (gut lesbar, neutral, ideal für längere Texte)<br />
               <strong>Überschriften:</strong> Sumana (Serif, klassisch, hochwertig)<br />
               <strong>Charakteristik:</strong> Durch die Kombination einer modernen Sans-Serif-Schrift mit einer Serif-Schrift entsteht ein bewusster Kontrast, der sehr professionell und stilvoll wirkt.<br />
               → Eignet sich besonders für Coaching, Beratung oder hochwertige Dienstleistungen.
