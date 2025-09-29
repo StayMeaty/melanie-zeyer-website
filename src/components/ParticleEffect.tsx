@@ -30,14 +30,14 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
 
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
-    height: Math.max(window.innerHeight * 2, document.body.scrollHeight),
+    height: window.innerHeight,
   });
 
   // Handle window resize
   const handleResize = useCallback(() => {
     setDimensions({
       width: window.innerWidth,
-      height: Math.max(window.innerHeight * 2, document.body.scrollHeight),
+      height: window.innerHeight,
     });
   }, []);
 
@@ -310,11 +310,11 @@ const ParticleEffect: React.FC<ParticleEffectProps> = ({
       aria-hidden="true"
       role="presentation"
       style={{
-        position: 'absolute',
+        position: 'fixed',
         top: 0,
         left: 0,
         width: '100%',
-        minHeight: '200vh', // Make canvas tall enough for scrolling
+        height: '100vh',
         pointerEvents: 'none',
         zIndex: -1, // Lowest z-index so particles are always behind content
       }}
