@@ -4,38 +4,19 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  # Decap CMS environment variables
-  # Note: Set these in Netlify UI for security
-  # DECAP_CMS_BRANCH = "main"
-  # DECAP_CMS_REPO = "your-username/melanie-repo"
   
   # Disable secrets scanning for specific keys
   # VITE_ADMIN_PASSWORD_HASH is a SHA-256 hash, not a secret
-  # VITE_GITHUB_TOKEN and NETLIFY_CMS_GITHUB_TOKEN are PATs configured in Netlify UI, not hardcoded secrets
-  SECRETS_SCAN_OMIT_KEYS = "VITE_ADMIN_PASSWORD_HASH,VITE_GITHUB_TOKEN,NETLIFY_CMS_GITHUB_TOKEN"
+  # VITE_GITHUB_TOKEN is a PAT configured in Netlify UI, not hardcoded
+  SECRETS_SCAN_OMIT_KEYS = "VITE_ADMIN_PASSWORD_HASH,VITE_GITHUB_TOKEN"
 
-# Identity and Git Gateway settings
-[template.environment]
-  NETLIFY_CMS_GITHUB_TOKEN = "GitHub Personal Access Token"
-  NETLIFY_CMS_SITE_URL = "https://melaniezeyer.de"
-  
-  # GitHub Integration Environment Variables (set in Netlify UI)
-  # VITE_GITHUB_TOKEN = "GitHub Personal Access Token with repo scope"
-  # VITE_GITHUB_REPO = "owner/repository-name"
-  # VITE_GITHUB_BRANCH = "main"
-  # VITE_ADMIN_PASSWORD_HASH = "SHA-256 hash of admin password"
+# GitHub Integration Environment Variables (set in Netlify UI)
+# VITE_GITHUB_TOKEN = "GitHub Personal Access Token with repo scope"
+# VITE_GITHUB_REPO = "owner/repository-name"
+# VITE_GITHUB_BRANCH = "main"
+# VITE_ADMIN_PASSWORD_HASH = "SHA-256 hash of admin password"
 
-# Admin panel redirect
-[[redirects]]
-  from = "/admin"
-  to = "/admin/index.html"
-  status = 200
-
-# CMS admin assets
-[[redirects]]
-  from = "/admin/*"
-  to = "/admin/:splat"
-  status = 200
+# Admin routes are handled by React Router (no static redirects needed)
 
 # Main SPA redirect (must be last)
 [[redirects]]

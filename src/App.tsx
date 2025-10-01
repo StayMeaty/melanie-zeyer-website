@@ -68,7 +68,7 @@ function App() {
           {/* Admin routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
-            path="/admin"
+            path="/admin/dashboard"
             element={
               <ProtectedRoute>
                 <AdminDashboard />
@@ -80,6 +80,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <BlogManagement />
+              </ProtectedRoute>
+            }
+          />
+          {/* Redirect /admin to dashboard */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
               </ProtectedRoute>
             }
           />
