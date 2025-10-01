@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../services/auth';
 import { APP_COLORS } from '../types';
@@ -16,7 +16,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { isAuthenticated, isLoading, user, checkSession } = useAuth();
   const location = useLocation();
-  const [isChecking, setIsChecking] = useState(false);
 
   // Handle visibility change (tab focus)
   useEffect(() => {
@@ -35,7 +34,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }, [checkSession]);
 
   // Loading state with spinner
-  if (isLoading || isChecking) {
+  if (isLoading) {
     return (
       <div style={styles.loadingContainer}>
         <div style={styles.loadingCard}>
