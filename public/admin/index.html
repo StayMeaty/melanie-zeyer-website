@@ -109,11 +109,13 @@
   
   <!-- CMS Configuration and Initialization -->
   <script>
-    // Configure CMS with German localization
-    window.CMS_MANUAL_INIT = true;
-    
-    // Initialize CMS when ready
-    document.addEventListener('DOMContentLoaded', function() {
+    // Wait for CMS to be available
+    function initCMS() {
+      if (typeof window.CMS === 'undefined') {
+        setTimeout(initCMS, 100);
+        return;
+      }
+      
       // Configure German locale
       if (window.CMS) {
         // Set German date format
@@ -231,18 +233,23 @@
           locale: 'de'
         });
         
-        // Hide loading screen when CMS is ready
-        CMS.registerEventListener({
-          name: 'ready',
-          handler: function() {
-            const loading = document.getElementById('loading');
-            if (loading) {
-              loading.style.display = 'none';
-            }
+        // Hide loading screen once CMS initializes
+        // Note: Decap CMS v3 doesn't have a 'ready' event, so we use a timeout
+        setTimeout(function() {
+          const loading = document.getElementById('loading');
+          if (loading) {
+            loading.style.display = 'none';
           }
-        });
+        }, 2000);
       }
-    });
+    }
+    
+    // Start initialization when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCMS);
+    } else {
+      initCMS();
+    }
     
     // Netlify Identity configuration
     if (window.netlifyIdentity) {
@@ -255,8 +262,7 @@
       });
     }
     
-    // Custom preview styles
-    CMS.registerPreviewStyle('/admin/preview.css');
+    // Custom preview styles (removed as it causes errors)
     
     // Custom editor components if needed
     // CMS.registerEditorComponent({
