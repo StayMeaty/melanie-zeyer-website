@@ -13,6 +13,40 @@ import {
   BlogSEO,
   BLOG_CONFIG,
 } from '../types/blog';
+import GitHubImageService, { GitHubUploadResult } from './githubImageService';
+
+/**
+ * Interface for GitHub image metadata
+ */
+export interface GitHubImageMetadata {
+  filename: string;
+  path: string; // public/content/blog/images/filename
+  url: string; // Raw GitHub URL
+  altText?: string;
+  size: number;
+  uploadedAt: string;
+  sha: string; // GitHub SHA for updates
+  storageType: 'github';
+}
+
+/**
+ * Interface for blog image manifest
+ */
+export interface BlogImageManifest {
+  images: GitHubImageMetadata[];
+  lastUpdated: string;
+  version: string;
+}
+
+/**
+ * Extended manifest structure with image support
+ */
+interface ExtendedManifest {
+  files: string[];
+  images?: GitHubImageMetadata[];
+  lastUpdated: string;
+  version: string;
+}
 
 /**
  * Interface for post cache entry
@@ -23,21 +57,30 @@ interface PostCacheEntry {
 }
 
 /**
- * Cache for processed blog posts to improve performance
+ * Interface for generic cache entry
  */
-class PostCache {
-  private cache = new Map<string, PostCacheEntry>();
+interface CacheEntry<T> {
+  data: T;
+  lastModified: number;
+}
+
+/**
+ * Extended cache for blog posts and images
+ */
+class BlogCache {
+  private postCache = new Map<string, PostCacheEntry>();
   private allPostsCache: BlogPost[] | null = null;
   private allPostsCacheTime: number = 0;
+  private genericCache = new Map<string, CacheEntry<unknown>>();
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   get(slug: string): BlogPost | null {
-    const entry = this.cache.get(slug);
+    const entry = this.postCache.get(slug);
     if (!entry) return null;
     
     // Check if cache entry is still valid
     if (Date.now() - entry.lastModified > this.CACHE_TTL) {
-      this.cache.delete(slug);
+      this.postCache.delete(slug);
       return null;
     }
     
@@ -45,8 +88,28 @@ class PostCache {
   }
 
   set(slug: string, post: BlogPost): void {
-    this.cache.set(slug, {
+    this.postCache.set(slug, {
       post,
+      lastModified: Date.now(),
+    });
+  }
+
+  getFromCache<T>(key: string): T | null {
+    const entry = this.genericCache.get(key);
+    if (!entry) return null;
+    
+    // Check if cache entry is still valid
+    if (Date.now() - entry.lastModified > this.CACHE_TTL) {
+      this.genericCache.delete(key);
+      return null;
+    }
+    
+    return entry.data as T;
+  }
+
+  setCache<T>(key: string, data: T): void {
+    this.genericCache.set(key, {
+      data,
       lastModified: Date.now(),
     });
   }
@@ -65,14 +128,25 @@ class PostCache {
   }
 
   clear(): void {
-    this.cache.clear();
+    this.postCache.clear();
     this.allPostsCache = null;
     this.allPostsCacheTime = 0;
+  }
+
+  clearImageCaches(): void {
+    this.genericCache.delete('github-images');
+    this.genericCache.delete('image-manifest');
+    this.genericCache.delete('combined-images');
+  }
+
+  clearAll(): void {
+    this.clear();
+    this.genericCache.clear();
   }
 }
 
 // Global cache instance
-const postCache = new PostCache();
+const blogCache = new BlogCache();
 
 /**
  * Generate URL-friendly slug from title
@@ -231,7 +305,7 @@ async function getMarkdownFiles(): Promise<string[]> {
 export async function loadAllPosts(): Promise<BlogPost[]> {
   try {
     // Check cache first
-    const cachedPosts = postCache.getAllPosts();
+    const cachedPosts = blogCache.getAllPosts();
     if (cachedPosts) {
       return cachedPosts;
     }
@@ -263,7 +337,7 @@ export async function loadAllPosts(): Promise<BlogPost[]> {
     posts.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 
     // Cache the results
-    postCache.setAllPosts(posts);
+    blogCache.setAllPosts(posts);
 
     return posts;
   } catch (error) {
@@ -280,7 +354,7 @@ export async function loadAllPosts(): Promise<BlogPost[]> {
 export async function loadPostBySlug(slug: string): Promise<BlogPost | null> {
   try {
     // Check cache first
-    const cachedPost = postCache.get(slug);
+    const cachedPost = blogCache.get(slug);
     if (cachedPost) {
       return cachedPost;
     }
@@ -290,7 +364,7 @@ export async function loadPostBySlug(slug: string): Promise<BlogPost | null> {
     const post = allPosts.find(p => p.slug === slug) || null;
     
     if (post) {
-      postCache.set(slug, post);
+      blogCache.set(slug, post);
     }
     
     return post;
@@ -487,10 +561,203 @@ function createEmptyPagination(): BlogPagination {
 }
 
 /**
+ * Handle successful image upload and update manifest
+ * This should be called after successful GitHubImageService.uploadImage calls
+ * @param uploadResult - Result from GitHub image upload
+ */
+export const handleImageUploadSuccess = async (uploadResult: GitHubUploadResult): Promise<void> => {
+  try {
+    if (!uploadResult.success) {
+      throw new Error('Upload war nicht erfolgreich');
+    }
+
+    // Update local manifest
+    await updateImageManifest(uploadResult);
+    
+    // Clear relevant caches to force reload
+    clearImageCaches();
+    
+    // Preload updated data
+    await loadGitHubImages();
+    
+    console.log(`Bild-Manifest nach Upload von ${uploadResult.filename} aktualisiert`);
+  } catch (error) {
+    console.error('Fehler beim automatischen Manifest-Update:', error);
+    throw error;
+  }
+};
+
+/**
+ * Load GitHub images with caching
+ * @returns Array of GitHub image metadata
+ */
+export const loadGitHubImages = async (): Promise<GitHubImageMetadata[]> => {
+  try {
+    // Check cache first
+    const cached = blogCache.getFromCache<GitHubImageMetadata[]>('github-images');
+    if (cached) return cached;
+    
+    // Check if GitHub service is available
+    const isConnected = await GitHubImageService.checkConnection();
+    if (!isConnected) {
+      console.warn('GitHub nicht verfügbar, verwende leere Bilderliste');
+      return [];
+    }
+
+    // Load manifest to get image list
+    const manifest = await loadImageManifest();
+    const images = manifest?.images || [];
+    
+    // Cache for 5 minutes (same as posts)
+    blogCache.setCache('github-images', images);
+    
+    return images;
+  } catch (error) {
+    console.error('Fehler beim Laden der GitHub-Bilder:', error);
+    return []; // Graceful degradation
+  }
+};
+
+/**
+ * Load image manifest from GitHub repository
+ * @returns Blog image manifest or null if not available
+ */
+const loadImageManifest = async (): Promise<ExtendedManifest | null> => {
+  try {
+    // Check cache first
+    const cached = blogCache.getFromCache<ExtendedManifest>('image-manifest');
+    if (cached) return cached;
+
+    const response = await fetch('/content/blog/manifest.json');
+    if (response.ok) {
+      const manifest: ExtendedManifest = await response.json();
+      
+      // Cache the manifest
+      blogCache.setCache('image-manifest', manifest);
+      
+      return manifest;
+    }
+  } catch (error) {
+    console.warn('Bild-Manifest nicht gefunden:', error);
+  }
+  
+  return null;
+};
+
+/**
+ * Update image manifest when new images are uploaded
+ * @param uploadResult - Result from GitHub image upload
+ */
+export const updateImageManifest = async (uploadResult: GitHubUploadResult): Promise<void> => {
+  try {
+    if (!uploadResult.success || !uploadResult.filename || !uploadResult.url || !uploadResult.sha) {
+      throw new Error('Ungültiges Upload-Ergebnis');
+    }
+
+    // Load current manifest
+    const currentManifest = await loadImageManifest();
+    const images = currentManifest?.images || [];
+
+    // Create new image metadata
+    const newImage: GitHubImageMetadata = {
+      filename: uploadResult.filename,
+      path: `public/content/blog/images/${uploadResult.filename}`,
+      url: uploadResult.url,
+      size: 0, // Size will be updated if available
+      uploadedAt: new Date().toISOString(),
+      sha: uploadResult.sha,
+      storageType: 'github',
+    };
+
+    // Add to images array (avoid duplicates)
+    const existingIndex = images.findIndex(img => img.filename === uploadResult.filename);
+    if (existingIndex >= 0) {
+      images[existingIndex] = newImage; // Update existing
+    } else {
+      images.push(newImage); // Add new
+    }
+
+    // Create updated manifest
+    const updatedManifest: ExtendedManifest = {
+      files: currentManifest?.files || [],
+      images,
+      lastUpdated: new Date().toISOString(),
+      version: '2.0.0', // Updated version with image support
+    };
+
+    // Note: In a real serverless environment, this would need to be handled
+    // by a build process or external service since we can't write files directly
+    console.log('Manifest-Update (nur im Cache):', updatedManifest);
+    
+    // Update cache with new manifest
+    blogCache.setCache('image-manifest', updatedManifest);
+    
+    // Clear image caches to force reload
+    blogCache.clearImageCaches();
+
+  } catch (error) {
+    console.error('Fehler beim Update des Bild-Manifests:', error);
+    throw new Error('Bild-Manifest konnte nicht aktualisiert werden');
+  }
+};
+
+/**
+ * Get metadata for a specific image
+ * @param filename - Image filename
+ * @returns Image metadata or null if not found
+ */
+export const getImageMetadata = async (filename: string): Promise<GitHubImageMetadata | null> => {
+  try {
+    const images = await loadGitHubImages();
+    return images.find(img => img.filename === filename) || null;
+  } catch (error) {
+    console.error(`Fehler beim Laden der Metadaten für ${filename}:`, error);
+    return null;
+  }
+};
+
+/**
+ * Get all images (combined GitHub + any future storage types)
+ * @returns Array of all available images
+ */
+export const getAllImages = async (): Promise<GitHubImageMetadata[]> => {
+  try {
+    // Check combined cache first
+    const cached = blogCache.getFromCache<GitHubImageMetadata[]>('combined-images');
+    if (cached) return cached;
+
+    // For now, only GitHub images are supported
+    const githubImages = await loadGitHubImages();
+    
+    // Cache combined results
+    blogCache.setCache('combined-images', githubImages);
+    
+    return githubImages;
+  } catch (error) {
+    console.error('Fehler beim Laden aller Bilder:', error);
+    return [];
+  }
+};
+
+/**
+ * Clear image-related caches
+ */
+export const clearImageCaches = (): void => {
+  blogCache.clearImageCaches();
+};
+
+/**
  * Clear all cached data (useful for development/testing)
  */
 export function clearCache(): void {
-  postCache.clear();
+  blogCache.clear();
+}
+
+/**
+ * Clear all caches including images
+ */
+export function clearAllCaches(): void {
+  blogCache.clearAll();
 }
 
 /**

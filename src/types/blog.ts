@@ -188,6 +188,113 @@ export interface BlogComment {
 }
 
 /**
+ * GitHub integration configuration interface
+ */
+export interface GitHubConfig {
+  /** Enable GitHub integration */
+  enabled: boolean;
+  /** Repository in format "owner/repo" */
+  repository: string;
+  /** Target branch */
+  branch: string;
+  /** Path for blog images in repository */
+  imagePath: string;
+  /** GitHub token from environment variable */
+  token?: string;
+  /** Raw GitHub content base URL */
+  baseUrl: string;
+  /** GitHub API base URL */
+  apiUrl: string;
+  /** Number of retries for rate limit errors */
+  rateLimitRetries: number;
+  /** Connection timeout in milliseconds */
+  connectionTimeout: number;
+  /** Upload timeout in milliseconds */
+  uploadTimeout: number;
+}
+
+/**
+ * Image storage configuration interface
+ */
+export interface ImageStorageConfig {
+  /** Enable GitHub storage */
+  enableGitHub: boolean;
+  /** Enable localStorage fallback */
+  enableLocalStorage: boolean;
+  /** Default storage method */
+  defaultStorage: 'github' | 'localStorage';
+  /** Maximum file size for GitHub uploads */
+  maxGitHubSize: number;
+  /** Maximum total size for localStorage */
+  maxLocalStorageSize: number;
+  /** Fallback behavior when primary storage fails */
+  fallbackBehavior: 'localStorage' | 'error';
+  /** Synchronization behavior between storage types */
+  syncBehavior: 'auto' | 'manual' | 'disabled';
+}
+
+/**
+ * GitHub image metadata interface
+ */
+export interface GitHubImageMetadata {
+  /** Image filename */
+  filename: string;
+  /** Full path in repository */
+  path: string;
+  /** Public URL for the image */
+  url: string;
+  /** Alt text for accessibility */
+  altText?: string;
+  /** File size in bytes */
+  size: number;
+  /** Upload timestamp */
+  uploadedAt: string;
+  /** GitHub SHA hash for the file */
+  sha: string;
+  /** Storage type identifier */
+  storageType: 'github';
+}
+
+/**
+ * Storage type union
+ */
+export type ImageStorageType = 'github' | 'localStorage';
+
+/**
+ * Image upload result interface
+ */
+export interface ImageUploadResult {
+  /** Upload success status */
+  success: boolean;
+  /** Storage type used */
+  storageType: ImageStorageType;
+  /** Public URL for the uploaded image */
+  url: string;
+  /** Final filename */
+  filename: string;
+  /** Error message if upload failed */
+  error?: string;
+  /** GitHub SHA hash (GitHub only) */
+  sha?: string;
+  /** Additional metadata */
+  metadata?: GitHubImageMetadata;
+}
+
+/**
+ * GitHub configuration validation result
+ */
+export interface GitHubConfigValidation {
+  /** Has valid GitHub token */
+  hasToken: boolean;
+  /** Has repository configured */
+  hasRepository: boolean;
+  /** Repository format is valid (owner/repo) */
+  repositoryFormat: boolean;
+  /** Configuration is complete and valid */
+  isConfigured: boolean;
+}
+
+/**
  * Blog configuration interface
  */
 export interface BlogConfig {
@@ -218,6 +325,18 @@ export interface BlogConfig {
     maxSize: number; // in bytes
     allowedTypes: readonly string[];
     thumbnailSizes: readonly number[];
+    supportedStorageTypes: readonly ImageStorageType[];
+    preferredStorage: ImageStorageType;
+  };
+  /** GitHub integration configuration */
+  github: GitHubConfig;
+  /** Image storage configuration */
+  imageStorage: ImageStorageConfig;
+  /** Feature flags */
+  features: {
+    githubIntegration: boolean;
+    hybridImageStorage: boolean;
+    offlineImageSupport: boolean;
   };
 }
 
@@ -367,6 +486,48 @@ export interface BlogRSSItem {
 }
 
 /**
+ * Required Environment Variables for GitHub Integration:
+ * 
+ * VITE_GITHUB_TOKEN - GitHub Personal Access Token with repo access
+ * VITE_GITHUB_REPO - Repository in format "owner/repo" 
+ * VITE_GITHUB_BRANCH - Target branch (optional, defaults to "main")
+ * 
+ * Example .env configuration:
+ * VITE_GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx
+ * VITE_GITHUB_REPO=username/melaniezeyer-website  
+ * VITE_GITHUB_BRANCH=main
+ */
+
+/**
+ * GitHub configuration defaults
+ */
+export const GITHUB_CONFIG: GitHubConfig = {
+  enabled: Boolean(import.meta.env.VITE_GITHUB_TOKEN),
+  repository: import.meta.env.VITE_GITHUB_REPO || '',
+  branch: import.meta.env.VITE_GITHUB_BRANCH || 'main',
+  imagePath: 'public/content/blog/images',
+  token: import.meta.env.VITE_GITHUB_TOKEN,
+  baseUrl: 'https://raw.githubusercontent.com',
+  apiUrl: 'https://api.github.com',
+  rateLimitRetries: 3,
+  connectionTimeout: 10000, // 10 seconds
+  uploadTimeout: 30000, // 30 seconds
+};
+
+/**
+ * Image storage configuration defaults
+ */
+export const IMAGE_STORAGE_CONFIG: ImageStorageConfig = {
+  enableGitHub: Boolean(import.meta.env.VITE_GITHUB_TOKEN),
+  enableLocalStorage: true,
+  defaultStorage: import.meta.env.VITE_GITHUB_TOKEN ? 'github' : 'localStorage',
+  maxGitHubSize: 5 * 1024 * 1024, // 5MB (same as current)
+  maxLocalStorageSize: 10 * 1024 * 1024, // 10MB total
+  fallbackBehavior: 'localStorage',
+  syncBehavior: 'auto',
+};
+
+/**
  * Default blog configuration
  */
 export const BLOG_CONFIG: BlogConfig = {
@@ -392,6 +553,15 @@ export const BLOG_CONFIG: BlogConfig = {
     maxSize: 5 * 1024 * 1024, // 5MB
     allowedTypes: ['image/jpeg', 'image/png', 'image/webp'] as const,
     thumbnailSizes: [150, 300, 600, 1200] as const,
+    supportedStorageTypes: ['github', 'localStorage'] as const,
+    preferredStorage: IMAGE_STORAGE_CONFIG.defaultStorage,
+  },
+  github: GITHUB_CONFIG,
+  imageStorage: IMAGE_STORAGE_CONFIG,
+  features: {
+    githubIntegration: Boolean(import.meta.env.VITE_GITHUB_TOKEN),
+    hybridImageStorage: true,
+    offlineImageSupport: true,
   },
 } as const;
 
@@ -454,6 +624,41 @@ export const BLOG_CATEGORIES: readonly BlogCategoryInfo[] = [
     icon: 'brain',
   },
 ] as const;
+
+/**
+ * Validates GitHub configuration
+ */
+export const validateGitHubConfig = (): GitHubConfigValidation => {
+  const config = BLOG_CONFIG.github;
+  const hasToken = !!config.token;
+  const hasRepository = !!config.repository;
+  const repositoryFormat = /^[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+$/.test(config.repository);
+  
+  return {
+    hasToken,
+    hasRepository,
+    repositoryFormat,
+    isConfigured: hasToken && hasRepository && repositoryFormat,
+  };
+};
+
+/**
+ * Gets image upload configuration based on current settings
+ */
+export const getImageUploadConfig = (): {
+  canUseGitHub: boolean;
+  canUseLocalStorage: boolean;
+  defaultMethod: ImageStorageType;
+} => {
+  const validation = validateGitHubConfig();
+  const storage = BLOG_CONFIG.imageStorage;
+  
+  return {
+    canUseGitHub: storage.enableGitHub && validation.isConfigured,
+    canUseLocalStorage: storage.enableLocalStorage,
+    defaultMethod: validation.isConfigured ? storage.defaultStorage : 'localStorage',
+  };
+};
 
 /**
  * Default admin permissions for different roles

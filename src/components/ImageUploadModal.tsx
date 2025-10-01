@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { APP_COLORS, APP_CONFIG } from '../types';
 import { BLOG_CONFIG } from '../types/blog';
+import GitHubImageService from '../services/githubImageService';
 
 interface ImageUploadModalProps {
   isOpen: boolean;
@@ -19,6 +20,9 @@ interface UploadedImage {
   height: number;
   type: string;
   uploadedAt: string;
+  storageType?: 'localStorage' | 'github';
+  sha?: string; // GitHub SHA for updates/deletions
+  filename?: string; // GitHub filename
 }
 
 interface ProcessedImage {
@@ -45,21 +49,56 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [uploadMethod, setUploadMethod] = useState<'file' | 'url'>('file');
+  const [storageMethod, setStorageMethod] = useState<'localStorage' | 'github'>('localStorage');
+  const [githubConnected, setGithubConnected] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isCheckingGitHub, setIsCheckingGitHub] = useState<boolean>(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const urlInputRef = useRef<HTMLInputElement>(null);
 
-  // Load uploaded images from localStorage on mount
+  // Load uploaded images from localStorage on mount and check GitHub connection
   useEffect(() => {
     const stored = localStorage.getItem('blog-uploaded-images');
     if (stored) {
       try {
-        setUploadedImages(JSON.parse(stored));
+        const localImages = JSON.parse(stored).map((img: UploadedImage) => ({
+          ...img,
+          storageType: img.storageType || 'localStorage'
+        }));
+        setUploadedImages(localImages);
       } catch (error) {
         console.error('Error loading uploaded images:', error);
       }
     }
-  }, []);
+
+    // Check GitHub connection when modal opens
+    if (isOpen) {
+      checkGitHubConnection();
+    }
+  }, [isOpen]);
+
+  // Check GitHub connection availability
+  const checkGitHubConnection = async () => {
+    setIsCheckingGitHub(true);
+    try {
+      const isConnected = await GitHubImageService.checkConnection();
+      setGithubConnected(isConnected);
+      
+      // Auto-select GitHub if available, localStorage if not
+      if (isConnected && storageMethod === 'localStorage') {
+        setStorageMethod('github');
+      } else if (!isConnected && storageMethod === 'github') {
+        setStorageMethod('localStorage');
+      }
+    } catch (error) {
+      console.error('GitHub connection check failed:', error);
+      setGithubConnected(false);
+      setStorageMethod('localStorage');
+    } finally {
+      setIsCheckingGitHub(false);
+    }
+  };
 
   // Save images to localStorage whenever uploadedImages changes
   useEffect(() => {
@@ -75,16 +114,18 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
       setError(null);
       setSearchQuery('');
       setUploadMethod('file');
+      setUploadProgress(0);
     }
   }, [isOpen, currentImage]);
 
-  // Handle file upload
+  // Handle file upload with GitHub integration
   const handleFiles = useCallback(async (files: FileList) => {
     const file = files[0];
     if (!file) return;
 
     setError(null);
     setIsProcessing(true);
+    setUploadProgress(0);
 
     try {
       // Validate file type
@@ -99,12 +140,80 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
 
       const processed = await processImage(file);
       setSelectedImage(processed);
+      
+      // If GitHub storage is selected and available, upload immediately
+      if (storageMethod === 'github' && githubConnected && altText.trim()) {
+        await handleGitHubUpload(processed);
+      }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Fehler beim Verarbeiten der Datei');
     } finally {
       setIsProcessing(false);
     }
-  }, []);
+  }, [storageMethod, githubConnected, altText]);
+
+  // Handle GitHub upload with progress tracking
+  const handleGitHubUpload = async (image: ProcessedImage) => {
+    if (!altText.trim()) {
+      setError('Alt-Text ist für GitHub-Upload erforderlich');
+      return;
+    }
+
+    setIsProcessing(true);
+    setUploadProgress(0);
+
+    try {
+      const result = await GitHubImageService.uploadImage(
+        image,
+        altText,
+        (progress) => setUploadProgress(progress)
+      );
+
+      if (result.success && result.url && result.filename) {
+        // Create GitHub image entry
+        const githubImage: UploadedImage = {
+          id: Date.now().toString(),
+          name: result.filename,
+          url: result.url,
+          altText: altText,
+          size: image.size,
+          width: image.width,
+          height: image.height,
+          type: image.type,
+          uploadedAt: new Date().toISOString(),
+          storageType: 'github',
+          sha: result.sha,
+          filename: result.filename
+        };
+
+        // Add to uploaded images list
+        setUploadedImages(prev => [githubImage, ...prev]);
+        
+        // Update selected image to use GitHub URL
+        setSelectedImage({
+          ...image,
+          url: result.url
+        });
+
+        setError(null);
+        return githubImage;
+      } else {
+        // Fallback to localStorage with notification
+        const fallbackMessage = `Upload fehlgeschlagen: ${result.error}. Bild wird lokal gespeichert.`;
+        setError(fallbackMessage);
+        setStorageMethod('localStorage');
+        return null;
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'GitHub Upload fehlgeschlagen';
+      setError(`${errorMessage}. Bild wird lokal gespeichert.`);
+      setStorageMethod('localStorage');
+      return null;
+    } finally {
+      setIsProcessing(false);
+      setUploadProgress(0);
+    }
+  };
 
   // Process image: convert to base64 and resize if needed
   const processImage = async (file: File): Promise<ProcessedImage> => {
@@ -224,8 +333,8 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
     }
   }, [isOpen, handlePaste]);
 
-  // Save uploaded image
-  const saveUploadedImage = (image: ProcessedImage) => {
+  // Save uploaded image with storage type
+  const saveUploadedImage = (image: ProcessedImage, storageType: 'localStorage' | 'github' = 'localStorage') => {
     const newImage: UploadedImage = {
       id: Date.now().toString(),
       name: image.name,
@@ -235,30 +344,71 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
       width: image.width,
       height: image.height,
       type: image.type,
-      uploadedAt: new Date().toISOString()
+      uploadedAt: new Date().toISOString(),
+      storageType
     };
 
     setUploadedImages(prev => [newImage, ...prev]);
+    return newImage;
   };
 
-  // Handle insert
-  const handleInsert = () => {
+  // Handle insert with GitHub upload if needed
+  const handleInsert = async () => {
     if (!selectedImage || !altText.trim()) {
       setError('Bitte geben Sie einen Alt-Text ein');
       return;
     }
 
-    // Save to gallery if it's a new upload
-    if (selectedImage.type !== 'external' && !uploadedImages.find(img => img.url === selectedImage.url)) {
-      saveUploadedImage(selectedImage);
-    }
+    try {
+      let finalImage = selectedImage;
+      const finalAltText = altText;
 
-    onInsert(selectedImage.url, altText);
+      // If GitHub storage is selected and we haven't uploaded yet
+      if (storageMethod === 'github' && githubConnected && selectedImage.type !== 'external') {
+        const existingGitHubImage = uploadedImages.find(
+          img => img.url === selectedImage.url && img.storageType === 'github'
+        );
+        
+        if (!existingGitHubImage) {
+          const uploadedImage = await handleGitHubUpload(selectedImage);
+          if (uploadedImage) {
+            finalImage = { ...selectedImage, url: uploadedImage.url };
+          }
+        }
+      }
+
+      // Save to gallery if it's a new upload
+      if (finalImage.type !== 'external' && !uploadedImages.find(img => img.url === finalImage.url)) {
+        saveUploadedImage(finalImage, storageMethod);
+      }
+
+      onInsert(finalImage.url, finalAltText);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Fehler beim Einfügen des Bildes');
+    }
   };
 
-  // Delete image from gallery
-  const deleteImage = (id: string) => {
-    setUploadedImages(prev => prev.filter(img => img.id !== id));
+  // Delete image from gallery with GitHub integration
+  const deleteImage = async (id: string) => {
+    const imageToDelete = uploadedImages.find(img => img.id === id);
+    if (!imageToDelete) return;
+
+    try {
+      // If it's a GitHub image, try to delete from repository
+      if (imageToDelete.storageType === 'github' && imageToDelete.filename && githubConnected) {
+        try {
+          await GitHubImageService.deleteImage(imageToDelete.filename, imageToDelete.sha);
+        } catch (error) {
+          console.warn('Failed to delete from GitHub:', error);
+          // Continue with local deletion even if GitHub deletion fails
+        }
+      }
+
+      // Remove from local state
+      setUploadedImages(prev => prev.filter(img => img.id !== id));
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Fehler beim Löschen des Bildes');
+    }
   };
 
   // Select image from gallery
@@ -274,11 +424,15 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
     setAltText(image.altText);
   };
 
-  // Filter images based on search
+  // Filter images based on search across both storage types
   const filteredImages = uploadedImages.filter(image =>
     image.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     image.altText.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Separate images by storage type for gallery display
+  const localImages = filteredImages.filter(img => img.storageType !== 'github');
+  const repoImages = filteredImages.filter(img => img.storageType === 'github');
 
   // Format file size
   const formatFileSize = (bytes: number) => {
@@ -473,6 +627,82 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
       overflowY: 'auto',
       maxHeight: '300px',
     },
+    storageSelector: {
+      display: 'flex',
+      gap: '1rem',
+      alignItems: 'center',
+      marginBottom: '1rem',
+      padding: '0.75rem',
+      backgroundColor: `${APP_COLORS.secondary}05`,
+      borderRadius: '0.5rem',
+      border: `1px solid ${APP_COLORS.secondary}20`,
+    },
+    radioGroup: {
+      display: 'flex',
+      gap: '1rem',
+      alignItems: 'center',
+    },
+    radioOption: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+      cursor: 'pointer',
+      padding: '0.25rem 0.5rem',
+      borderRadius: '0.25rem',
+      transition: 'background-color 0.2s ease',
+    },
+    radioInput: {
+      marginRight: '0.25rem',
+    },
+    connectionStatus: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.25rem',
+      fontSize: '0.75rem',
+      padding: '0.25rem 0.5rem',
+      borderRadius: '0.25rem',
+      backgroundColor: 'transparent',
+    },
+    progressBar: {
+      width: '100%',
+      height: '0.5rem',
+      backgroundColor: `${APP_COLORS.secondary}20`,
+      borderRadius: '0.25rem',
+      overflow: 'hidden',
+      marginTop: '0.5rem',
+    },
+    progressFill: {
+      height: '100%',
+      backgroundColor: APP_COLORS.primary,
+      borderRadius: '0.25rem',
+      transition: 'width 0.3s ease',
+    },
+    gallerySection: {
+      marginBottom: '1rem',
+    },
+    gallerySectionTitle: {
+      fontSize: '0.875rem',
+      fontWeight: '600',
+      color: APP_COLORS.primary,
+      marginBottom: '0.5rem',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+    },
+    sectionIcon: {
+      fontSize: '1rem',
+    },
+    imageStorageBadge: {
+      position: 'absolute',
+      bottom: '0.25rem',
+      left: '0.25rem',
+      fontSize: '0.5rem',
+      padding: '0.125rem 0.25rem',
+      borderRadius: '0.125rem',
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      color: 'white',
+      fontWeight: '600',
+    },
     galleryItem: {
       position: 'relative',
       aspectRatio: '1',
@@ -574,6 +804,61 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
 
         <div style={styles.content}>
           <div style={styles.leftPanel}>
+            {/* Storage Method Selector */}
+            <div style={styles.storageSelector}>
+              <strong style={{ color: APP_COLORS.primary, fontSize: '0.875rem' }}>Speicherort:</strong>
+              <div style={styles.radioGroup}>
+                <label style={styles.radioOption}>
+                  <input
+                    type="radio"
+                    name="storageMethod"
+                    value="localStorage"
+                    checked={storageMethod === 'localStorage'}
+                    onChange={(e) => setStorageMethod(e.target.value as 'localStorage' | 'github')}
+                    style={styles.radioInput}
+                  />
+                  📁 Lokal speichern
+                </label>
+                <label style={{
+                  ...styles.radioOption,
+                  opacity: githubConnected ? 1 : 0.6,
+                  cursor: githubConnected ? 'pointer' : 'not-allowed'
+                }}>
+                  <input
+                    type="radio"
+                    name="storageMethod"
+                    value="github"
+                    checked={storageMethod === 'github'}
+                    onChange={(e) => githubConnected && setStorageMethod(e.target.value as 'localStorage' | 'github')}
+                    disabled={!githubConnected}
+                    style={styles.radioInput}
+                  />
+                  🔗 In Repository speichern
+                </label>
+              </div>
+              
+              {/* GitHub Connection Status */}
+              <div style={{
+                ...styles.connectionStatus,
+                color: isCheckingGitHub ? APP_COLORS.secondary : (githubConnected ? '#28a745' : '#dc3545'),
+                backgroundColor: isCheckingGitHub ? `${APP_COLORS.secondary}10` : (githubConnected ? '#28a74510' : '#dc354510')
+              }}>
+                {isCheckingGitHub ? (
+                  <>
+                    <span style={styles.spinner} />
+                    Überprüfe Verbindung...
+                  </>
+                ) : githubConnected ? (
+                  <>
+                    ✅ Verbunden
+                  </>
+                ) : (
+                  <>
+                    ❌ Nicht verfügbar
+                  </>
+                )}
+              </div>
+            </div>
             <div style={styles.methodSelector}>
               <button
                 style={{
@@ -663,7 +948,31 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
             {isProcessing && (
               <div style={styles.loading}>
                 <span style={styles.spinner} />
-                Bild wird verarbeitet...
+                {storageMethod === 'github' && uploadProgress > 0 
+                  ? `Lade in Repository hoch... ${uploadProgress}%`
+                  : 'Bild wird verarbeitet...'
+                }
+              </div>
+            )}
+
+            {/* Upload Progress Bar for GitHub */}
+            {storageMethod === 'github' && uploadProgress > 0 && uploadProgress < 100 && (
+              <div>
+                <div style={{ 
+                  fontSize: '0.75rem', 
+                  color: APP_COLORS.secondary, 
+                  marginBottom: '0.25rem' 
+                }}>
+                  Upload-Fortschritt: {uploadProgress}%
+                </div>
+                <div style={styles.progressBar}>
+                  <div 
+                    style={{
+                      ...styles.progressFill,
+                      width: `${uploadProgress}%`
+                    }}
+                  />
+                </div>
               </div>
             )}
 
@@ -712,7 +1021,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Bilder durchsuchen..."
+                  placeholder="Alle Bilder durchsuchen..."
                   onFocus={(e) => {
                     e.target.style.borderColor = APP_COLORS.primary;
                   }}
@@ -727,43 +1036,114 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                   Noch keine Bilder hochgeladen
                 </div>
               ) : (
-                <div style={styles.galleryGrid}>
-                  {filteredImages.map((image) => (
-                    <div
-                      key={image.id}
-                      style={{
-                        ...styles.galleryItem,
-                        ...(selectedImage?.url === image.url ? styles.galleryItemSelected : {})
-                      }}
-                      onClick={() => selectImageFromGallery(image)}
-                      onMouseEnter={(e) => {
-                        const deleteBtn = e.currentTarget.querySelector('.delete-btn') as HTMLElement;
-                        if (deleteBtn) deleteBtn.style.opacity = '1';
-                      }}
-                      onMouseLeave={(e) => {
-                        const deleteBtn = e.currentTarget.querySelector('.delete-btn') as HTMLElement;
-                        if (deleteBtn) deleteBtn.style.opacity = '0';
-                      }}
-                      title={image.altText}
-                    >
-                      <img
-                        src={image.url}
-                        alt={image.altText}
-                        style={styles.galleryImage}
-                      />
-                      <button
-                        className="delete-btn"
-                        style={styles.galleryItemDelete}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteImage(image.id);
-                        }}
-                        aria-label="Bild löschen"
-                      >
-                        ×
-                      </button>
+                <div style={{ overflowY: 'auto', flex: 1 }}>
+                  {/* Repository Images Section */}
+                  {repoImages.length > 0 && (
+                    <div style={styles.gallerySection}>
+                      <div style={styles.gallerySectionTitle}>
+                        <span style={styles.sectionIcon}>🔗</span>
+                        Repository-Bilder ({repoImages.length})
+                      </div>
+                      <div style={styles.galleryGrid}>
+                        {repoImages.map((image) => (
+                          <div
+                            key={image.id}
+                            style={{
+                              ...styles.galleryItem,
+                              ...(selectedImage?.url === image.url ? styles.galleryItemSelected : {})
+                            }}
+                            onClick={() => selectImageFromGallery(image)}
+                            onMouseEnter={(e) => {
+                              const deleteBtn = e.currentTarget.querySelector('.delete-btn') as HTMLElement;
+                              if (deleteBtn) deleteBtn.style.opacity = '1';
+                            }}
+                            onMouseLeave={(e) => {
+                              const deleteBtn = e.currentTarget.querySelector('.delete-btn') as HTMLElement;
+                              if (deleteBtn) deleteBtn.style.opacity = '0';
+                            }}
+                            title={image.altText}
+                          >
+                            <img
+                              src={image.url}
+                              alt={image.altText}
+                              style={styles.galleryImage}
+                            />
+                            <div style={{
+                              ...styles.imageStorageBadge,
+                              backgroundColor: APP_COLORS.primary
+                            }}>
+                              REPO
+                            </div>
+                            <button
+                              className="delete-btn"
+                              style={styles.galleryItemDelete}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteImage(image.id);
+                              }}
+                              aria-label="Bild löschen"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  ))}
+                  )}
+
+                  {/* Local Images Section */}
+                  {localImages.length > 0 && (
+                    <div style={styles.gallerySection}>
+                      <div style={styles.gallerySectionTitle}>
+                        <span style={styles.sectionIcon}>📁</span>
+                        Lokale Bilder ({localImages.length})
+                      </div>
+                      <div style={styles.galleryGrid}>
+                        {localImages.map((image) => (
+                          <div
+                            key={image.id}
+                            style={{
+                              ...styles.galleryItem,
+                              ...(selectedImage?.url === image.url ? styles.galleryItemSelected : {})
+                            }}
+                            onClick={() => selectImageFromGallery(image)}
+                            onMouseEnter={(e) => {
+                              const deleteBtn = e.currentTarget.querySelector('.delete-btn') as HTMLElement;
+                              if (deleteBtn) deleteBtn.style.opacity = '1';
+                            }}
+                            onMouseLeave={(e) => {
+                              const deleteBtn = e.currentTarget.querySelector('.delete-btn') as HTMLElement;
+                              if (deleteBtn) deleteBtn.style.opacity = '0';
+                            }}
+                            title={image.altText}
+                          >
+                            <img
+                              src={image.url}
+                              alt={image.altText}
+                              style={styles.galleryImage}
+                            />
+                            <div style={{
+                              ...styles.imageStorageBadge,
+                              backgroundColor: APP_COLORS.secondary
+                            }}>
+                              LOKAL
+                            </div>
+                            <button
+                              className="delete-btn"
+                              style={styles.galleryItemDelete}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteImage(image.id);
+                              }}
+                              aria-label="Bild löschen"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -778,11 +1158,22 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
             Abbrechen
           </button>
           <button
-            style={{ ...styles.button, ...styles.primaryButton }}
+            style={{ 
+              ...styles.button, 
+              ...styles.primaryButton,
+              opacity: (!selectedImage || !altText.trim() || isProcessing) ? 0.6 : 1
+            }}
             onClick={handleInsert}
-            disabled={!selectedImage || !altText.trim()}
+            disabled={!selectedImage || !altText.trim() || isProcessing}
           >
-            Einfügen
+            {isProcessing ? (
+              <>
+                <span style={{ ...styles.spinner, marginRight: '0.5rem' }} />
+                {storageMethod === 'github' ? 'Uploading...' : 'Verarbeite...'}
+              </>
+            ) : (
+              'Einfügen'
+            )}
           </button>
         </div>
       </div>

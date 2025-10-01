@@ -89,6 +89,10 @@ npm run build    # Build for production to dist/
 npm run preview  # Preview production build on port 4173
 npm run lint     # Run ESLint checks
 
+# Setup and verification commands
+npm run verify-env # Verify environment variables setup
+npm run setup      # Alias for verify-env (same command)
+
 # Deployment (automatic via Netlify)
 # Push to main branch triggers deployment
 ```
@@ -615,6 +619,10 @@ npm run lint     # ESLint validation
 
 # DEVELOPMENT COMMANDS (VERIFIED)
 npm run dev      # Start development server
+
+# SETUP COMMANDS (VERIFIED)
+npm run verify-env # Verify environment variables configuration
+npm run setup      # Alias for verify-env
 
 # VALIDATION COMMANDS (RUN AFTER CHANGES)
 npm run build && npm run preview  # Full validation cycle
