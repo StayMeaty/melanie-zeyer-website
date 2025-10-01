@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../services/auth';
 import { BlogPost } from '../types/blog';
 import { loadAllPosts } from '../services/blogContent';
 import BlogManagementDashboard from './BlogManagementDashboard';
@@ -24,7 +23,6 @@ interface TabConfig {
 }
 
 const BlogManagement: React.FC<BlogManagementProps> = () => {
-  const { } = useAuth();
   const navigate = useNavigate();
   
   // State management
@@ -454,7 +452,8 @@ const BlogManagement: React.FC<BlogManagementProps> = () => {
       {/* Modals */}
       {showDeleteModal && deleteTarget && (
         <DeleteConfirmationModal
-          post={deleteTarget}
+          isOpen={showDeleteModal}
+          posts={deleteTarget}
           onConfirm={confirmDelete}
           onCancel={() => {
             setShowDeleteModal(false);
@@ -465,11 +464,12 @@ const BlogManagement: React.FC<BlogManagementProps> = () => {
 
       {showImageModal && (
         <ImageUploadModal
-          onUpload={(imageUrl) => {
-            console.log('Image uploaded:', imageUrl);
+          isOpen={showImageModal}
+          onInsert={(imageUrl, altText) => {
+            console.log('Image uploaded:', imageUrl, altText);
             setShowImageModal(false);
           }}
-          onCancel={() => setShowImageModal(false)}
+          onClose={() => setShowImageModal(false)}
         />
       )}
     </div>

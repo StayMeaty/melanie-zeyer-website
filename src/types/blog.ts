@@ -57,8 +57,24 @@ export interface BlogSEO {
   canonicalUrl?: string;
   /** Open Graph image */
   ogImage?: string;
+  /** Open Graph title */
+  ogTitle?: string;
+  /** Open Graph description */
+  ogDescription?: string;
+  /** Twitter card title */
+  twitterTitle?: string;
+  /** Twitter card description */
+  twitterDescription?: string;
+  /** Twitter card image */
+  twitterImage?: string;
+  /** Twitter card type */
+  twitterCard?: 'summary' | 'summary_large_image';
   /** Keywords for SEO */
   keywords?: string[];
+  /** Focus keyphrase for content optimization */
+  focusKeyphrase?: string;
+  /** Robots meta tag directives */
+  robots?: string;
   /** Schema.org structured data */
   structuredData?: Record<string, unknown>;
 }

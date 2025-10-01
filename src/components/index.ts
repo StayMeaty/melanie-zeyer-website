@@ -15,3 +15,4 @@ export { default as AdminLogin } from './AdminLogin';
 export { default as ProtectedRoute } from './ProtectedRoute';
 export { default as AdminDashboard } from './AdminDashboard';
 export { default as BlogManagement } from './BlogManagement';
+export { default as SEOMetaEditor } from './SEOMetaEditor';

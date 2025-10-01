@@ -151,13 +151,15 @@ const BlogPostPage: React.FC = () => {
 
   useEffect(() => {
     // Simulate API call
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       if (slug === 'kraft-der-selbstreflexion') {
         setPost(mockPost);
         setRelatedPosts(mockRelatedPosts);
       }
       setIsLoading(false);
     }, 500);
+
+    return () => clearTimeout(timer);
   }, [slug]);
 
   const styles: Record<string, React.CSSProperties> = {
