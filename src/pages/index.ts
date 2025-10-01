@@ -4,3 +4,5 @@ export { default as Kurse } from './Kurse';
 export { default as Coaching } from './Coaching';
 export { default as FAQ } from './FAQ';
 export { default as Impressum } from './Impressum';
+export { default as Blog } from './Blog';
+export { default as BlogPost } from './BlogPost';

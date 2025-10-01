@@ -4,7 +4,29 @@
 
 [build.environment]
   NODE_VERSION = "18"
+  # Decap CMS environment variables
+  # Note: Set these in Netlify UI for security
+  # DECAP_CMS_BRANCH = "main"
+  # DECAP_CMS_REPO = "your-username/melanie-repo"
 
+# Identity and Git Gateway settings
+[template.environment]
+  NETLIFY_CMS_GITHUB_TOKEN = "GitHub Personal Access Token"
+  NETLIFY_CMS_SITE_URL = "https://melaniezeyer.de"
+
+# Admin panel redirect
+[[redirects]]
+  from = "/admin"
+  to = "/admin/index.html"
+  status = 200
+
+# CMS admin assets
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin/:splat"
+  status = 200
+
+# Main SPA redirect (must be last)
 [[redirects]]
   from = "/*"
   to = "/index.html"

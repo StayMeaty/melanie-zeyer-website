@@ -183,6 +183,17 @@ const Navigation: React.FC = () => {
                 FAQ
               </NavLink>
             </li>
+            <li>
+              <NavLink 
+                to="/preview/blog" 
+                style={({ isActive }) => ({
+                  ...styles.navLink,
+                  ...(isActive ? styles.navLinkActive : {}),
+                })}
+              >
+                Blog
+              </NavLink>
+            </li>
           </ul>
 
           <button 
@@ -276,6 +287,18 @@ const Navigation: React.FC = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 FAQ
+              </NavLink>
+            </li>
+            <li>
+              <NavLink 
+                to="/preview/blog" 
+                style={({ isActive }) => ({
+                  ...styles.navLink,
+                  ...(isActive ? styles.navLinkActive : {}),
+                })}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Blog
               </NavLink>
             </li>
           </ul>

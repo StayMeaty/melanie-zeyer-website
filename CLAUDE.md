@@ -286,6 +286,287 @@ If needed in future:
 - Error rate: < 0.1%
 - Core Web Vitals: All green
 
+## Blog System Architecture
+
+### Overview
+The website includes a comprehensive blog system with client-side authentication and content management capabilities. The blog is fully serverless-compatible, using markdown files for content storage and client-side rendering for all functionality.
+
+### Core Components
+
+#### 1. Type Definitions (`src/types/blog.ts`)
+Comprehensive TypeScript interfaces and types for the blog system:
+- **BlogPost**: Complete post structure with metadata and content
+- **BlogMetadata**: Frontmatter data from markdown files
+- **BlogCategory**: Six predefined categories (coaching, persoenlichkeitsentwicklung, lifestyle, business, gesundheit, mindset)
+- **BlogStatus**: Post states (draft, published, archived)
+- **BlogAuthor**: Author information with social links
+- **BlogSEO**: SEO metadata for search optimization
+- **AdminUser**: User roles and permissions system
+- **BlogConfig**: System-wide configuration settings
+
+Default configuration includes:
+- Posts per page: 12
+- Comments enabled with moderation
+- Search functionality enabled
+- RSS feed support
+- Reading speed: 200 words/minute
+- Max image size: 5MB
+
+#### 2. Authentication System (`src/services/auth.ts`)
+
+**Client-Side Password Protection:**
+- SHA-256 password hashing using Web Crypto API
+- Password hash stored in environment variable `VITE_ADMIN_PASSWORD_HASH`
+- Session-based authentication with configurable duration (4 hours default)
+- "Remember Me" option extends session to 24 hours
+- Login attempt tracking with lockout after 5 failed attempts (15-minute lockout)
+- CSRF token generation for form protection
+- Security event logging to sessionStorage for debugging
+
+**Session Management:**
+- Sessions stored in sessionStorage (default) or localStorage ("Remember Me")
+- Automatic session expiration checking
+- Session refresh every minute
+- Secure token generation using crypto.getRandomValues()
+
+**Security Features:**
+- Account lockout mechanism
+- Security event logging
+- CSRF protection
+- Session expiration
+- No backend dependencies (fully client-side)
+
+#### 3. Content Service (`src/services/blogContent.ts`)
+
+**Markdown Processing:**
+- Gray-matter for frontmatter parsing
+- Support for all BlogMetadata fields
+- Automatic slug generation from titles (German character support)
+- Reading time calculation (200 words/minute)
+- Content caching with 5-minute TTL
+
+**Data Loading:**
+- Loads markdown files from `/public/content/blog/`
+- Requires manifest.json for file listing (serverless constraint)
+- Parallel loading with error handling
+- Automatic sorting by date (newest first)
+- Draft posts hidden in production, visible in development
+
+**Query Functions:**
+- `loadAllPosts()`: Get all published posts
+- `loadPostBySlug()`: Get single post by URL slug
+- `getPostsByCategory()`: Filter by category
+- `getPostsByTag()`: Filter by tag
+- `getRecentPosts()`: Get latest posts
+- `searchPosts()`: Full-text search in title, excerpt, content, and tags
+- `getPaginatedPosts()`: Paginated post listings
+- `getAllTags()`: Get all unique tags with counts
+- `getBlogStats()`: Basic blog statistics
+
+#### 4. CMS Integration (Decap CMS)
+
+**Configuration Location:** `public/admin/config.yml`
+
+**Features:**
+- Git-based content management via Netlify Identity
+- Editorial workflow (draft/review/publish)
+- Local development backend support
+- German language interface
+- Media upload to `public/content/blog/images/`
+
+**Content Collections:**
+1. **Blog Posts:**
+   - Location: `public/content/blog/`
+   - Slug format: `{{year}}-{{month}}-{{day}}-{{slug}}`
+   - Full markdown editor with preview
+   - All BlogMetadata fields supported
+   - SEO settings group
+   - Featured post flag
+
+2. **Authors:**
+   - Location: `public/content/authors/`
+   - Author profiles with social links
+   - Avatar image support
+
+**Access:** Available at `/admin` route (requires authentication)
+
+#### 5. React Components
+
+**Blog Pages:**
+- `src/pages/Blog.tsx`: Main blog listing page with category filter and search
+- `src/pages/BlogPost.tsx`: Individual post display with related posts
+- `src/components/BlogCard.tsx`: Post card component for listings
+- `src/components/BlogManagement.tsx`: Admin interface for post management
+
+**Admin Components:**
+- `src/components/AdminLogin.tsx`: Login form with password protection
+- `src/components/AdminDashboard.tsx`: Main admin dashboard
+- `src/components/ProtectedRoute.tsx`: Route protection with permission checking
+
+#### 6. Routing Structure
+
+```typescript
+// Public routes
+/blog                 // Blog listing page
+/blog/:slug          // Individual blog post
+
+// Admin routes (protected)
+/admin               // Admin dashboard
+/admin/login         // Login page
+/admin/blog          // Blog management interface
+```
+
+### Content Storage
+
+**Directory Structure:**
+```
+public/
+├── content/
+│   ├── blog/
+│   │   ├── images/          // Blog post images
+│   │   ├── manifest.json    // File listing for serverless
+│   │   └── *.md            // Blog post markdown files
+│   └── authors/            // Author profiles
+└── admin/
+    ├── config.yml          // Decap CMS configuration
+    └── index.html          // CMS entry point
+```
+
+**Markdown File Format:**
+```markdown
+---
+title: "Post Title"
+slug: "url-friendly-slug"
+date: "2024-01-01T10:00:00.000Z"
+excerpt: "Short description"
+author: "melanie"
+category: "coaching"
+tags: ["tag1", "tag2"]
+image: "/content/blog/images/hero.jpg"
+imageAlt: "Description"
+status: "published"
+featured: false
+seo:
+  metaTitle: "SEO Title"
+  metaDescription: "SEO Description"
+---
+
+Post content in markdown format...
+```
+
+### Security Considerations
+
+1. **Authentication Security:**
+   - Password never transmitted or stored in plain text
+   - Client-side hashing before comparison
+   - Session tokens use cryptographically secure random values
+   - Automatic session expiration
+
+2. **Content Security:**
+   - All content sanitized before rendering
+   - No user-generated content without authentication
+   - CSRF protection on all forms
+   - XSS prevention through React's default escaping
+
+3. **Deployment Security:**
+   - HTTPS enforced by Netlify
+   - No sensitive data in frontend code
+   - Environment variables for secrets
+   - Git-based version control for content
+
+### Environment Variables
+
+Required environment variables for blog functionality:
+
+```bash
+# Admin password hash (generate using hashPassword function)
+VITE_ADMIN_PASSWORD_HASH=<sha256-hash>
+
+# Optional: Netlify Identity (for CMS)
+NETLIFY_IDENTITY_ENDPOINT=<identity-url>
+```
+
+### Development Workflow
+
+1. **Creating Blog Posts:**
+   - Option 1: Create markdown files directly in `public/content/blog/`
+   - Option 2: Use Decap CMS at `/admin` (requires setup)
+   - Option 3: Use the admin interface at `/admin/blog`
+
+2. **Managing Content:**
+   - Edit markdown files for quick changes
+   - Use CMS for full editorial workflow
+   - Admin dashboard for post management
+
+3. **Testing:**
+   - Draft posts visible in development mode
+   - Use `npm run dev` to test locally
+   - Preview at `/blog` route
+
+### Performance Optimizations
+
+1. **Caching Strategy:**
+   - 5-minute TTL for processed posts
+   - Session-based cache for better performance
+   - Lazy loading of post content
+
+2. **Loading Optimization:**
+   - Parallel markdown file loading
+   - Post summaries for listings (reduced payload)
+   - Pagination to limit initial load
+
+3. **Search Performance:**
+   - Client-side full-text search
+   - Indexed on demand
+   - Results cached during session
+
+### Future Enhancements
+
+Potential improvements maintaining serverless architecture:
+
+1. **Comments System:**
+   - Integration with Disqus or similar service
+   - Netlify Forms for comment submission
+   - Moderation through admin interface
+
+2. **Newsletter Integration:**
+   - Email subscription via Netlify Forms
+   - Integration with email service (Mailchimp, ConvertKit)
+   - GDPR-compliant signup process
+
+3. **Analytics:**
+   - Client-side view tracking
+   - Popular posts widget
+   - Reading statistics
+
+4. **RSS Feed:**
+   - Static RSS generation at build time
+   - Automatic feed updates on deploy
+
+### Troubleshooting
+
+**Common Issues:**
+
+1. **Posts not appearing:**
+   - Check `status` field is "published"
+   - Verify manifest.json includes the file
+   - Clear cache with `clearCache()`
+
+2. **Authentication failures:**
+   - Verify VITE_ADMIN_PASSWORD_HASH is set
+   - Check for account lockout (15-minute wait)
+   - Clear browser storage and retry
+
+3. **CMS not loading:**
+   - Ensure Netlify Identity is configured
+   - Check git-gateway settings
+   - Verify branch permissions
+
+4. **Image upload issues:**
+   - Check file size (max 5MB)
+   - Verify format (JPG, PNG, WebP only)
+   - Ensure correct path in markdown
+
 ## Communication Style
 
 When providing updates or explanations:
