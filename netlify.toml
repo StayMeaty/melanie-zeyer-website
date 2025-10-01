@@ -8,6 +8,10 @@
   # Note: Set these in Netlify UI for security
   # DECAP_CMS_BRANCH = "main"
   # DECAP_CMS_REPO = "your-username/melanie-repo"
+  
+  # Disable secrets scanning for password hash
+  # The VITE_ADMIN_PASSWORD_HASH is a SHA-256 hash, not a secret
+  SECRETS_SCAN_OMIT_KEYS = "VITE_ADMIN_PASSWORD_HASH"
 
 # Identity and Git Gateway settings
 [template.environment]
