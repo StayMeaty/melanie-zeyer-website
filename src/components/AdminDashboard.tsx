@@ -1,11 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../services/auth';
+import { getBlogStats } from '../services/blogContent';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface AdminDashboardProps {}
 
 const AdminDashboard: React.FC<AdminDashboardProps> = () => {
   const { user, logout } = useAuth();
+  const [blogStats, setBlogStats] = useState<{
+    totalPosts: number;
+    totalCategories: number;
+    totalTags: number;
+    averageReadingTime: number;
+  } | null>(null);
+  const [draftsCount, setDraftsCount] = useState(0);
+
+  // Load blog statistics on mount
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const stats = await getBlogStats();
+        setBlogStats(stats);
+        
+        // Count drafts from localStorage
+        const draftsJson = localStorage.getItem('blog_drafts');
+        if (draftsJson) {
+          const drafts = JSON.parse(draftsJson);
+          setDraftsCount(Array.isArray(drafts) ? drafts.length : 0);
+        }
+      } catch (error) {
+        console.error('Error loading blog stats:', error);
+      }
+    };
+
+    loadStats();
+  }, []);
 
   const styles: Record<string, React.CSSProperties> = {
     container: {
@@ -69,6 +98,43 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
       textDecoration: 'none',
       fontWeight: 'bold',
     },
+    primaryLink: {
+      color: '#0097B2',
+      textDecoration: 'none',
+      fontWeight: 'bold',
+      display: 'inline-block',
+      marginTop: '1rem',
+      padding: '0.5rem 1rem',
+      backgroundColor: '#f0f9ff',
+      borderRadius: '4px',
+      border: '1px solid #0097B2',
+      transition: 'all 0.2s',
+    },
+    statsGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(3, 1fr)',
+      gap: '1rem',
+      margin: '1rem 0',
+      padding: '1rem',
+      backgroundColor: '#f8f9fa',
+      borderRadius: '6px',
+    },
+    stat: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      textAlign: 'center',
+    },
+    statNumber: {
+      fontSize: '1.5rem',
+      fontWeight: 'bold',
+      color: '#0097B2',
+    },
+    statLabel: {
+      fontSize: '0.8rem',
+      color: '#666',
+      marginTop: '0.25rem',
+    },
   };
 
   return (
@@ -89,7 +155,23 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
           <p style={styles.cardDescription}>
             Verwalten Sie Ihre Blog-Beiträge, erstellen Sie neue Artikel und bearbeiten Sie bestehende Inhalte.
           </p>
-          <a href="/admin/blog" style={styles.link}>
+          {blogStats && (
+            <div style={styles.statsGrid}>
+              <div style={styles.stat}>
+                <span style={styles.statNumber}>{blogStats.totalPosts}</span>
+                <span style={styles.statLabel}>Veröffentlichte Beiträge</span>
+              </div>
+              <div style={styles.stat}>
+                <span style={styles.statNumber}>{draftsCount}</span>
+                <span style={styles.statLabel}>Entwürfe</span>
+              </div>
+              <div style={styles.stat}>
+                <span style={styles.statNumber}>{blogStats.totalTags}</span>
+                <span style={styles.statLabel}>Tags</span>
+              </div>
+            </div>
+          )}
+          <a href="/admin/blog" style={styles.primaryLink}>
             Zum Blog-Management →
           </a>
         </div>
