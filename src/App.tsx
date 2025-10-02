@@ -127,6 +127,22 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/blog/new"
+            element={
+              <ProtectedRoute>
+                <BlogManagement initialView="create" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/blog/edit/:slug"
+            element={
+              <ProtectedRoute>
+                <BlogManagement initialView="edit" />
+              </ProtectedRoute>
+            }
+          />
           {/* Redirect /admin to dashboard */}
           <Route
             path="/admin"

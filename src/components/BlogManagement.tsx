@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { BlogPost } from '../types/blog';
 import { loadAllPosts, clearPostCaches } from '../services/blogContent';
 import BlogManagementDashboard from './BlogManagementDashboard';
@@ -10,8 +10,9 @@ import DraftManager from './DraftManager';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import ImageUploadModal from './ImageUploadModal';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-interface BlogManagementProps {}
+interface BlogManagementProps {
+  initialView?: ViewType;
+}
 
 type ViewType = 'overview' | 'statistics' | 'categories' | 'drafts' | 'create' | 'edit';
 
@@ -22,11 +23,12 @@ interface TabConfig {
   component: React.ComponentType<any>;
 }
 
-const BlogManagement: React.FC<BlogManagementProps> = () => {
+const BlogManagement: React.FC<BlogManagementProps> = ({ initialView = 'overview' }) => {
   const navigate = useNavigate();
+  const { slug } = useParams<{ slug?: string }>();
   
   // State management
-  const [currentView, setCurrentView] = useState<ViewType>('overview');
+  const [currentView, setCurrentView] = useState<ViewType>(initialView);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -75,6 +77,19 @@ const BlogManagement: React.FC<BlogManagementProps> = () => {
   useEffect(() => {
     loadPosts();
   }, [loadPosts]);
+
+  // Load specific post when editing with slug
+  useEffect(() => {
+    if (initialView === 'edit' && slug && posts.length > 0) {
+      const post = posts.find(p => p.slug === slug);
+      if (post) {
+        setEditingPost(post);
+      } else {
+        setError(`Beitrag mit Slug "${slug}" nicht gefunden`);
+        setCurrentView('overview');
+      }
+    }
+  }, [initialView, slug, posts]);
 
   // Clear success messages after 3 seconds
   useEffect(() => {
