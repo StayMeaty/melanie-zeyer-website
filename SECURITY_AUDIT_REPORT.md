@@ -36,7 +36,7 @@ getSecureToken()                                    // Proxy service retrieval
 #### Issue
 Found hardcoded token in `tina/__generated__/client.ts`:
 ```typescript
-token: 's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'  // EXPOSED!
+token: '[REDACTED]'  // Token was exposed in generated file
 ```
 
 #### Resolution
