@@ -145,7 +145,10 @@ export const validateTokenSecurely = async (
       };
     }
 
-    if (!providedToken) {
+    // If no token provided, try to use the environment token
+    const tokenToValidate = providedToken || import.meta.env.VITE_GITHUB_TOKEN;
+    
+    if (!tokenToValidate) {
       logSecurityEvent('tina_token_missing', { context });
       recordValidationAttempt(false, context);
       return { 
@@ -154,8 +157,8 @@ export const validateTokenSecurely = async (
       };
     }
 
-    // Hash the provided token
-    const providedTokenHash = await hashToken(providedToken);
+    // Hash the token to validate
+    const providedTokenHash = await hashToken(tokenToValidate);
     
     // Use time-constant comparison
     const isValid = secureCompare(providedTokenHash, expectedTokenHash);
