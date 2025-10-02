@@ -16,7 +16,16 @@
 # VITE_GITHUB_BRANCH = "main"
 # VITE_ADMIN_PASSWORD_HASH = "SHA-256 hash of admin password"
 
-# Admin routes are handled by React Router (no static redirects needed)
+# Admin routes are handled by React Router
+[[redirects]]
+  from = "/admin"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/index.html"
+  status = 200
 
 # Main SPA redirect (must be last)
 [[redirects]]
