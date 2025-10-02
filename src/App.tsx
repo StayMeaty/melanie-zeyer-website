@@ -142,8 +142,7 @@ function App() {
             path="/admin/tina"
             element={
               <ProtectedRoute>
-                <Suspense fallback={
-                  <div style={{
+                <Suspense fallback={<div style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
