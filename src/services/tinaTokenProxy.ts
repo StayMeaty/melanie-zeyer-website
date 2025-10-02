@@ -134,14 +134,14 @@ export const validateTokenSecurely = async (
 
   try {
     // Get expected token hash from environment
-    const expectedTokenHash = import.meta.env.VITE_TINA_TOKEN_HASH;
+    const expectedTokenHash = import.meta.env.VITE_GITHUB_TOKEN_HASH;
     
     if (!expectedTokenHash) {
       logSecurityEvent('tina_token_not_configured', { context });
       recordValidationAttempt(false, context);
       return { 
         valid: false, 
-        error: 'Tina CMS token not configured. Please set VITE_TINA_TOKEN_HASH.' 
+        error: 'GitHub token not configured. Please set VITE_GITHUB_TOKEN_HASH.' 
       };
     }
 
@@ -185,7 +185,7 @@ export const getSecureToken = async (): Promise<string | null> => {
   // In production, this would validate against a secure session
   // Never return the actual token from environment directly
   
-  const tokenFromEnv = import.meta.env.VITE_TINA_TOKEN;
+  const tokenFromEnv = import.meta.env.VITE_GITHUB_TOKEN;
   
   if (!tokenFromEnv) {
     logSecurityEvent('tina_token_request_failed', { 
@@ -330,7 +330,7 @@ export const generateTokenHashForEnv = async (token: string): Promise<string> =>
   
   const hash = await hashToken(token);
   console.log('Add this to your .env file:');
-  console.log(`VITE_TINA_TOKEN_HASH=${hash}`);
+  console.log(`VITE_GITHUB_TOKEN_HASH=${hash}`);
   
   return hash;
 };

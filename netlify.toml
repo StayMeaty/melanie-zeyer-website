@@ -7,8 +7,8 @@
   
   # Disable secrets scanning for specific keys
   # VITE_ADMIN_PASSWORD_HASH is a SHA-256 hash, not a secret
-  # VITE_GITHUB_TOKEN and NETLIFY_CMS_GITHUB_TOKEN are PATs configured in Netlify UI
-  SECRETS_SCAN_OMIT_KEYS = "VITE_ADMIN_PASSWORD_HASH,VITE_GITHUB_TOKEN,NETLIFY_CMS_GITHUB_TOKEN"
+  # VITE_GITHUB_TOKEN is a PAT configured in Netlify UI
+  SECRETS_SCAN_OMIT_KEYS = "VITE_ADMIN_PASSWORD_HASH,VITE_GITHUB_TOKEN"
 
 # GitHub Integration Environment Variables (set in Netlify UI)
 # VITE_GITHUB_TOKEN = "GitHub Personal Access Token with repo scope"

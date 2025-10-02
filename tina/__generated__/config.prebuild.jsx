@@ -18,7 +18,7 @@ var TWITTER_CARD_OPTIONS = [
   { value: "summary_large_image", label: "Summary Large Image" }
 ];
 var getBackendConfig = () => {
-  const isLocalDevelopment = !process.env.VITE_TINA_TOKEN;
+  const isLocalDevelopment = !process.env.VITE_GITHUB_TOKEN;
   if (isLocalDevelopment) {
     return {
       type: "filesystem"
@@ -26,9 +26,9 @@ var getBackendConfig = () => {
   }
   return {
     type: "github",
-    branch: process.env.VITE_GITHUB_BRANCH || process.env.VITE_TINA_BRANCH || "main",
+    branch: process.env.VITE_GITHUB_BRANCH || "main",
     repo: process.env.VITE_GITHUB_REPO || "",
-    token: process.env.VITE_TINA_TOKEN || process.env.VITE_GITHUB_TOKEN || "",
+    token: process.env.VITE_GITHUB_TOKEN || "",
     auth: {
       useLocalAuth: true
     }
@@ -38,7 +38,7 @@ var config_default = defineConfig({
   // Client ID for Tina Cloud (future enhancement)
   clientId: process.env.VITE_TINA_CLIENT_ID || null,
   // Token for authentication
-  token: process.env.VITE_TINA_TOKEN || process.env.VITE_GITHUB_TOKEN || null,
+  token: process.env.VITE_GITHUB_TOKEN || null,
   // Backend configuration (filesystem for local, GitHub for production)
   backend: getBackendConfig(),
   // TypeScript generation configuration
@@ -59,7 +59,7 @@ var config_default = defineConfig({
       // Use GitHub for media storage in production
     },
     // Override for local development
-    ...!process.env.VITE_TINA_TOKEN ? {
+    ...!process.env.VITE_GITHUB_TOKEN ? {
       tina: {
         mediaRoot: "public/content/blog/images",
         publicFolder: "public",

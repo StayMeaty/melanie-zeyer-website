@@ -68,14 +68,14 @@ interface TinaAuthContextType {
  * Get Tina authentication configuration from environment
  */
 export const getTinaConfig = (): TinaAuthConfig => {
-  const isLocalDevelopment = import.meta.env.DEV && !import.meta.env.VITE_TINA_TOKEN;
-  const hasToken = Boolean(import.meta.env.VITE_TINA_TOKEN || import.meta.env.VITE_GITHUB_TOKEN);
+  const isLocalDevelopment = import.meta.env.DEV && !import.meta.env.VITE_GITHUB_TOKEN;
+  const hasToken = Boolean(import.meta.env.VITE_GITHUB_TOKEN);
   
   return {
     enabled: Boolean(import.meta.env.VITE_USE_TINA_CMS === 'true'),
     hasToken, // Only indicate if token exists, don't expose it
     repository: import.meta.env.VITE_GITHUB_REPO || '',
-    branch: import.meta.env.VITE_GITHUB_BRANCH || import.meta.env.VITE_TINA_BRANCH || 'main',
+    branch: import.meta.env.VITE_GITHUB_BRANCH || 'main',
     isLocalDevelopment,
     useLocalAuth: isLocalDevelopment,
   };
@@ -306,7 +306,7 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
     
     // Validate session token hash matches current environment
-    const currentTokenHash = import.meta.env.VITE_TINA_TOKEN_HASH;
+    const currentTokenHash = import.meta.env.VITE_GITHUB_TOKEN_HASH;
     
     if (!currentTokenHash || currentSession.tokenHash !== currentTokenHash) {
       logTinaSecurityEvent('session_token_mismatch', {});
@@ -368,7 +368,7 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
       }
       
       // Create session with token hash
-      const tokenHash = token ? await hashToken(token) : import.meta.env.VITE_TINA_TOKEN_HASH;
+      const tokenHash = token ? await hashToken(token) : import.meta.env.VITE_GITHUB_TOKEN_HASH;
       
       if (!tokenHash) {
         return { 
@@ -491,7 +491,7 @@ export const getGitHubTokenInstructions = (): string[] => {
     '   - workflow (Update GitHub Action workflows)',
     '6. Click "Generate token"',
     '7. Copy the token immediately (it won\'t be shown again)',
-    '8. Add to your .env file as VITE_TINA_TOKEN=ghp_your_token_here',
+    '8. Add to your .env file as VITE_GITHUB_TOKEN=ghp_your_token_here',
   ];
 };
 

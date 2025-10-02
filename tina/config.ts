@@ -26,7 +26,7 @@ const TWITTER_CARD_OPTIONS = [
 
 // Determine backend configuration based on environment
 const getBackendConfig = () => {
-  const isLocalDevelopment = process.env.NODE_ENV === 'development' && !process.env.VITE_TINA_TOKEN;
+  const isLocalDevelopment = process.env.NODE_ENV === 'development' && !process.env.VITE_GITHUB_TOKEN;
   
   if (isLocalDevelopment) {
     // Use filesystem for local development without GitHub token
@@ -37,8 +37,8 @@ const getBackendConfig = () => {
   
   // Use GitHub backend for production or when token is available
   const repo = process.env.VITE_GITHUB_REPO || "";
-  const token = process.env.VITE_TINA_TOKEN || process.env.VITE_GITHUB_TOKEN || "";
-  const branch = process.env.VITE_GITHUB_BRANCH || process.env.VITE_TINA_BRANCH || "main";
+  const token = process.env.VITE_GITHUB_TOKEN || "";
+  const branch = process.env.VITE_GITHUB_BRANCH || "main";
   
   if (!repo || !token) {
     console.warn('Tina: Missing repository or token configuration for GitHub backend');
@@ -64,7 +64,7 @@ export default defineConfig({
   clientId: process.env.VITE_TINA_CLIENT_ID || null,
   
   // Token for authentication
-  token: process.env.VITE_TINA_TOKEN || process.env.VITE_GITHUB_TOKEN || null,
+  token: process.env.VITE_GITHUB_TOKEN || null,
   
   // Backend configuration (filesystem for local, GitHub for production)
   backend: getBackendConfig(),
@@ -81,7 +81,7 @@ export default defineConfig({
   
   // Media configuration
   media: (() => {
-    const isLocalDevelopment = process.env.NODE_ENV === 'development' && !process.env.VITE_TINA_TOKEN;
+    const isLocalDevelopment = process.env.NODE_ENV === 'development' && !process.env.VITE_GITHUB_TOKEN;
     
     if (isLocalDevelopment) {
       // Local development - use local filesystem

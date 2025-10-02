@@ -164,8 +164,7 @@ function checkNetlifyConfig() {
   
   const requiredComments = [
     'VITE_GITHUB_TOKEN',
-    'VITE_GITHUB_REPO',
-    'NETLIFY_CMS_GITHUB_TOKEN'
+    'VITE_GITHUB_REPO'
   ];
   
   let allSectionsPresent = true;

@@ -722,11 +722,11 @@ export function mapTinaSEOToBlogSEO(tinaSEO?: TinaSEO): BlogSEO | undefined {
 export const DEFAULT_TINA_CONFIG: TinaClientConfig = {
   enabled: import.meta.env.VITE_USE_TINA_CMS === 'true',
   clientId: import.meta.env.VITE_TINA_CLIENT_ID,
-  branch: import.meta.env.VITE_TINA_BRANCH || 'main',
+  branch: import.meta.env.VITE_GITHUB_BRANCH || 'main',
   connectionTimeout: 10000, // 10 seconds
   queryTimeout: 15000, // 15 seconds
   apiUrl: import.meta.env.VITE_TINA_API_URL,
-  token: import.meta.env.VITE_TINA_TOKEN,
+  token: import.meta.env.VITE_GITHUB_TOKEN,
 } as const;
 
 /**

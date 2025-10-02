@@ -52,7 +52,7 @@ const TinaAuthStatus: React.FC<TinaAuthStatusProps> = ({
 
   const handleTestConnection = async () => {
     if (!config.hasToken) {
-      setError('No token configured. Please set VITE_TINA_TOKEN in your environment.');
+      setError('No token configured. Please set VITE_GITHUB_TOKEN in your environment.');
       return;
     }
     
@@ -303,7 +303,7 @@ const TinaAuthStatus: React.FC<TinaAuthStatusProps> = ({
                 <p style={{ marginBottom: '0.5rem', fontSize: '0.875rem', color: '#6b7280' }}>
                   {config.hasToken 
                     ? 'Token is configured in environment. Click Connect to authenticate.'
-                    : 'No token configured. Please set VITE_TINA_TOKEN in your .env file.'}
+                    : 'No token configured. Please set VITE_GITHUB_TOKEN in your .env file.'}
                 </p>
               </>
             )}
@@ -392,7 +392,7 @@ const TinaAuthStatus: React.FC<TinaAuthStatusProps> = ({
           <div style={{ ...styles.error, marginTop: '1rem' }}>
             <strong>Configuration Required:</strong>
             <ul style={{ margin: '0.5rem 0 0 1.5rem', padding: 0 }}>
-              {!config.hasToken && <li>Missing: VITE_TINA_TOKEN or VITE_GITHUB_TOKEN</li>}
+              {!config.hasToken && <li>Missing: VITE_GITHUB_TOKEN</li>}
               {!config.repository && <li>Missing: VITE_GITHUB_REPO</li>}
               {!config.branch && <li>Missing: VITE_GITHUB_BRANCH (will use "main")</li>}
             </ul>

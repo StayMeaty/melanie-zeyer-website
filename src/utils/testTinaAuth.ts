@@ -28,7 +28,7 @@ export async function testTinaAuth() {
   
   // Check if we can proceed with testing
   if (!config.hasToken) {
-    console.error('❌ No token configured. Set VITE_TINA_TOKEN or VITE_GITHUB_TOKEN');
+    console.error('❌ No token configured. Set VITE_GITHUB_TOKEN');
     return false;
   }
   

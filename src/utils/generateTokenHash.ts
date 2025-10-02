@@ -3,7 +3,7 @@
  * DEVELOPMENT ONLY - Used to generate secure hashes for environment configuration
  * 
  * This utility should NEVER be included in production builds
- * It's only used during setup to generate the hash for VITE_TINA_TOKEN_HASH
+ * It's only used during setup to generate the hash for VITE_GITHUB_TOKEN_HASH
  */
 
 import { hashToken } from '../services/tinaTokenProxy';
@@ -15,7 +15,7 @@ import { hashToken } from '../services/tinaTokenProxy';
  * Usage:
  * 1. Run this function with your GitHub token
  * 2. Copy the generated hash
- * 3. Add to your .env file as VITE_TINA_TOKEN_HASH=<hash>
+ * 3. Add to your .env file as VITE_GITHUB_TOKEN_HASH=<hash>
  * 4. Never commit the actual token, only the hash
  */
 export const generateTokenHashForSetup = async (token: string): Promise<void> => {
@@ -37,10 +37,10 @@ export const generateTokenHashForSetup = async (token: string): Promise<void> =>
     console.log('\n✅ Token hash generated successfully!\n');
     console.log('Add the following to your .env file:');
     console.log('=====================================');
-    console.log(`VITE_TINA_TOKEN_HASH=${hash}`);
+    console.log(`VITE_GITHUB_TOKEN_HASH=${hash}`);
     console.log('=====================================\n');
     console.log('Also make sure you have:');
-    console.log('VITE_TINA_TOKEN=<your-github-token>');
+    console.log('VITE_GITHUB_TOKEN=<your-github-token>');
     console.log('VITE_USE_TINA_CMS=true');
     console.log('VITE_GITHUB_REPO=<owner/repo>');
     console.log('VITE_GITHUB_BRANCH=main\n');
@@ -65,10 +65,10 @@ export const verifyTokenHashMatch = async (token: string): Promise<void> => {
     return;
   }
   
-  const expectedHash = import.meta.env.VITE_TINA_TOKEN_HASH;
+  const expectedHash = import.meta.env.VITE_GITHUB_TOKEN_HASH;
   
   if (!expectedHash) {
-    console.error('❌ VITE_TINA_TOKEN_HASH is not configured in environment');
+    console.error('❌ VITE_GITHUB_TOKEN_HASH is not configured in environment');
     return;
   }
   
@@ -82,7 +82,7 @@ export const verifyTokenHashMatch = async (token: string): Promise<void> => {
       console.log('Expected hash:', expectedHash);
       console.log('Your token hash:', tokenHash);
       console.log('\nThis means the token you provided is different from the one configured.');
-      console.log('Please update VITE_TINA_TOKEN_HASH with the correct hash.');
+      console.log('Please update VITE_GITHUB_TOKEN_HASH with the correct hash.');
     }
   } catch (error) {
     console.error('❌ Failed to verify token hash:', error);

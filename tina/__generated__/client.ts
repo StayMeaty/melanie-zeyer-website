@@ -3,7 +3,7 @@ import { queries } from "./types";
 
 // Dynamic configuration based on environment
 const getClientConfig = () => {
-  const isLocalDevelopment = import.meta.env.DEV && !import.meta.env.VITE_TINA_TOKEN;
+  const isLocalDevelopment = import.meta.env.DEV && !import.meta.env.VITE_GITHUB_TOKEN;
   
   if (isLocalDevelopment) {
     // Local development with filesystem backend
@@ -15,9 +15,9 @@ const getClientConfig = () => {
   }
   
   // Production or development with GitHub backend
-  const token = import.meta.env.VITE_TINA_TOKEN || import.meta.env.VITE_GITHUB_TOKEN || '';
+  const token = import.meta.env.VITE_GITHUB_TOKEN || '';
   const clientId = import.meta.env.VITE_TINA_CLIENT_ID;
-  const branch = import.meta.env.VITE_TINA_BRANCH || import.meta.env.VITE_GITHUB_BRANCH || 'main';
+  const branch = import.meta.env.VITE_GITHUB_BRANCH || 'main';
   
   if (clientId) {
     // Tina Cloud setup
