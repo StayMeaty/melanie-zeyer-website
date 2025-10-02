@@ -286,8 +286,12 @@ const TinaAuthContext = createContext<TinaAuthContextType | undefined>(undefined
 export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState<TinaSession | null>(null);
-  const config = getTinaConfig();
-  const provider = getAuthProvider(config);
+  
+  // Memoize config to prevent recreation on every render
+  const config = React.useMemo(() => getTinaConfig(), []);
+  
+  // Memoize provider to prevent recreation on every render
+  const provider = React.useMemo(() => getAuthProvider(config), [config]);
   
   /**
    * Validate current session
@@ -326,7 +330,7 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     setSession(currentSession);
     return true;
-  }, [config, provider]);
+  }, [config.isLocalDevelopment, config.useLocalAuth, provider]);
   
   /**
    * Login function
@@ -419,12 +423,17 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
    * Set up session check interval
    */
   useEffect(() => {
+    // Only set up interval if authenticated
+    if (!session?.isAuthenticated) {
+      return;
+    }
+    
     const interval = setInterval(async () => {
       await validateSession();
     }, 60000); // Check every minute
     
     return () => clearInterval(interval);
-  }, [validateSession]);
+  }, [validateSession, session?.isAuthenticated]);
   
   const value: TinaAuthContextType = {
     isAuthenticated: !!session?.isAuthenticated,

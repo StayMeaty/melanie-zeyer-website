@@ -29,7 +29,7 @@ const TinaCMS = React.lazy(async () => {
             // Register any custom fields or plugins here
             console.log('Tina CMS interface initialized');
           }
-        }, []);
+        }, []); // config.enabled is stable from useTinaAuth context
         
         return (
           <div style={{
