@@ -1,20 +1,33 @@
 ---
-title: "Willkommen zu meinem Blog"
-slug: "willkommen-zu-meinem-blog"
-date: "2024-01-15"
-excerpt: "Herzlich willkommen auf meinem neuen Blog! Hier teile ich meine Gedanken zu Coaching, Persönlichkeitsentwicklung und einem bewussten Lifestyle."
-author: "melanie"
-category: "coaching"
-tags: ["willkommen", "persönlichkeitsentwicklung", "coaching"]
-image: "/assets/blog/willkommen.jpg"
-imageAlt: "Melanie Zeyer begrüßt ihre Blog-Leser"
-status: "published"
+title: Willkommen zu meinem Blog
+slug: willkommen-zu-meinem-blog
+date: '2024-01-15T10:00:00.000Z'
+excerpt: >-
+  Herzlich willkommen auf meinem neuen Blog! Hier teile ich meine Gedanken zu
+  Coaching, Persönlichkeitsentwicklung und einem bewussten Lifestyle.
+author: melanie
+category: coaching
+tags:
+  - willkommen
+  - persönlichkeitsentwicklung
+  - coaching
+image: /assets/blog/willkommen.jpg
+imageAlt: Melanie Zeyer begrüßt ihre Blog-Leser
+status: published
 featured: true
 seo:
-  metaTitle: "Willkommen zu meinem Blog - Melanie Zeyer"
-  metaDescription: "Entdecke inspirierende Inhalte zu Coaching, Persönlichkeitsentwicklung und bewusstem Leben auf Melanie Zeyers Blog."
-  keywords: ["Coaching", "Persönlichkeitsentwicklung", "Lifestyle", "Bewusstsein"]
-lastModified: "2024-01-15"
+  metaTitle: Willkommen zu meinem Blog - Melanie Zeyer
+  metaDescription: >-
+    Entdecke inspirierende Inhalte zu Coaching, Persönlichkeitsentwicklung und
+    bewusstem Leben auf Melanie Zeyers Blog.
+  keywords:
+    - Coaching
+    - Persönlichkeitsentwicklung
+    - Lifestyle
+    - Bewusstsein
+  twitterCard: summary_large_image
+lastModified: '2024-01-15'
+readingTime: null
 ---
 
 # Willkommen zu meinem Blog!

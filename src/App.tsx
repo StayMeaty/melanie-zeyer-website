@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { Suspense, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { 
   ComingSoon, 
   Layout, 
@@ -19,6 +19,48 @@ import {
   BlogPost 
 } from './pages';
 import { AuthProvider } from './services/auth';
+import { TinaAuthProvider } from './services/tinaAuth';
+import { preloadTina, preloadTinaEditor } from './utils/lazyTina';
+
+// Lazy load Tina components with enhanced code splitting
+const TinaAdmin = React.lazy(() => 
+  import(
+    /* webpackChunkName: "tina-admin" */
+    /* webpackPreload: true */
+    './components/TinaAdmin'
+  ).then(module => ({
+    default: module.default
+  }))
+);
+
+const TinaEdit = React.lazy(() => 
+  import(
+    /* webpackChunkName: "tina-edit" */
+    /* webpackPreload: true */
+    './pages/TinaEdit'
+  ).then(module => ({
+    default: module.default
+  }))
+);
+
+// Route prefetcher component
+const RoutePreloader: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
+  
+  useEffect(() => {
+    // Preload Tina when on admin pages
+    if (location.pathname.startsWith('/admin')) {
+      preloadTina();
+      
+      // Preload editor if near edit routes
+      if (location.pathname.includes('/blog') || location.pathname.includes('/tina')) {
+        preloadTinaEditor();
+      }
+    }
+  }, [location.pathname]);
+  
+  return <>{children}</>;
+};
 
 // Landing page component with coming soon
 const LandingPage: React.FC = () => {
@@ -40,7 +82,9 @@ const LandingPage: React.FC = () => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <TinaAuthProvider>
+        <Router>
+        <RoutePreloader>
         <Routes>
           {/* Landing page */}
           <Route path="/" element={<LandingPage />} />
@@ -92,8 +136,92 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Tina CMS routes */}
+          <Route
+            path="/admin/tina"
+            element={
+              <ProtectedRoute>
+                <Suspense fallback={
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: '100vh',
+                    backgroundColor: '#f8f9fa',
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem',
+                      padding: '2rem',
+                      backgroundColor: 'white',
+                      borderRadius: '0.5rem',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                    }}>
+                      <div style={{
+                        width: '2rem',
+                        height: '2rem',
+                        border: '3px solid #e2e8f0',
+                        borderTopColor: '#0097B2',
+                        borderRadius: '50%',
+                        animation: 'spin 0.8s linear infinite',
+                      }} />
+                      <span style={{ color: '#4a5568', fontSize: '0.875rem' }}>
+                        Lade Tina CMS...
+                      </span>
+                    </div>
+                  </div>
+                }>
+                  <TinaAdmin />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/tina/edit/:slug"
+            element={
+              <ProtectedRoute>
+                <Suspense fallback={
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: '100vh',
+                    backgroundColor: '#f8f9fa',
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem',
+                      padding: '2rem',
+                      backgroundColor: 'white',
+                      borderRadius: '0.5rem',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                    }}>
+                      <div style={{
+                        width: '2rem',
+                        height: '2rem',
+                        border: '3px solid #e2e8f0',
+                        borderTopColor: '#0097B2',
+                        borderRadius: '50%',
+                        animation: 'spin 0.8s linear infinite',
+                      }} />
+                      <span style={{ color: '#4a5568', fontSize: '0.875rem' }}>
+                        Lade Editor...
+                      </span>
+                    </div>
+                  </div>
+                }>
+                  <TinaEdit />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
         </Routes>
+        </RoutePreloader>
       </Router>
+      </TinaAuthProvider>
     </AuthProvider>
   );
 }

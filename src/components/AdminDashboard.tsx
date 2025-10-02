@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../services/auth';
 import { getBlogStats } from '../services/blogContent';
+import { useTinaAuth, getTinaConfig } from '../services/tinaAuth';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface AdminDashboardProps {}
 
 const AdminDashboard: React.FC<AdminDashboardProps> = () => {
   const { user, logout } = useAuth();
+  const { isAuthenticated: isTinaAuthenticated, session: tinaSession } = useTinaAuth();
+  const tinaConfig = getTinaConfig();
   const [blogStats, setBlogStats] = useState<{
     totalPosts: number;
     totalCategories: number;
@@ -110,6 +113,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
       border: '1px solid #0097B2',
       transition: 'all 0.2s',
     },
+    secondaryLink: {
+      color: '#70A6B0',
+      textDecoration: 'none',
+      fontWeight: 'bold',
+      display: 'inline-block',
+      marginTop: '1rem',
+      padding: '0.5rem 1rem',
+      backgroundColor: '#f8fafb',
+      borderRadius: '4px',
+      border: '1px solid #70A6B0',
+      transition: 'all 0.2s',
+    },
     statsGrid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(3, 1fr)',
@@ -171,9 +186,96 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
               </div>
             </div>
           )}
-          <a href="/admin/blog" style={styles.primaryLink}>
-            Zum Blog-Management →
-          </a>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <a href="/admin/blog" style={styles.primaryLink}>
+              Klassisches Blog-Management →
+            </a>
+            <a href="/admin/tina" style={styles.secondaryLink}>
+              Tina CMS (Visual Editor) →
+            </a>
+          </div>
+        </div>
+
+        <div style={styles.card}>
+          <h2 style={styles.cardTitle}>Tina CMS Status</h2>
+          <p style={styles.cardDescription}>
+            Visual Content Editor für eine verbesserte Blog-Bearbeitungsbenutzeroberfläche.
+          </p>
+          <div style={styles.statsGrid}>
+            <div style={styles.stat}>
+              <span style={{
+                ...styles.statNumber,
+                color: tinaConfig.enabled ? '#10b981' : '#6b7280',
+                fontSize: '1.2rem',
+              }}>
+                {tinaConfig.enabled ? '✓' : '○'}
+              </span>
+              <span style={styles.statLabel}>CMS Status</span>
+            </div>
+            <div style={styles.stat}>
+              <span style={{
+                ...styles.statNumber,
+                color: isTinaAuthenticated ? '#10b981' : '#f59e0b',
+                fontSize: '1.2rem',
+              }}>
+                {isTinaAuthenticated ? '🔗' : '🔑'}
+              </span>
+              <span style={styles.statLabel}>Verbindung</span>
+            </div>
+            <div style={styles.stat}>
+              <span style={{
+                ...styles.statNumber,
+                color: tinaConfig.isLocalDevelopment ? '#3b82f6' : '#0097B2',
+                fontSize: '1.2rem',
+              }}>
+                {tinaConfig.isLocalDevelopment ? '💻' : '☁️'}
+              </span>
+              <span style={styles.statLabel}>Umgebung</span>
+            </div>
+          </div>
+          <div style={{ 
+            padding: '0.75rem', 
+            backgroundColor: '#f9fafb', 
+            borderRadius: '0.375rem',
+            marginBottom: '1rem',
+            fontSize: '0.875rem',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+              <span style={{ color: '#6b7280' }}>Repository:</span>
+              <span style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                {tinaConfig.repository || 'Nicht konfiguriert'}
+              </span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+              <span style={{ color: '#6b7280' }}>Branch:</span>
+              <span style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                {tinaConfig.branch}
+              </span>
+            </div>
+            {isTinaAuthenticated && tinaSession && (
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#6b7280' }}>Session läuft ab:</span>
+                <span style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                  {new Date(tinaSession.expiresAt).toLocaleString('de-DE')}
+                </span>
+              </div>
+            )}
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            {tinaConfig.enabled ? (
+              <a href="/admin/tina" style={styles.primaryLink}>
+                Tina CMS öffnen →
+              </a>
+            ) : (
+              <span style={{
+                ...styles.secondaryLink,
+                opacity: 0.6,
+                cursor: 'not-allowed',
+              }}>
+                CMS deaktiviert
+              </span>
+            )}
+          </div>
         </div>
 
         <div style={styles.card}>

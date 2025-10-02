@@ -1,0 +1,128 @@
+{
+  "timestamp": "2025-10-01T11:52:32.629Z",
+  "operation": "migration",
+  "summary": {
+    "totalFiles": 5,
+    "validFiles": 1,
+    "invalidFiles": 4,
+    "filesWithWarnings": 4,
+    "filesWithFixes": 5
+  },
+  "results": [
+    {
+      "filename": "2024-01-15-willkommen-zu-meinem-blog.md",
+      "valid": true,
+      "errorCount": 0,
+      "warningCount": 0,
+      "fixCount": 2,
+      "details": {
+        "errors": [],
+        "warnings": [],
+        "fixes": [
+          "Added default readingTime",
+          "Added time to date field"
+        ]
+      }
+    },
+    {
+      "filename": "2024-03-15-blog-start-coaching-reise.md",
+      "valid": false,
+      "errorCount": 1,
+      "warningCount": 1,
+      "fixCount": 8,
+      "details": {
+        "errors": [
+          "Invalid category: Persönliche Entwicklung. Must be one of: coaching, persoenlichkeitsentwicklung, lifestyle, business, gesundheit, mindset"
+        ],
+        "warnings": [
+          "Image alt text is recommended when an image is specified"
+        ],
+        "fixes": [
+          "Added default status",
+          "Added default featured",
+          "Added default readingTime",
+          "Added default lastModified",
+          "Added default seo",
+          "Generated slug from title",
+          "Added time to date field",
+          "Set lastModified to current time"
+        ]
+      }
+    },
+    {
+      "filename": "2024-03-16-selbstentwicklung-der-schluessel-zum-erfolg.md",
+      "valid": false,
+      "errorCount": 1,
+      "warningCount": 1,
+      "fixCount": 8,
+      "details": {
+        "errors": [
+          "Invalid category: Persönliche Entwicklung. Must be one of: coaching, persoenlichkeitsentwicklung, lifestyle, business, gesundheit, mindset"
+        ],
+        "warnings": [
+          "Image alt text is recommended when an image is specified"
+        ],
+        "fixes": [
+          "Added default status",
+          "Added default featured",
+          "Added default readingTime",
+          "Added default lastModified",
+          "Added default seo",
+          "Generated slug from title",
+          "Added time to date field",
+          "Set lastModified to current time"
+        ]
+      }
+    },
+    {
+      "filename": "2024-03-17-fuehrungskraefte-coaching-unternehmenserfolg.md",
+      "valid": false,
+      "errorCount": 1,
+      "warningCount": 1,
+      "fixCount": 8,
+      "details": {
+        "errors": [
+          "Invalid category: Business Coaching. Must be one of: coaching, persoenlichkeitsentwicklung, lifestyle, business, gesundheit, mindset"
+        ],
+        "warnings": [
+          "Image alt text is recommended when an image is specified"
+        ],
+        "fixes": [
+          "Added default status",
+          "Added default featured",
+          "Added default readingTime",
+          "Added default lastModified",
+          "Added default seo",
+          "Generated slug from title",
+          "Added time to date field",
+          "Set lastModified to current time"
+        ]
+      }
+    },
+    {
+      "filename": "2024-03-18-work-life-balance-selbstfuersorge.md",
+      "valid": false,
+      "errorCount": 1,
+      "warningCount": 1,
+      "fixCount": 8,
+      "details": {
+        "errors": [
+          "Invalid category: Selbstfürsorge. Must be one of: coaching, persoenlichkeitsentwicklung, lifestyle, business, gesundheit, mindset"
+        ],
+        "warnings": [
+          "Image alt text is recommended when an image is specified"
+        ],
+        "fixes": [
+          "Added default status",
+          "Added default featured",
+          "Added default readingTime",
+          "Added default lastModified",
+          "Added default seo",
+          "Generated slug from title",
+          "Added time to date field",
+          "Set lastModified to current time"
+        ]
+      }
+    }
+  ]
+}

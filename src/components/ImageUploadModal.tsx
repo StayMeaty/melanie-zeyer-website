@@ -57,6 +57,28 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const urlInputRef = useRef<HTMLInputElement>(null);
 
+  // Check GitHub connection availability
+  const checkGitHubConnection = useCallback(async () => {
+    setIsCheckingGitHub(true);
+    try {
+      const isConnected = await GitHubImageService.checkConnection();
+      setGithubConnected(isConnected);
+      
+      // Auto-select GitHub if available, localStorage if not
+      if (isConnected && storageMethod === 'localStorage') {
+        setStorageMethod('github');
+      } else if (!isConnected && storageMethod === 'github') {
+        setStorageMethod('localStorage');
+      }
+    } catch (error) {
+      console.error('GitHub connection check failed:', error);
+      setGithubConnected(false);
+      setStorageMethod('localStorage');
+    } finally {
+      setIsCheckingGitHub(false);
+    }
+  }, [storageMethod]);
+
   // Load uploaded images from localStorage on mount and check GitHub connection
   useEffect(() => {
     const stored = localStorage.getItem('blog-uploaded-images');
@@ -76,29 +98,8 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
     if (isOpen) {
       checkGitHubConnection();
     }
-  }, [isOpen]);
+  }, [isOpen, checkGitHubConnection]);
 
-  // Check GitHub connection availability
-  const checkGitHubConnection = async () => {
-    setIsCheckingGitHub(true);
-    try {
-      const isConnected = await GitHubImageService.checkConnection();
-      setGithubConnected(isConnected);
-      
-      // Auto-select GitHub if available, localStorage if not
-      if (isConnected && storageMethod === 'localStorage') {
-        setStorageMethod('github');
-      } else if (!isConnected && storageMethod === 'github') {
-        setStorageMethod('localStorage');
-      }
-    } catch (error) {
-      console.error('GitHub connection check failed:', error);
-      setGithubConnected(false);
-      setStorageMethod('localStorage');
-    } finally {
-      setIsCheckingGitHub(false);
-    }
-  };
 
   // Save images to localStorage whenever uploadedImages changes
   useEffect(() => {
@@ -141,19 +142,16 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
       const processed = await processImage(file);
       setSelectedImage(processed);
       
-      // If GitHub storage is selected and available, upload immediately
-      if (storageMethod === 'github' && githubConnected && altText.trim()) {
-        await handleGitHubUpload(processed);
-      }
+      // Note: GitHub upload will be handled separately when alt text is provided
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Fehler beim Verarbeiten der Datei');
     } finally {
       setIsProcessing(false);
     }
-  }, [storageMethod, githubConnected, altText]);
+  }, []);
 
   // Handle GitHub upload with progress tracking
-  const handleGitHubUpload = async (image: ProcessedImage) => {
+  const handleGitHubUpload = useCallback(async (image: ProcessedImage) => {
     if (!altText.trim()) {
       setError('Alt-Text ist für GitHub-Upload erforderlich');
       return;
@@ -213,7 +211,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
       setIsProcessing(false);
       setUploadProgress(0);
     }
-  };
+  }, [altText]);
 
   // Process image: convert to base64 and resize if needed
   const processImage = async (file: File): Promise<ProcessedImage> => {

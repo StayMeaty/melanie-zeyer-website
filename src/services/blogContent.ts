@@ -299,7 +299,36 @@ async function getMarkdownFiles(): Promise<string[]> {
 }
 
 /**
- * Load all blog posts from markdown files
+ * Load posts from localStorage (already parsed BlogPost objects)
+ * @returns Array of posts from localStorage
+ */
+function loadPostsFromLocalStorage(): BlogPost[] {
+  try {
+    const draftsJson = localStorage.getItem('blog_drafts');
+    if (!draftsJson) {
+      return [];
+    }
+
+    const drafts = JSON.parse(draftsJson);
+    if (!Array.isArray(drafts)) {
+      console.warn('Ungültiges Format in localStorage blog_drafts');
+      return [];
+    }
+
+    // Convert date strings back to Date objects if needed
+    return drafts.map(post => ({
+      ...post,
+      publishedAt: new Date(post.publishedAt),
+      updatedAt: new Date(post.updatedAt),
+    }));
+  } catch (error) {
+    console.error('Fehler beim Laden der Posts aus localStorage:', error);
+    return [];
+  }
+}
+
+/**
+ * Load all blog posts from multiple sources (Tina CMS, markdown files, localStorage)
  * @returns Array of all blog posts
  */
 export async function loadAllPosts(): Promise<BlogPost[]> {
@@ -310,8 +339,34 @@ export async function loadAllPosts(): Promise<BlogPost[]> {
       return cachedPosts;
     }
 
+    // Try to load from Tina CMS first if enabled
+    let tinaPosts: BlogPost[] = [];
+    const useTina = import.meta.env.VITE_USE_TINA_CMS === 'true';
+    
+    if (useTina) {
+      try {
+        const { loadTinaBlogService } = await import('../utils/lazyTina');
+        const tinaBlogService = await loadTinaBlogService();
+        const { loadPostsFromTina, isTinaAvailable } = tinaBlogService as any;
+        const tinaAvailable = await isTinaAvailable();
+        
+        if (tinaAvailable) {
+          tinaPosts = await loadPostsFromTina();
+          console.log(`${tinaPosts.length} Posts von Tina CMS geladen`);
+        } else {
+          console.warn('Tina CMS nicht verfügbar, verwende Fallback-Quellen');
+        }
+      } catch (error) {
+        console.warn('Tina CMS Laden fehlgeschlagen, verwende Fallback-Quellen:', error);
+      }
+    }
+
+    // Load posts from localStorage (already parsed, no gray-matter needed)
+    const localStoragePosts = loadPostsFromLocalStorage();
+    
+    // Load posts from markdown files
     const fileList = await getMarkdownFiles();
-    const posts: BlogPost[] = [];
+    const filePosts: BlogPost[] = [];
     
     // Load posts in parallel with error handling
     const loadPromises = fileList.map(async (filePath) => {
@@ -329,17 +384,58 @@ export async function loadAllPosts(): Promise<BlogPost[]> {
     // Filter out failed loads and draft posts (unless in development)
     for (const post of results) {
       if (post && (post.status === 'published' || import.meta.env.DEV)) {
-        posts.push(post);
+        filePosts.push(post);
       }
     }
 
+    // Merge posts with priority: Tina > localStorage > files
+    const allPosts: BlogPost[] = [];
+    const processedSlugs = new Set<string>();
+
+    // Add Tina posts first (highest priority)
+    for (const tinaPost of tinaPosts) {
+      if (!processedSlugs.has(tinaPost.slug)) {
+        allPosts.push(tinaPost);
+        processedSlugs.add(tinaPost.slug);
+      }
+    }
+
+    // Add localStorage posts (medium priority)
+    for (const localPost of localStoragePosts) {
+      if (!processedSlugs.has(localPost.slug)) {
+        allPosts.push(localPost);
+        processedSlugs.add(localPost.slug);
+      }
+    }
+
+    // Add file-based posts (lowest priority)
+    for (const filePost of filePosts) {
+      if (!processedSlugs.has(filePost.slug)) {
+        allPosts.push(filePost);
+        processedSlugs.add(filePost.slug);
+      }
+    }
+
+    // Filter based on status and environment
+    const filteredPosts = allPosts.filter(post => 
+      post.status === 'published' || import.meta.env.DEV
+    );
+
     // Sort posts by date (newest first)
-    posts.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+    filteredPosts.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 
     // Cache the results
-    blogCache.setAllPosts(posts);
+    blogCache.setAllPosts(filteredPosts);
 
-    return posts;
+    const sourceStats = {
+      tina: tinaPosts.length,
+      localStorage: localStoragePosts.length,
+      files: filePosts.length,
+      total: filteredPosts.length
+    };
+    console.log('Blog Posts geladen:', sourceStats);
+
+    return filteredPosts;
   } catch (error) {
     console.error('Fehler beim Laden aller Blog-Posts:', error);
     throw new Error('Blog-Posts konnten nicht geladen werden');
@@ -542,6 +638,7 @@ function createPostSummary(post: BlogPost): BlogPostSummary {
     featured: post.featured,
     viewCount: post.viewCount,
     commentCount: post.commentCount,
+    status: post.status,
   };
 }
 
@@ -751,6 +848,23 @@ export const clearImageCaches = (): void => {
  */
 export function clearCache(): void {
   blogCache.clear();
+  
+  // Clear Tina cache if available
+  if (import.meta.env.VITE_USE_TINA_CMS === 'true') {
+    try {
+      import('./tinaBlogService').then((tinaBlogService) => {
+        if (tinaBlogService && typeof tinaBlogService.clearTinaCache === 'function') {
+          tinaBlogService.clearTinaCache();
+        }
+      }).catch(() => {
+        // Silently ignore if Tina service is not available
+      }).catch(() => {
+        // Silently ignore if lazy loader is not available
+      });
+    } catch {
+      // Silently ignore if import fails
+    }
+  }
 }
 
 /**
@@ -758,6 +872,48 @@ export function clearCache(): void {
  */
 export function clearAllCaches(): void {
   blogCache.clearAll();
+  
+  // Clear Tina cache if available
+  if (import.meta.env.VITE_USE_TINA_CMS === 'true') {
+    try {
+      import('./tinaBlogService').then((tinaBlogService) => {
+        if (tinaBlogService && typeof tinaBlogService.clearTinaCache === 'function') {
+          tinaBlogService.clearTinaCache();
+        }
+      }).catch(() => {
+        // Silently ignore if Tina service is not available
+      }).catch(() => {
+        // Silently ignore if lazy loader is not available
+      });
+    } catch {
+      // Silently ignore if import fails
+    }
+  }
+}
+
+/**
+ * Clear post caches - useful when localStorage posts are updated
+ * This ensures fresh data is loaded on next request
+ */
+export function clearPostCaches(): void {
+  blogCache.clear();
+  
+  // Clear Tina cache if available
+  if (import.meta.env.VITE_USE_TINA_CMS === 'true') {
+    try {
+      import('./tinaBlogService').then((tinaBlogService) => {
+        if (tinaBlogService && typeof tinaBlogService.clearTinaCache === 'function') {
+          tinaBlogService.clearTinaCache();
+        }
+      }).catch(() => {
+        // Silently ignore if Tina service is not available
+      }).catch(() => {
+        // Silently ignore if lazy loader is not available
+      });
+    } catch {
+      // Silently ignore if import fails
+    }
+  }
 }
 
 /**

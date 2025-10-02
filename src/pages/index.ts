@@ -6,3 +6,5 @@ export { default as FAQ } from './FAQ';
 export { default as Impressum } from './Impressum';
 export { default as Blog } from './Blog';
 export { default as BlogPost } from './BlogPost';
+// TinaEdit is lazy-loaded in App.tsx
+// It is not exported here to ensure proper code splitting

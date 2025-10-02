@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BlogPost } from '../types/blog';
-import { loadAllPosts } from '../services/blogContent';
+import { loadAllPosts, clearPostCaches } from '../services/blogContent';
 import BlogManagementDashboard from './BlogManagementDashboard';
 import BlogEditor from './BlogEditor';
 import BlogStatistics from './BlogStatistics';
@@ -119,6 +119,9 @@ const BlogManagement: React.FC<BlogManagementProps> = () => {
       
       localStorage.setItem('blog_drafts', JSON.stringify(drafts));
       
+      // Clear cache to ensure fresh data
+      clearPostCaches();
+      
       // Refresh posts list
       await loadPosts();
       
@@ -146,6 +149,9 @@ const BlogManagement: React.FC<BlogManagementProps> = () => {
       const drafts: BlogPost[] = draftsJson ? JSON.parse(draftsJson) : [];
       const updatedDrafts = drafts.filter(d => d.slug !== deleteTarget.slug);
       localStorage.setItem('blog_drafts', JSON.stringify(updatedDrafts));
+      
+      // Clear cache to ensure fresh data
+      clearPostCaches();
       
       // Refresh posts list
       await loadPosts();
@@ -190,6 +196,10 @@ const BlogManagement: React.FC<BlogManagementProps> = () => {
         const importedPosts = JSON.parse(e.target?.result as string);
         if (Array.isArray(importedPosts)) {
           localStorage.setItem('blog_drafts', JSON.stringify(importedPosts));
+          
+          // Clear cache to ensure fresh data
+          clearPostCaches();
+          
           await loadPosts();
           setSuccessMessage('Blog-Daten erfolgreich importiert!');
         } else {

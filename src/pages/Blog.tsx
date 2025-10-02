@@ -19,6 +19,7 @@ const mockPosts: BlogPostSummary[] = [
     featured: true,
     viewCount: 245,
     commentCount: 12,
+    status: 'published',
   },
   {
     id: '2',
@@ -34,6 +35,7 @@ const mockPosts: BlogPostSummary[] = [
     featured: false,
     viewCount: 189,
     commentCount: 8,
+    status: 'published',
   },
   {
     id: '3',
@@ -49,6 +51,7 @@ const mockPosts: BlogPostSummary[] = [
     featured: true,
     viewCount: 321,
     commentCount: 15,
+    status: 'published',
   },
 ];
 

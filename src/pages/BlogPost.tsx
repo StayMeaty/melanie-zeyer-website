@@ -127,6 +127,7 @@ const mockRelatedPosts: BlogPostSummary[] = [
     publishedAt: new Date('2024-01-10'),
     readingTime: 6,
     featured: false,
+    status: 'published',
   },
   {
     id: '3',
@@ -140,6 +141,7 @@ const mockRelatedPosts: BlogPostSummary[] = [
     publishedAt: new Date('2024-01-08'),
     readingTime: 10,
     featured: false,
+    status: 'published',
   },
 ];
 

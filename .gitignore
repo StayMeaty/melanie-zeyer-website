@@ -45,3 +45,6 @@ netlify/functions-serve/
 
 # Temporary folders
 temp-melanie/
+
+# Tina CMS
+.tina/__generated__/

@@ -6,19 +6,29 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:analyze": "tsc -b && vite build && echo \"Bundle analysis saved to dist/stats.html\"",
     "lint": "eslint .",
     "preview": "vite preview",
     "verify-env": "node scripts/verify-env.js",
-    "setup": "node scripts/verify-env.js"
+    "setup": "node scripts/verify-env.js",
+    "tina": "tinacms dev -c \"npm run dev\"",
+    "tina:build": "tinacms build && node scripts/fix-tina-types.js",
+    "fix-tina-types": "node scripts/fix-tina-types.js",
+    "migrate:validate": "node scripts/validateContent.js",
+    "migrate:fix": "node scripts/migrateBlogContent.js fix",
+    "migrate:export": "echo \"Copy scripts/exportLocalStorage.js content and run in browser console\"",
+    "migrate:report": "node scripts/migrateBlogContent.js report"
   },
   "dependencies": {
+    "@tinacms/cli": "^1.11.0",
     "@types/react-router-dom": "^5.3.3",
     "gray-matter": "^4.0.3",
     "markdown-to-jsx": "^7.7.13",
     "netlify-identity-widget": "^1.9.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.9.3"
+    "react-router-dom": "^7.9.3",
+    "tinacms": "^2.9.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
@@ -29,6 +39,7 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
+    "rollup-plugin-visualizer": "^6.0.3",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1"

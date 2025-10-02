@@ -104,6 +104,8 @@ export interface BlogMetadata {
   imageAlt?: string;
   /** Publication status */
   status: BlogStatus;
+  /** Featured post flag */
+  featured?: boolean;
   /** SEO metadata */
   seo?: BlogSEO;
   /** Estimated reading time in minutes */
@@ -155,6 +157,7 @@ export interface BlogPostSummary {
   featured?: boolean;
   viewCount?: number;
   commentCount?: number;
+  status: BlogStatus;
 }
 
 /**

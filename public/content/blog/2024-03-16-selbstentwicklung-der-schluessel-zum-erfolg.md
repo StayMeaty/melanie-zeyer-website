@@ -1,14 +1,32 @@
 ---
-title: "Selbstentwicklung: Der Schlüssel zu persönlichem Erfolg"
-date: "2024-03-16"
-author: "Melanie Zeyer"
-category: "Persönliche Entwicklung"
-tags: ["Selbstentwicklung", "Coaching", "Motivation", "Persönlichkeitswachstum"]
-excerpt: "Wie gezielte Selbstentwicklung Ihr Leben und Ihre Karriere grundlegend verändern kann."
-image: "/images/blog/personal-development.jpg"
-published: true
-metaTitle: "Selbstentwicklung als Wegweiser zum Erfolg"
-metaDescription: "Entdecken Sie, wie systematische Selbstentwicklung Ihre persönlichen und beruflichen Ziele transformieren kann."
+title: 'Selbstentwicklung: Der Schlüssel zu persönlichem Erfolg'
+date: '2024-03-16T10:00:00.000Z'
+author: melanie
+category: persoenlichkeitsentwicklung
+tags:
+  - Selbstentwicklung
+  - Coaching
+  - Motivation
+  - Persönlichkeitswachstum
+excerpt: >-
+  Wie gezielte Selbstentwicklung Ihr Leben und Ihre Karriere grundlegend
+  verändern kann.
+image: /images/blog/personal-development.jpg
+imageAlt: Symbolbild für Persönlichkeitsentwicklung und persönliches Wachstum
+status: published
+featured: false
+readingTime: null
+lastModified: '2025-10-01T11:52:32.620Z'
+seo:
+  metaTitle: 'Selbstentwicklung als Wegweiser zum Erfolg'
+  metaDescription: 'Entdecken Sie, wie systematische Selbstentwicklung Ihre persönlichen und beruflichen Ziele transformieren kann.'
+  keywords:
+    - Selbstentwicklung
+    - Persönlichkeitsentwicklung
+    - Erfolg
+    - Coaching
+  twitterCard: summary_large_image
+slug: selbstentwicklung-der-schluessel-zu-persoenlichem-erfolg
 ---
 
 In einer Welt, die sich rasant verändert, ist Selbstentwicklung nicht mehr nur ein Luxus, sondern eine Notwendigkeit. Als Coach erlebe ich täglich, wie Menschen durch gezielte Entwicklung ihre persönlichen und beruflichen Grenzen erweitern.

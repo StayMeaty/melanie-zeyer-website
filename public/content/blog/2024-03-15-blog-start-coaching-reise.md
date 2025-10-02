@@ -1,14 +1,30 @@
 ---
-title: "Meine Coaching-Reise: Ein Neuanfang mit Leidenschaft"
-date: "2024-03-15"
-author: "Melanie Zeyer"
-category: "Persönliche Entwicklung"
-tags: ["Coaching", "Selbstentwicklung", "Neue Anfänge"]
-excerpt: "Ein persönlicher Einblick in meine Mission, Menschen auf ihrem Weg zu begleiten und zu unterstützen."
-image: "/images/blog/welcome-post.jpg"
-published: true
-metaTitle: "Melanie Zeyer: Meine Coaching-Mission beginnt"
-metaDescription: "Entdecken Sie meine Leidenschaft für persönliche Entwicklung und wie ich Menschen auf ihrem Weg begleite."
+title: 'Meine Coaching-Reise: Ein Neuanfang mit Leidenschaft'
+date: '2024-03-15T10:00:00.000Z'
+author: melanie
+category: persoenlichkeitsentwicklung
+tags:
+  - Coaching
+  - Selbstentwicklung
+  - Neue Anfänge
+excerpt: >-
+  Ein persönlicher Einblick in meine Mission, Menschen auf ihrem Weg zu
+  begleiten und zu unterstützen.
+image: /images/blog/welcome-post.jpg
+imageAlt: Melanie Zeyer beim Coaching - ein neuer Anfang mit Leidenschaft
+status: published
+featured: false
+readingTime: null
+lastModified: '2025-10-01T11:52:32.616Z'
+seo:
+  metaTitle: 'Melanie Zeyer: Meine Coaching-Mission beginnt'
+  metaDescription: 'Entdecken Sie meine Leidenschaft für persönliche Entwicklung und wie ich Menschen auf ihrem Weg begleite.'
+  keywords: 
+    - Coaching
+    - Persönlichkeitsentwicklung
+    - Leidenschaft
+  twitterCard: summary_large_image
+slug: meine-coaching-reise-ein-neuanfang-mit-leidenschaft
 ---
 
 Liebe Leserinnen und Leser,

@@ -1,0 +1,48 @@
+fragment BlogParts on Blog {
+  __typename
+  title
+  slug
+  date
+  excerpt
+  author
+  category
+  tags
+  image
+  imageAlt
+  status
+  featured
+  seo {
+    __typename
+    metaTitle
+    metaDescription
+    canonicalUrl
+    ogImage
+    ogTitle
+    ogDescription
+    twitterTitle
+    twitterDescription
+    twitterImage
+    twitterCard
+    keywords
+    focusKeyphrase
+    robots
+  }
+  readingTime
+  lastModified
+  body
+}
+
+fragment AuthorsParts on Authors {
+  __typename
+  name
+  email
+  bio
+  avatar
+  website
+  social {
+    __typename
+    instagram
+    linkedin
+    twitter
+  }
+}

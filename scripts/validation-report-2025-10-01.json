@@ -1,0 +1,96 @@
+{
+  "metadata": {
+    "timestamp": "2025-10-01T11:55:08.057Z",
+    "totalFiles": 5,
+    "validFiles": 5,
+    "invalidFiles": 0,
+    "filesWithWarnings": 0,
+    "totalErrors": 0,
+    "totalWarnings": 0,
+    "tinaCompatible": true
+  },
+  "namingConventions": {
+    "datePrefixedFiles": 5,
+    "correctSlugFormat": 5,
+    "duplicateSlugs": [],
+    "issues": []
+  },
+  "validationResults": [
+    {
+      "filename": "2024-01-15-willkommen-zu-meinem-blog.md",
+      "valid": true,
+      "errorCount": 0,
+      "warningCount": 0,
+      "errors": [],
+      "warnings": [],
+      "info": [
+        "Word count: ~232",
+        "Character count: 1515",
+        "Tags: 3",
+        "SEO fields: 4"
+      ]
+    },
+    {
+      "filename": "2024-03-15-blog-start-coaching-reise.md",
+      "valid": true,
+      "errorCount": 0,
+      "warningCount": 0,
+      "errors": [],
+      "warnings": [],
+      "info": [
+        "Word count: ~196",
+        "Character count: 1379",
+        "Tags: 3",
+        "SEO fields: 4"
+      ]
+    },
+    {
+      "filename": "2024-03-16-selbstentwicklung-der-schluessel-zum-erfolg.md",
+      "valid": true,
+      "errorCount": 0,
+      "warningCount": 0,
+      "errors": [],
+      "warnings": [],
+      "info": [
+        "Word count: ~190",
+        "Character count: 1416",
+        "Tags: 4",
+        "SEO fields: 4"
+      ]
+    },
+    {
+      "filename": "2024-03-17-fuehrungskraefte-coaching-unternehmenserfolg.md",
+      "valid": true,
+      "errorCount": 0,
+      "warningCount": 0,
+      "errors": [],
+      "warnings": [],
+      "info": [
+        "Word count: ~162",
+        "Character count: 1433",
+        "Tags: 4",
+        "SEO fields: 4"
+      ]
+    },
+    {
+      "filename": "2024-03-18-work-life-balance-selbstfuersorge.md",
+      "valid": true,
+      "errorCount": 0,
+      "warningCount": 0,
+      "errors": [],
+      "warnings": [],
+      "info": [
+        "Word count: ~154",
+        "Character count: 1177",
+        "Tags: 4",
+        "SEO fields: 4"
+      ]
+    }
+  ],
+  "summary": {
+    "readyForTina": true,
+    "recommendedActions": [
+      "All content is ready for Tina CMS migration!"
+    ]
+  }
+}

@@ -16,3 +16,7 @@ export { default as ProtectedRoute } from './ProtectedRoute';
 export { default as AdminDashboard } from './AdminDashboard';
 export { default as BlogManagement } from './BlogManagement';
 export { default as SEOMetaEditor } from './SEOMetaEditor';
+export { default as TinaAuthStatus } from './TinaAuthStatus';
+// TinaAdmin and TinaEditorWrapper are lazy-loaded in App.tsx
+// They are not exported here to ensure proper code splitting
+export { default as ContentMigration } from './ContentMigration';
