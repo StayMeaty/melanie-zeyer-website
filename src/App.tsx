@@ -155,6 +155,45 @@ function App() {
 
           {/* Tina CMS routes */}
           <Route
+            path="/admin/cms"
+            element={
+              <ProtectedRoute>
+                <Suspense fallback={<div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: '100vh',
+                    backgroundColor: '#f8f9fa',
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem',
+                      padding: '2rem',
+                      backgroundColor: 'white',
+                      borderRadius: '0.5rem',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                    }}>
+                      <div style={{
+                        width: '2rem',
+                        height: '2rem',
+                        border: '3px solid #e2e8f0',
+                        borderTopColor: '#0097B2',
+                        borderRadius: '50%',
+                        animation: 'spin 0.8s linear infinite',
+                      }} />
+                      <span style={{ color: '#4a5568', fontSize: '0.875rem' }}>
+                        Lade Tina CMS...
+                      </span>
+                    </div>
+                  </div>
+                }>
+                  <TinaAdmin />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/tina"
             element={
               <ProtectedRoute>
