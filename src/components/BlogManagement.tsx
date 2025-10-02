@@ -118,6 +118,12 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ initialView = 'overview
     setCurrentView('edit');
   }, []);
 
+  const handleView = useCallback((post: BlogPost) => {
+    // Open blog post in new tab
+    const blogUrl = `/blog/${post.slug}`;
+    window.open(blogUrl, '_blank');
+  }, []);
+
   const handleSave = useCallback(async (post: BlogPost) => {
     try {
       // Save to localStorage as draft or published
@@ -383,7 +389,7 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ initialView = 'overview
       return (
         <Component
           {...commonProps}
-          onView={(post: BlogPost) => console.log('View post:', post)}
+          onView={handleView}
           onCreateNew={handleCreateNew}
         />
       );
