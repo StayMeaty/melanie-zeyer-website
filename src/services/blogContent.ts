@@ -1,6 +1,15 @@
 // Blog content service for loading and managing blog posts from markdown files
 // Serverless-compatible implementation for Netlify deployment
 
+// Add Buffer polyfill for browser environment
+if (typeof window !== 'undefined' && typeof window.Buffer === 'undefined') {
+  // Simple Buffer polyfill for gray-matter in browser
+  (window as any).Buffer = {
+    isBuffer: () => false,
+    from: (str: string) => str,
+  };
+}
+
 import matter from 'gray-matter';
 import {
   BlogPost,
