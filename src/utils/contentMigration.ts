@@ -115,7 +115,7 @@ function validateField(fieldName: string, value: unknown): string | null {
       if (value.length > 300) return 'Excerpt should be max 300 characters';
       break;
       
-    case 'category':
+    case 'category': {
       const validCategories: BlogCategory[] = [
         'coaching', 'persoenlichkeitsentwicklung', 'lifestyle', 
         'business', 'gesundheit', 'mindset'
@@ -124,13 +124,15 @@ function validateField(fieldName: string, value: unknown): string | null {
         return `Category must be one of: ${validCategories.join(', ')}`;
       }
       break;
+    }
       
-    case 'status':
+    case 'status': {
       const validStatuses: BlogStatus[] = ['draft', 'published', 'archived'];
       if (!value || !validStatuses.includes(value as BlogStatus)) {
         return `Status must be one of: ${validStatuses.join(', ')}`;
       }
       break;
+    }
       
     case 'tags':
       if (value && !Array.isArray(value)) {
