@@ -105,10 +105,9 @@ export const BlogDataProvider: React.FC<BlogDataProviderProps> = ({ children }) 
 
   // Load posts on mount - only once
   useEffect(() => {
-    if (state.posts.length === 0 && !state.isLoading && !state.lastUpdated) {
-      loadPosts();
-    }
-  }, []); // Empty dependency array - only run on mount
+    loadPosts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Intentionally empty - only load once on mount
 
   const contextValue = useMemo<BlogDataContextType>(() => ({
     ...state,

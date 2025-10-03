@@ -3,7 +3,7 @@
  * Handles GitHub-based authentication for content management
  */
 
-import React, { createContext, useCallback, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState, useMemo, ReactNode } from 'react';
 import { 
   validateTokenSecurely, 
   getSecureToken, 
@@ -503,8 +503,8 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     return () => clearInterval(interval);
   }, [validateSession, session?.isAuthenticated]);
-  
-  const value: TinaAuthContextType = {
+
+  const value = useMemo<TinaAuthContextType>(() => ({
     isAuthenticated: !!session?.isAuthenticated,
     isLoading,
     session,
@@ -513,8 +513,8 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
     login,
     logout,
     validateSession,
-  };
-  
+  }), [session?.isAuthenticated, isLoading, session, provider, config, login, logout, validateSession]);
+
   return React.createElement(TinaAuthContext.Provider, { value }, children);
 };
 
