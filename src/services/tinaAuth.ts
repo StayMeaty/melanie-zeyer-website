@@ -442,17 +442,37 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
   }, []);
   
   /**
-   * Check and restore session on mount
+   * Check and restore session on mount, with auto-authentication for Tina Cloud
    */
   useEffect(() => {
     const checkSession = async () => {
       setIsLoading(true);
-      await validateSession();
+      
+      // Try to restore existing session first
+      const sessionRestored = await validateSession();
+      
+      // If no session exists and we're in Tina Cloud mode, auto-authenticate
+      if (!sessionRestored && config.useTinaCloud && provider.isConfigured) {
+        logTinaSecurityEvent('auto_authentication_attempt', { 
+          clientId: config.clientId,
+          repository: config.repository,
+        });
+        
+        const result = await login();
+        if (result.success) {
+          logTinaSecurityEvent('auto_authentication_success', {});
+        } else {
+          logTinaSecurityEvent('auto_authentication_failed', { 
+            error: result.error,
+          });
+        }
+      }
+      
       setIsLoading(false);
     };
     
     checkSession();
-  }, [validateSession]);
+  }, [validateSession, config.useTinaCloud, provider.isConfigured, login]);
   
   /**
    * Set up session check interval
