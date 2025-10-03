@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { BlogPost } from '../types/blog';
 import { loadAllPosts, clearPostCaches } from '../services/blogContent';
 
@@ -110,13 +110,13 @@ export const BlogDataProvider: React.FC<BlogDataProviderProps> = ({ children }) 
     }
   }, []); // Empty dependency array - only run on mount
 
-  const contextValue: BlogDataContextType = {
+  const contextValue = useMemo<BlogDataContextType>(() => ({
     ...state,
     refreshPosts,
     clearCache,
     updatePost,
     removePost,
-  };
+  }), [state, refreshPosts, clearCache, updatePost, removePost]);
 
   return (
     <BlogDataContext.Provider value={contextValue}>
