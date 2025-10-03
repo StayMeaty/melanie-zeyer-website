@@ -86,7 +86,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [value, debounceTimer]);
+  }, [value]);
 
   // Keyboard shortcuts
   useEffect(() => {
