@@ -774,7 +774,8 @@ const PostsManagement: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
 
   useEffect(() => {
     applyFiltersAndSort();
-  }, [posts, searchTerm, statusFilter, categoryFilter, sortBy, sortOrder, applyFiltersAndSort]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [posts, searchTerm, statusFilter, categoryFilter, sortBy, sortOrder]);
 
   const handleDeletePost = async (postId: string) => {
     if (!confirm('Sind Sie sicher, dass Sie diesen Beitrag löschen möchten?')) {
@@ -1934,6 +1935,7 @@ const TinaAdmin: React.FC<TinaAdminProps> = ({ className = '' }) => {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [bypassAuth, setBypassAuth] = useState(false);
+  const autoLoginAttempted = useRef(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -1946,7 +1948,8 @@ const TinaAdmin: React.FC<TinaAdminProps> = ({ className = '' }) => {
 
   // Auto-authentication: bypass login for seamless admin access
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
+    if (!isAuthenticated && !isLoading && !autoLoginAttempted.current) {
+      autoLoginAttempted.current = true;
       // Attempt auto-login first
       const attemptAutoLogin = async () => {
         const result = await login();
@@ -1958,7 +1961,8 @@ const TinaAdmin: React.FC<TinaAdminProps> = ({ className = '' }) => {
       };
       attemptAutoLogin();
     }
-  }, [isAuthenticated, isLoading, login]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, isLoading]);
   
   const handleLogin = async () => {
     setLoginError(null);

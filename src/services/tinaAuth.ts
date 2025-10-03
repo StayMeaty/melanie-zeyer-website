@@ -320,12 +320,19 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
     const currentSession = getTinaSession();
     
     if (!currentSession) {
+      // Only update state if it's currently set
+      if (session !== null) {
+        setSession(null);
+      }
       return false;
     }
     
     // For local development, session is always valid
     if (config.isLocalDevelopment && config.useLocalAuth) {
-      setSession(currentSession);
+      // Only update state if it's different
+      if (!session || session.tokenHash !== currentSession.tokenHash) {
+        setSession(currentSession);
+      }
       return true;
     }
     
@@ -335,7 +342,9 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
     if (!currentTokenHash || currentSession.tokenHash !== currentTokenHash) {
       logTinaSecurityEvent('session_token_mismatch', {});
       clearTinaSession();
-      setSession(null);
+      if (session !== null) {
+        setSession(null);
+      }
       return false;
     }
     
@@ -344,13 +353,18 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     if (!isValid) {
       clearTinaSession();
-      setSession(null);
+      if (session !== null) {
+        setSession(null);
+      }
       return false;
     }
     
-    setSession(currentSession);
+    // Only update state if it's different
+    if (!session || session.tokenHash !== currentSession.tokenHash) {
+      setSession(currentSession);
+    }
     return true;
-  }, [config.isLocalDevelopment, config.useLocalAuth, provider]);
+  }, [config.isLocalDevelopment, config.useLocalAuth, provider, session]);
   
   /**
    * Login function
@@ -485,7 +499,7 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     const interval = setInterval(async () => {
       await validateSession();
-    }, 60000); // Check every minute
+    }, 5 * 60000); // Check every 5 minutes (reduced frequency)
     
     return () => clearInterval(interval);
   }, [validateSession, session?.isAuthenticated]);
