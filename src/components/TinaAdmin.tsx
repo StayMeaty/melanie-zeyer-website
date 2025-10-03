@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import MDEditor from '@uiw/react-md-editor';
 import { useTinaAuth } from '../services/tinaAuth';
 import { APP_COLORS } from '../types';
 import { loadAllPosts, clearPostCaches, generateSlug } from '../services/blogContent';
@@ -475,6 +476,7 @@ const PostsManagement: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
 
 // New Post Creation Component
 const NewPostCreation: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
+  const [activeTab, setActiveTab] = useState<'write' | 'preview'>('write');
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -725,16 +727,53 @@ const NewPostCreation: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
           
           <div style={styles.formField}>
             <label style={styles.formLabel}>Hauptinhalt *</label>
-            <textarea
-              value={formData.content}
-              onChange={(e) => handleInputChange('content', e.target.value)}
-              style={{
-                ...styles.formTextarea,
-                minHeight: '300px',
-                borderColor: errors.content ? '#dc2626' : '#d1d5db'
-              }}
-              placeholder="Schreiben Sie hier Ihren Blog-Beitrag (Markdown unterstützt)"
-            />
+            <div style={{display: 'flex', marginBottom: '0.5rem'}}>
+              <button 
+                style={{
+                  ...styles.tabButton, 
+                  backgroundColor: activeTab === 'write' ? APP_COLORS.primary : '#f1f5f9',
+                  color: activeTab === 'write' ? 'white' : '#64748b'
+                }}
+                onClick={() => setActiveTab('write')}
+              >
+                Schreiben
+              </button>
+              <button 
+                style={{
+                  ...styles.tabButton, 
+                  backgroundColor: activeTab === 'preview' ? APP_COLORS.primary : '#f1f5f9',
+                  color: activeTab === 'preview' ? 'white' : '#64748b'
+                }}
+                onClick={() => setActiveTab('preview')}
+              >
+                Vorschau
+              </button>
+            </div>
+            <div data-color-mode='light' data-rk='light'>
+              {activeTab === 'write' ? (
+                <MDEditor
+                  value={formData.content}
+                  onChange={(val) => handleInputChange('content', val || '')}
+                  height={400}
+                  style={{
+                    borderColor: errors.content ? '#dc2626' : '#d1d5db'
+                  }}
+                  textareaProps={{
+                    placeholder: 'Schreiben Sie hier Ihren Blog-Beitrag (Markdown unterstützt)'
+                  }}
+                />
+              ) : (
+                <MDEditor.Markdown 
+                  source={formData.content || 'Keine Vorschau verfügbar'} 
+                  style={{
+                    padding: '1rem',
+                    minHeight: '400px',
+                    border: `1px solid ${errors.content ? '#dc2626' : '#d1d5db'}`,
+                    borderRadius: '0.5rem'
+                  }}
+                />
+              )}
+            </div>
             {errors.content && <span style={styles.formError}>{errors.content}</span>}
           </div>
         </div>
@@ -2009,6 +2048,17 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#9ca3af',
     fontSize: '0.75rem',
     fontStyle: 'italic' as const,
+  },
+  tabButton: {
+    backgroundColor: '#f1f5f9',
+    color: '#64748b',
+    border: 'none',
+    padding: '0.5rem 1rem',
+    fontSize: '0.875rem',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    marginRight: '0.5rem',
+    borderRadius: '0.25rem'
   },
 
   // Form styles
