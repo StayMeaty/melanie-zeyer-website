@@ -21,6 +21,11 @@ export default defineConfig({
     minify: 'esbuild',
     // Optimize chunk size warnings
     chunkSizeWarningLimit: 500,
+    // Handle CommonJS modules properly
+    commonjsOptions: {
+      include: [/async-lock/, /node_modules/],
+      transformMixedEsModules: true
+    },
     rollupOptions: {
       output: {
         // Strategic code splitting for Tina CMS
@@ -63,15 +68,35 @@ export default defineConfig({
       'react-dom',
       'react-router-dom',
       'gray-matter',
-      'markdown-to-jsx'
+      'markdown-to-jsx',
+      // Include TinaCMS client to handle async-lock dependency chain
+      'tinacms/dist/client',
+      // Force pre-bundle async-lock to handle CommonJS/ES6 interop  
+      'async-lock'
     ],
     exclude: [
-      'tinacms',
+      // Exclude only the CLI and large UI components to reduce bundle size
       '@tinacms/cli',
       'tinacms/dist/rich-text',
-      'tinacms/dist/react',
-      'async-lock'
-    ]
+      'tinacms/dist/react'
+    ],
+    // Force Vite to handle CommonJS dependencies correctly
+    esbuildOptions: {
+      define: {
+        global: 'globalThis'
+      }
+    }
+  },
+  // Add explicit dependency configuration
+  define: {
+    global: 'globalThis'
+  },
+  // Handle CommonJS/ES6 module resolution
+  resolve: {
+    alias: {
+      // Ensure async-lock resolves correctly for TinaCMS
+      'async-lock': 'async-lock/lib/index.js'
+    }
   },
   server: {
     port: 3000

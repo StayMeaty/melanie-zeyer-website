@@ -236,7 +236,7 @@ const Blog: React.FC = () => {
     }
 
     return filtered;
-  }, [selectedCategory, searchQuery]);
+  }, [posts, selectedCategory, searchQuery]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredPosts.length / BLOG_CONFIG.postsPerPage);

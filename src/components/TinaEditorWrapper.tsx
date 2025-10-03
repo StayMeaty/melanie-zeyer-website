@@ -758,7 +758,7 @@ const TinaEditorWrapper: React.FC<TinaEditorWrapperProps> = ({
               query="query BlogPost($relativePath: String!) { post(relativePath: $relativePath) { __typename id title excerpt body category status tags author date image imageAlt featured seo { metaTitle metaDescription } } }"
               variables={{ relativePath: contentPath }}
               data={null}
-              onFormChange={(_formData: Record<string, unknown> | TinaFormData) => {
+              onFormChange={() => {
                 // Mark as having unsaved changes when form changes
                 if (!hasUnsavedChanges) {
                   setHasUnsavedChanges(true);

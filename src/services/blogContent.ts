@@ -73,6 +73,7 @@ interface CacheEntry<T> {
   lastModified: number;
 }
 
+
 /**
  * Extended cache for blog posts and images
  */
@@ -81,6 +82,7 @@ class BlogCache {
   private allPostsCache: BlogPost[] | null = null;
   private allPostsCacheTime: number = 0;
   private genericCache = new Map<string, CacheEntry<unknown>>();
+  private isLoadingAllPosts: boolean = false;
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   get(slug: string): BlogPost | null {
@@ -131,6 +133,14 @@ class BlogCache {
     return this.allPostsCache;
   }
 
+  isLoadingPosts(): boolean {
+    return this.isLoadingAllPosts;
+  }
+
+  setLoadingPosts(loading: boolean): void {
+    this.isLoadingAllPosts = loading;
+  }
+
   setAllPosts(posts: BlogPost[]): void {
     this.allPostsCache = posts;
     this.allPostsCacheTime = Date.now();
@@ -140,6 +150,7 @@ class BlogCache {
     this.postCache.clear();
     this.allPostsCache = null;
     this.allPostsCacheTime = 0;
+    this.isLoadingAllPosts = false;
   }
 
   clearImageCaches(): void {
@@ -348,11 +359,30 @@ export async function loadAllPosts(): Promise<BlogPost[]> {
       return cachedPosts;
     }
 
+    // Check if already loading to prevent concurrent calls
+    if (blogCache.isLoadingPosts()) {
+      // Wait a bit and check cache again
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const cachedAfterWait = blogCache.getAllPosts();
+      if (cachedAfterWait) {
+        return cachedAfterWait;
+      }
+      // If still loading, return empty array to prevent infinite loops
+      return [];
+    }
+
+    // Set loading flag
+    blogCache.setLoadingPosts(true);
+
     // Try to load from Tina CMS first if enabled
     let tinaPosts: BlogPost[] = [];
     const useTina = import.meta.env.VITE_USE_TINA_CMS === 'true';
     
-    if (useTina) {
+    // Check if we should skip Tina loading for admin pages
+    const isAdminPage = window.location.pathname.includes('/admin');
+    const skipTina = isAdminPage; // Skip on admin pages to prevent conflicts
+    
+    if (useTina && !skipTina) {
       try {
         const { loadTinaBlogService } = await import('../utils/lazyTina');
         const tinaBlogService = await loadTinaBlogService();
@@ -368,6 +398,8 @@ export async function loadAllPosts(): Promise<BlogPost[]> {
       } catch (error) {
         console.warn('Tina CMS Laden fehlgeschlagen, verwende Fallback-Quellen:', error);
       }
+    } else if (skipTina) {
+      console.log('Tina CMS übersprungen (Admin-Modus oder temporär deaktiviert)');
     }
 
     // Load posts from localStorage (already parsed, no gray-matter needed)
@@ -447,7 +479,10 @@ export async function loadAllPosts(): Promise<BlogPost[]> {
     return filteredPosts;
   } catch (error) {
     console.error('Fehler beim Laden aller Blog-Posts:', error);
-    throw new Error('Blog-Posts konnten nicht geladen werden');
+    return []; // Return empty array instead of throwing to prevent infinite loops
+  } finally {
+    // Always clear loading flag
+    blogCache.setLoadingPosts(false);
   }
 }
 
@@ -979,3 +1014,4 @@ export async function getBlogStats(): Promise<{
     throw new Error('Blog-Statistiken konnten nicht geladen werden');
   }
 }
+

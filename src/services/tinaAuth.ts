@@ -486,7 +486,7 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
     };
     
     checkSession();
-  }, [validateSession, config.useTinaCloud, provider.isConfigured, login]);
+  }, [validateSession, config.useTinaCloud, config.clientId, config.repository, provider.isConfigured, login]);
   
   /**
    * Set up session check interval

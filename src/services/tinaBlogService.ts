@@ -671,9 +671,12 @@ export async function searchPostsWithTina(
     // Build search query with filters
     const searchQuery = {
       term: searchTerm,
-      filters: {}, // Search filters object
+      filters: {}, // TODO: Implement proper TinaBlogQueryParams filters
       limit: 50,
     };
+    
+    // Note: Custom filters parameter currently not implemented in Tina search
+    // This will need to be added when Tina search supports advanced filtering
 
     // Execute search query
     const client = await tinaClient.getClient();

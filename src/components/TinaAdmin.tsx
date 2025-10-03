@@ -29,7 +29,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   const [viewMode, setViewMode] = useState<ViewMode>('split');
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [debounceTimer, setDebounceTimer] = useState<number | null>(null);
+  const debounceTimerRef = useRef<number | null>(null);
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   const insertMarkdown = useCallback((before: string, after: string, placeholder: string) => {
@@ -73,15 +73,15 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
   // Debounced preview updates
   useEffect(() => {
-    if (debounceTimer) {
-      clearTimeout(debounceTimer);
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
     }
     
     const timer = setTimeout(() => {
       setDebouncedValue(value);
     }, 300);
     
-    setDebounceTimer(timer);
+    debounceTimerRef.current = timer;
     
     return () => {
       if (timer) clearTimeout(timer);
