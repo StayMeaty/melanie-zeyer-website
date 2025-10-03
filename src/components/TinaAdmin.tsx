@@ -91,46 +91,17 @@ const TinaCMS = React.lazy(async () => {
                     Inhalte
                   </h3>
                   
-                  {/* Quick Actions */}
+                  {/* Info Box */}
                   <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.5rem',
+                    padding: '1rem',
+                    backgroundColor: '#fef3c7',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    color: '#92400e',
                   }}>
-                    <button 
-                      onClick={() => {
-                        // Navigate to new post creation
-                        window.location.href = '/admin/blog/new';
-                      }}
-                      style={{
-                        padding: '0.5rem 1rem',
-                        backgroundColor: APP_COLORS.primary,
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '0.375rem',
-                        fontSize: '0.875rem',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      + Neuer Beitrag
-                    </button>
-                    <button 
-                      onClick={() => {
-                        // Open blog management
-                        window.location.href = '/admin/blog';
-                      }}
-                      style={{
-                        padding: '0.5rem 1rem',
-                        backgroundColor: '#f3f4f6',
-                        color: '#374151',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '0.375rem',
-                        fontSize: '0.875rem',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      📁 Blog verwalten
-                    </button>
+                    ⚠️ <strong>Hinweis:</strong><br />
+                    Tina CMS wird derzeit konfiguriert.<br /><br />
+                    Verwenden Sie GitHub oder die Markdown-Dateien im Repository zum Verwalten von Blog-Inhalten.
                   </div>
                 </div>
 
@@ -150,7 +121,7 @@ const TinaCMS = React.lazy(async () => {
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                       <li style={{ marginBottom: '0.5rem' }}>
                         <a 
-                          href="/admin/blog" 
+                          href="#" 
                           style={{ 
                             color: APP_COLORS.primary, 
                             textDecoration: 'none',
@@ -199,42 +170,6 @@ const TinaCMS = React.lazy(async () => {
                   }}>
                     Wählen Sie einen Bereich aus der Seitenleiste aus, um mit der Bearbeitung zu beginnen.
                   </p>
-                  <div style={{
-                    display: 'flex',
-                    gap: '1rem',
-                    justifyContent: 'center',
-                  }}>
-                    <button
-                      onClick={() => window.location.href = '/admin/blog'}
-                      style={{
-                        padding: '0.75rem 1.5rem',
-                        backgroundColor: APP_COLORS.primary,
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '0.375rem',
-                        fontSize: '0.875rem',
-                        cursor: 'pointer',
-                        fontWeight: '500',
-                      }}
-                    >
-                      Blog verwalten
-                    </button>
-                    <button
-                      onClick={() => window.location.href = '/admin/cms'}
-                      style={{
-                        padding: '0.75rem 1.5rem',
-                        backgroundColor: 'white',
-                        color: APP_COLORS.primary,
-                        border: `1px solid ${APP_COLORS.primary}`,
-                        borderRadius: '0.375rem',
-                        fontSize: '0.875rem',
-                        cursor: 'pointer',
-                        fontWeight: '500',
-                      }}
-                    >
-                      CMS Editor
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
