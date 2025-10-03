@@ -974,6 +974,11 @@ const NewPostCreation: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    console.log('📝 NewPostCreation component mounted');
+    return () => console.log('📝 NewPostCreation component unmounted');
+  }, []);
+
+  useEffect(() => {
     if (isAutoSlug && formData.title) {
       setFormData(prev => ({
         ...prev,

@@ -32,6 +32,7 @@ export const BlogDataProvider: React.FC<BlogDataProviderProps> = ({ children }) 
 
   const loadPosts = useCallback(async () => {
     try {
+      console.trace('🔍 loadPosts called from:');
       setState(prev => {
         // Prevent multiple simultaneous loads
         if (prev.isLoading) {

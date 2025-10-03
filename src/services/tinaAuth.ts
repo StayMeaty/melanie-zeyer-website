@@ -503,16 +503,23 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
     return () => clearInterval(interval);
   }, [validateSession, session?.isAuthenticated]);
 
-  const value = useMemo<TinaAuthContextType>(() => ({
-    isAuthenticated: !!session?.isAuthenticated,
-    isLoading,
-    session,
-    provider,
-    config,
-    login,
-    logout,
-    validateSession,
-  }), [session?.isAuthenticated, isLoading, session, provider, config, login, logout, validateSession]);
+  const value = useMemo<TinaAuthContextType>(() => {
+    console.log('🔄 TinaAuth context value recreated', {
+      isAuthenticated: !!session?.isAuthenticated,
+      isLoading,
+      sessionHash: session?.tokenHash,
+    });
+    return {
+      isAuthenticated: !!session?.isAuthenticated,
+      isLoading,
+      session,
+      provider,
+      config,
+      login,
+      logout,
+      validateSession,
+    };
+  }, [session?.isAuthenticated, isLoading, session, provider, config, login, logout, validateSession]);
 
   return React.createElement(TinaAuthContext.Provider, { value }, children);
 };
