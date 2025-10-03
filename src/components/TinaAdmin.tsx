@@ -4,11 +4,416 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import MDEditor from '@uiw/react-md-editor';
+import Markdown from 'markdown-to-jsx';
 import { useTinaAuth } from '../services/tinaAuth';
 import { APP_COLORS } from '../types';
 import { loadAllPosts, clearPostCaches, generateSlug } from '../services/blogContent';
 import { BlogPost, BlogStatus, BlogCategory, BLOG_CATEGORIES, BLOG_CONFIG } from '../types/blog';
+
+// Rich Markdown Editor Component
+interface MarkdownEditorProps {
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  placeholder?: string;
+}
+
+const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ 
+  value, 
+  onChange, 
+  error, 
+  placeholder = 'Schreiben Sie hier Ihren Blog-Beitrag...' 
+}) => {
+  const [activeView, setActiveView] = useState<'editor' | 'preview' | 'split'>('editor');
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [debounceTimer, setDebounceTimer] = useState<number | null>(null);
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  // Handle window resize for responsive behavior
+  useEffect(() => {
+    const handleResize = () => {
+      const desktop = window.innerWidth >= 768;
+      setIsDesktop(desktop);
+      // Reset to editor view on mobile
+      if (!desktop && activeView === 'split') {
+        setActiveView('editor');
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [activeView]);
+
+  // Debounced preview updates
+  useEffect(() => {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+    
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, 300);
+    
+    setDebounceTimer(timer);
+    
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [value]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!textareaRef.current || document.activeElement !== textareaRef.current) return;
+      
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case 'b':
+            e.preventDefault();
+            insertMarkdown('**', '**', 'Fetter Text');
+            break;
+          case 'i':
+            e.preventDefault();
+            insertMarkdown('*', '*', 'Kursiver Text');
+            break;
+          case 'k':
+            e.preventDefault();
+            insertMarkdown('[', '](url)', 'Linktext');
+            break;
+          case '`':
+            e.preventDefault();
+            insertMarkdown('`', '`', 'Code');
+            break;
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const insertMarkdown = (before: string, after: string, placeholder: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    const textToInsert = selectedText || placeholder;
+    
+    const newText = 
+      textarea.value.substring(0, start) +
+      before + textToInsert + after +
+      textarea.value.substring(end);
+    
+    onChange(newText);
+    
+    // Set cursor position
+    setTimeout(() => {
+      const newPos = start + before.length + textToInsert.length;
+      textarea.setSelectionRange(newPos, newPos);
+      textarea.focus();
+    }, 0);
+  };
+
+  const formatHeading = (level: number) => {
+    const prefix = '#'.repeat(level) + ' ';
+    insertMarkdown(prefix, '', `Überschrift ${level}`);
+  };
+
+  const formatList = (ordered: boolean = false) => {
+    const prefix = ordered ? '1. ' : '- ';
+    insertMarkdown(prefix, '', 'Listenelement');
+  };
+
+  const formatCodeBlock = () => {
+    insertMarkdown('```\n', '\n```', 'Code hier einfügen');
+  };
+
+  const formatImage = () => {
+    insertMarkdown('![', '](bild-url)', 'Bildbeschreibung');
+  };
+
+  const toolbarButtonStyle = {
+    backgroundColor: 'transparent',
+    border: '1px solid #d1d5db',
+    borderRadius: '0.25rem',
+    padding: '0.5rem',
+    cursor: 'pointer',
+    fontSize: '0.875rem',
+    color: '#374151',
+    transition: 'all 0.2s',
+    marginRight: '0.25rem',
+    marginBottom: '0.25rem',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.25rem',
+    ':hover': {
+      backgroundColor: '#f9fafb',
+      borderColor: APP_COLORS.primary,
+    }
+  };
+
+  const viewButtonStyle = (isActive: boolean) => ({
+    backgroundColor: isActive ? APP_COLORS.primary : '#f1f5f9',
+    color: isActive ? 'white' : '#64748b',
+    border: 'none',
+    padding: '0.5rem 1rem',
+    fontSize: '0.875rem',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    borderRadius: '0.25rem',
+    marginRight: '0.25rem',
+  });
+
+  const editorStyle = {
+    width: '100%',
+    minHeight: '400px',
+    padding: '1rem',
+    border: `1px solid ${error ? '#dc2626' : '#d1d5db'}`,
+    borderRadius: '0.5rem',
+    fontSize: '0.875rem',
+    fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
+    resize: 'vertical' as const,
+    outline: 'none',
+    backgroundColor: 'white',
+  };
+
+  const previewStyle = {
+    width: '100%',
+    minHeight: '400px',
+    padding: '1rem',
+    border: `1px solid ${error ? '#dc2626' : '#d1d5db'}`,
+    borderRadius: '0.5rem',
+    backgroundColor: '#fafafa',
+    overflow: 'auto',
+  };
+
+  return (
+    <div style={{ width: '100%' }}>
+      {/* Toolbar */}
+      <div style={{ 
+        marginBottom: '0.5rem', 
+        padding: '0.75rem',
+        backgroundColor: '#f8fafc',
+        borderRadius: '0.5rem',
+        border: '1px solid #e2e8f0'
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          gap: '0.25rem',
+          marginBottom: '0.75rem'
+        }}>
+          <button
+            style={toolbarButtonStyle}
+            onClick={() => insertMarkdown('**', '**', 'Fetter Text')}
+            title="Fett (Ctrl+B)"
+            aria-label="Text fett formatieren"
+          >
+            <strong>B</strong> Fett
+          </button>
+          
+          <button
+            style={toolbarButtonStyle}
+            onClick={() => insertMarkdown('*', '*', 'Kursiver Text')}
+            title="Kursiv (Ctrl+I)"
+            aria-label="Text kursiv formatieren"
+          >
+            <em>I</em> Kursiv
+          </button>
+          
+          <button
+            style={toolbarButtonStyle}
+            onClick={() => formatHeading(1)}
+            title="Überschrift 1"
+            aria-label="Überschrift 1 einfügen"
+          >
+            H1
+          </button>
+          
+          <button
+            style={toolbarButtonStyle}
+            onClick={() => formatHeading(2)}
+            title="Überschrift 2"
+            aria-label="Überschrift 2 einfügen"
+          >
+            H2
+          </button>
+          
+          <button
+            style={toolbarButtonStyle}
+            onClick={() => formatHeading(3)}
+            title="Überschrift 3"
+            aria-label="Überschrift 3 einfügen"
+          >
+            H3
+          </button>
+          
+          <button
+            style={toolbarButtonStyle}
+            onClick={() => formatList(false)}
+            title="Aufzählungsliste"
+            aria-label="Aufzählungsliste einfügen"
+          >
+            • Liste
+          </button>
+          
+          <button
+            style={toolbarButtonStyle}
+            onClick={() => formatList(true)}
+            title="Nummerierte Liste"
+            aria-label="Nummerierte Liste einfügen"
+          >
+            1. Nummeriert
+          </button>
+          
+          <button
+            style={toolbarButtonStyle}
+            onClick={() => insertMarkdown('[', '](url)', 'Linktext')}
+            title="Link (Ctrl+K)"
+            aria-label="Link einfügen"
+          >
+            🔗 Link
+          </button>
+          
+          <button
+            style={toolbarButtonStyle}
+            onClick={() => insertMarkdown('`', '`', 'Code')}
+            title="Inline Code (Ctrl+`)"
+            aria-label="Inline Code einfügen"
+          >
+            &lt;/&gt; Code
+          </button>
+          
+          <button
+            style={toolbarButtonStyle}
+            onClick={formatCodeBlock}
+            title="Code Block"
+            aria-label="Code Block einfügen"
+          >
+            📝 Code Block
+          </button>
+          
+          <button
+            style={toolbarButtonStyle}
+            onClick={formatImage}
+            title="Bild"
+            aria-label="Bild einfügen"
+          >
+            🖼️ Bild
+          </button>
+        </div>
+
+        {/* View Toggle */}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <button
+            style={viewButtonStyle(activeView === 'editor')}
+            onClick={() => setActiveView('editor')}
+            aria-label="Editor-Ansicht"
+          >
+            ✏️ Schreiben
+          </button>
+          
+          <button
+            style={viewButtonStyle(activeView === 'preview')}
+            onClick={() => setActiveView('preview')}
+            aria-label="Vorschau-Ansicht"
+          >
+            👁️ Vorschau
+          </button>
+          
+          {isDesktop && (
+            <button
+              style={viewButtonStyle(activeView === 'split')}
+              onClick={() => setActiveView('split')}
+              aria-label="Geteilte Ansicht"
+            >
+              ⚌ Geteilt
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Content Area */}
+      <div style={{ 
+        display: 'flex', 
+        gap: '1rem',
+        flexDirection: activeView === 'split' && isDesktop ? 'row' : 'column'
+      }}>
+        {/* Editor */}
+        {(activeView === 'editor' || (activeView === 'split' && isDesktop)) && (
+          <div style={{ 
+            flex: activeView === 'split' ? 1 : 'none',
+            width: activeView === 'split' ? '50%' : '100%'
+          }}>
+            <textarea
+              ref={textareaRef}
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder={placeholder}
+              style={editorStyle}
+              aria-label="Markdown Editor"
+            />
+          </div>
+        )}
+
+        {/* Preview */}
+        {(activeView === 'preview' || (activeView === 'split' && isDesktop)) && (
+          <div style={{ 
+            flex: activeView === 'split' ? 1 : 'none',
+            width: activeView === 'split' ? '50%' : '100%'
+          }}>
+            <div style={previewStyle}>
+              {debouncedValue ? (
+                <Markdown
+                  options={{
+                    overrides: {
+                      h1: { props: { style: { color: APP_COLORS.primary, marginBottom: '1rem' } } },
+                      h2: { props: { style: { color: APP_COLORS.secondary, marginBottom: '0.75rem' } } },
+                      h3: { props: { style: { color: APP_COLORS.secondary, marginBottom: '0.5rem' } } },
+                      p: { props: { style: { marginBottom: '1rem', lineHeight: '1.6' } } },
+                      ul: { props: { style: { marginBottom: '1rem', paddingLeft: '1.5rem' } } },
+                      ol: { props: { style: { marginBottom: '1rem', paddingLeft: '1.5rem' } } },
+                      code: { props: { style: { 
+                        backgroundColor: '#f1f5f9', 
+                        padding: '0.125rem 0.25rem', 
+                        borderRadius: '0.25rem',
+                        fontSize: '0.875em'
+                      } } },
+                      pre: { props: { style: { 
+                        backgroundColor: '#f1f5f9', 
+                        padding: '1rem', 
+                        borderRadius: '0.5rem',
+                        overflow: 'auto',
+                        marginBottom: '1rem'
+                      } } },
+                      blockquote: { props: { style: { 
+                        borderLeft: `4px solid ${APP_COLORS.accent}`,
+                        marginLeft: '0',
+                        paddingLeft: '1rem',
+                        fontStyle: 'italic',
+                        color: '#6b7280'
+                      } } },
+                      a: { props: { style: { color: APP_COLORS.primary, textDecoration: 'underline' } } },
+                    }
+                  }}
+                >
+                  {debouncedValue}
+                </Markdown>
+              ) : (
+                <p style={{ color: '#9ca3af', fontStyle: 'italic' }}>
+                  Keine Vorschau verfügbar. Beginnen Sie mit dem Schreiben, um eine Vorschau zu sehen.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 interface ContentDashboardProps {
   onNavigate: (section: string) => void;
@@ -476,7 +881,6 @@ const PostsManagement: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
 
 // New Post Creation Component
 const NewPostCreation: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
-  const [activeTab, setActiveTab] = useState<'write' | 'preview'>('write');
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -727,53 +1131,12 @@ const NewPostCreation: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
           
           <div style={styles.formField}>
             <label style={styles.formLabel}>Hauptinhalt *</label>
-            <div style={{display: 'flex', marginBottom: '0.5rem'}}>
-              <button 
-                style={{
-                  ...styles.tabButton, 
-                  backgroundColor: activeTab === 'write' ? APP_COLORS.primary : '#f1f5f9',
-                  color: activeTab === 'write' ? 'white' : '#64748b'
-                }}
-                onClick={() => setActiveTab('write')}
-              >
-                Schreiben
-              </button>
-              <button 
-                style={{
-                  ...styles.tabButton, 
-                  backgroundColor: activeTab === 'preview' ? APP_COLORS.primary : '#f1f5f9',
-                  color: activeTab === 'preview' ? 'white' : '#64748b'
-                }}
-                onClick={() => setActiveTab('preview')}
-              >
-                Vorschau
-              </button>
-            </div>
-            <div data-color-mode='light' data-rk='light'>
-              {activeTab === 'write' ? (
-                <MDEditor
-                  value={formData.content}
-                  onChange={(val) => handleInputChange('content', val || '')}
-                  height={400}
-                  style={{
-                    borderColor: errors.content ? '#dc2626' : '#d1d5db'
-                  }}
-                  textareaProps={{
-                    placeholder: 'Schreiben Sie hier Ihren Blog-Beitrag (Markdown unterstützt)'
-                  }}
-                />
-              ) : (
-                <MDEditor.Markdown 
-                  source={formData.content || 'Keine Vorschau verfügbar'} 
-                  style={{
-                    padding: '1rem',
-                    minHeight: '400px',
-                    border: `1px solid ${errors.content ? '#dc2626' : '#d1d5db'}`,
-                    borderRadius: '0.5rem'
-                  }}
-                />
-              )}
-            </div>
+            <MarkdownEditor
+              value={formData.content}
+              onChange={(value) => handleInputChange('content', value)}
+              error={errors.content}
+              placeholder="Schreiben Sie hier Ihren Blog-Beitrag (Markdown unterstützt)"
+            />
             {errors.content && <span style={styles.formError}>{errors.content}</span>}
           </div>
         </div>
