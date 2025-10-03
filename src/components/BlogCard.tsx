@@ -9,7 +9,7 @@ interface BlogCardProps {
 
 const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
   const categoryInfo = BLOG_CATEGORIES.find(cat => cat.category === post.category);
-  const formattedDate = post.publishedAt.toLocaleDateString('de-DE', {
+  const formattedDate = new Date(post.publishedAt).toLocaleDateString('de-DE', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'

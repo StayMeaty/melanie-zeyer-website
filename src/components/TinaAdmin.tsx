@@ -666,7 +666,9 @@ const ContentDashboard: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
                 </div>
                 <p style={styles.postExcerpt}>{post.excerpt}</p>
                 <div style={styles.postFooter}>
-                  <span style={styles.postDate}>{post.publishedAt.toLocaleDateString('de-DE')}</span>
+                  <span style={styles.postDate}>
+                    {new Date(post.publishedAt).toLocaleDateString('de-DE')}
+                  </span>
                   <div style={styles.postActions}>
                     <button className="action-btn" style={styles.actionBtn}>Bearbeiten</button>
                     <button className="action-btn" style={styles.actionBtn}>Vorschau</button>
@@ -910,7 +912,7 @@ const PostsManagement: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
                     {BLOG_CATEGORIES.find(c => c.category === post.category)?.displayName}
                   </span>
                   <span style={styles.postDate}>
-                    {post.publishedAt.toLocaleDateString('de-DE')}
+                    {new Date(post.publishedAt).toLocaleDateString('de-DE')}
                   </span>
                   <span style={styles.postReadingTime}>
                     {post.readingTime} Min. Lesezeit

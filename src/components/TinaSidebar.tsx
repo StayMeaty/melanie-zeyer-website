@@ -494,7 +494,7 @@ const TinaSidebar: React.FC<TinaSidebarProps> = ({
                       <div style={styles.postInfo}>
                         <div style={styles.postTitle}>{post.title}</div>
                         <div style={styles.postMeta}>
-                          {post.publishedAt.toLocaleDateString('de-DE')} • {post.author}
+                          {new Date(post.publishedAt).toLocaleDateString('de-DE')} • {post.author}
                         </div>
                       </div>
                     </Link>

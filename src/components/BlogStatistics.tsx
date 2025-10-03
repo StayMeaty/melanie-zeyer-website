@@ -609,7 +609,7 @@ Featured Beiträge: ${statistics.featured}
                 </div>
                 <div style={styles.postMeta}>
                   <span>{post.status}</span>
-                  <span>{post.publishedAt.toLocaleDateString('de-DE')}</span>
+                  <span>{new Date(post.publishedAt).toLocaleDateString('de-DE')}</span>
                   <span>{post.viewCount || 0} Aufrufe</span>
                 </div>
               </div>
