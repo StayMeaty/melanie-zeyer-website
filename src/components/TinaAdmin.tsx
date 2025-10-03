@@ -18,32 +18,58 @@ interface MarkdownEditorProps {
   placeholder?: string;
 }
 
+type ViewMode = 'write' | 'preview' | 'split';
+
 const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ 
   value, 
   onChange, 
   error, 
   placeholder = 'Schreiben Sie hier Ihren Blog-Beitrag...' 
 }) => {
-  const [activeView, setActiveView] = useState<'editor' | 'preview' | 'split'>('editor');
+  const [viewMode, setViewMode] = useState<ViewMode>('split');
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [debounceTimer, setDebounceTimer] = useState<number | null>(null);
   const [debouncedValue, setDebouncedValue] = useState(value);
+
+  const insertMarkdown = useCallback((before: string, after: string, placeholder: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    const textToInsert = selectedText || placeholder;
+    
+    const newText = 
+      textarea.value.substring(0, start) +
+      before + textToInsert + after +
+      textarea.value.substring(end);
+    
+    onChange(newText);
+    
+    // Set cursor position
+    setTimeout(() => {
+      const newPos = start + before.length + textToInsert.length;
+      textarea.setSelectionRange(newPos, newPos);
+      textarea.focus();
+    }, 0);
+  }, [onChange]);
 
   // Handle window resize for responsive behavior
   useEffect(() => {
     const handleResize = () => {
       const desktop = window.innerWidth >= 768;
       setIsDesktop(desktop);
-      // Reset to editor view on mobile
-      if (!desktop && activeView === 'split') {
-        setActiveView('editor');
+      // Reset to write view on mobile if split mode is active
+      if (!desktop && viewMode === 'split') {
+        setViewMode('write');
       }
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [activeView]);
+  }, [viewMode]);
 
   // Debounced preview updates
   useEffect(() => {
@@ -60,7 +86,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [value]);
+  }, [value, debounceTimer]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -91,31 +117,8 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [insertMarkdown]);
 
-  const insertMarkdown = (before: string, after: string, placeholder: string) => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end);
-    const textToInsert = selectedText || placeholder;
-    
-    const newText = 
-      textarea.value.substring(0, start) +
-      before + textToInsert + after +
-      textarea.value.substring(end);
-    
-    onChange(newText);
-    
-    // Set cursor position
-    setTimeout(() => {
-      const newPos = start + before.length + textToInsert.length;
-      textarea.setSelectionRange(newPos, newPos);
-      textarea.focus();
-    }, 0);
-  };
 
   const formatHeading = (level: number) => {
     const prefix = '#'.repeat(level) + ' ';
@@ -183,11 +186,14 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   const previewStyle = {
     width: '100%',
     minHeight: '400px',
-    padding: '1rem',
+    padding: '1.5rem',
     border: `1px solid ${error ? '#dc2626' : '#d1d5db'}`,
     borderRadius: '0.5rem',
-    backgroundColor: '#fafafa',
+    backgroundColor: '#ffffff',
     overflow: 'auto',
+    fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    fontSize: '1rem',
+    lineHeight: '1.6',
   };
 
   return (
@@ -309,16 +315,16 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         {/* View Toggle */}
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <button
-            style={viewButtonStyle(activeView === 'editor')}
-            onClick={() => setActiveView('editor')}
+            style={viewButtonStyle(viewMode === 'write')}
+            onClick={() => setViewMode('write')}
             aria-label="Editor-Ansicht"
           >
             ✏️ Schreiben
           </button>
           
           <button
-            style={viewButtonStyle(activeView === 'preview')}
-            onClick={() => setActiveView('preview')}
+            style={viewButtonStyle(viewMode === 'preview')}
+            onClick={() => setViewMode('preview')}
             aria-label="Vorschau-Ansicht"
           >
             👁️ Vorschau
@@ -326,8 +332,8 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
           
           {isDesktop && (
             <button
-              style={viewButtonStyle(activeView === 'split')}
-              onClick={() => setActiveView('split')}
+              style={viewButtonStyle(viewMode === 'split')}
+              onClick={() => setViewMode('split')}
               aria-label="Geteilte Ansicht"
             >
               ⚌ Geteilt
@@ -340,13 +346,13 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
       <div style={{ 
         display: 'flex', 
         gap: '1rem',
-        flexDirection: activeView === 'split' && isDesktop ? 'row' : 'column'
+        flexDirection: viewMode === 'split' && isDesktop ? 'row' : 'column'
       }}>
         {/* Editor */}
-        {(activeView === 'editor' || (activeView === 'split' && isDesktop)) && (
+        {(viewMode === 'write' || (viewMode === 'split' && isDesktop)) && (
           <div style={{ 
-            flex: activeView === 'split' ? 1 : 'none',
-            width: activeView === 'split' ? '50%' : '100%'
+            flex: viewMode === 'split' ? 1 : 'none',
+            width: viewMode === 'split' ? '50%' : '100%'
           }}>
             <textarea
               ref={textareaRef}
@@ -360,50 +366,149 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         )}
 
         {/* Preview */}
-        {(activeView === 'preview' || (activeView === 'split' && isDesktop)) && (
+        {(viewMode === 'preview' || (viewMode === 'split' && isDesktop)) && (
           <div style={{ 
-            flex: activeView === 'split' ? 1 : 'none',
-            width: activeView === 'split' ? '50%' : '100%'
+            flex: viewMode === 'split' ? 1 : 'none',
+            width: viewMode === 'split' ? '50%' : '100%'
           }}>
             <div style={previewStyle}>
               {debouncedValue ? (
                 <Markdown
                   options={{
                     overrides: {
-                      h1: { props: { style: { color: APP_COLORS.primary, marginBottom: '1rem' } } },
-                      h2: { props: { style: { color: APP_COLORS.secondary, marginBottom: '0.75rem' } } },
-                      h3: { props: { style: { color: APP_COLORS.secondary, marginBottom: '0.5rem' } } },
-                      p: { props: { style: { marginBottom: '1rem', lineHeight: '1.6' } } },
-                      ul: { props: { style: { marginBottom: '1rem', paddingLeft: '1.5rem' } } },
-                      ol: { props: { style: { marginBottom: '1rem', paddingLeft: '1.5rem' } } },
+                      h1: { props: { style: { 
+                        color: APP_COLORS.primary, 
+                        marginBottom: '1rem',
+                        fontSize: '1.875rem',
+                        fontWeight: '700',
+                        lineHeight: '1.2'
+                      } } },
+                      h2: { props: { style: { 
+                        color: APP_COLORS.secondary, 
+                        marginBottom: '0.75rem',
+                        fontSize: '1.5rem',
+                        fontWeight: '600',
+                        lineHeight: '1.3'
+                      } } },
+                      h3: { props: { style: { 
+                        color: APP_COLORS.secondary, 
+                        marginBottom: '0.5rem',
+                        fontSize: '1.25rem',
+                        fontWeight: '600',
+                        lineHeight: '1.4'
+                      } } },
+                      h4: { props: { style: { 
+                        color: '#374151', 
+                        marginBottom: '0.5rem',
+                        fontSize: '1.125rem',
+                        fontWeight: '600'
+                      } } },
+                      h5: { props: { style: { 
+                        color: '#374151', 
+                        marginBottom: '0.5rem',
+                        fontSize: '1rem',
+                        fontWeight: '600'
+                      } } },
+                      h6: { props: { style: { 
+                        color: '#374151', 
+                        marginBottom: '0.5rem',
+                        fontSize: '0.875rem',
+                        fontWeight: '600'
+                      } } },
+                      p: { props: { style: { 
+                        marginBottom: '1rem', 
+                        lineHeight: '1.6',
+                        color: '#374151'
+                      } } },
+                      ul: { props: { style: { 
+                        marginBottom: '1rem', 
+                        paddingLeft: '1.5rem',
+                        color: '#374151'
+                      } } },
+                      ol: { props: { style: { 
+                        marginBottom: '1rem', 
+                        paddingLeft: '1.5rem',
+                        color: '#374151'
+                      } } },
+                      li: { props: { style: { 
+                        marginBottom: '0.25rem',
+                        lineHeight: '1.5'
+                      } } },
                       code: { props: { style: { 
                         backgroundColor: '#f1f5f9', 
                         padding: '0.125rem 0.25rem', 
                         borderRadius: '0.25rem',
-                        fontSize: '0.875em'
+                        fontSize: '0.875em',
+                        fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
+                        color: '#dc2626'
                       } } },
                       pre: { props: { style: { 
                         backgroundColor: '#f1f5f9', 
                         padding: '1rem', 
                         borderRadius: '0.5rem',
                         overflow: 'auto',
-                        marginBottom: '1rem'
+                        marginBottom: '1rem',
+                        fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
+                        fontSize: '0.875rem',
+                        lineHeight: '1.5'
                       } } },
                       blockquote: { props: { style: { 
                         borderLeft: `4px solid ${APP_COLORS.accent}`,
                         marginLeft: '0',
                         paddingLeft: '1rem',
+                        marginBottom: '1rem',
                         fontStyle: 'italic',
-                        color: '#6b7280'
+                        color: '#6b7280',
+                        backgroundColor: '#f9fafb'
                       } } },
-                      a: { props: { style: { color: APP_COLORS.primary, textDecoration: 'underline' } } },
+                      a: { props: { style: { 
+                        color: APP_COLORS.primary, 
+                        textDecoration: 'underline',
+                        transition: 'color 0.2s'
+                      } } },
+                      strong: { props: { style: { 
+                        fontWeight: '700',
+                        color: '#1f2937'
+                      } } },
+                      em: { props: { style: { 
+                        fontStyle: 'italic'
+                      } } },
+                      hr: { props: { style: { 
+                        border: 'none',
+                        borderTop: '1px solid #e5e7eb',
+                        margin: '1.5rem 0'
+                      } } },
+                      table: { props: { style: { 
+                        width: '100%',
+                        borderCollapse: 'collapse' as const,
+                        marginBottom: '1rem'
+                      } } },
+                      th: { props: { style: { 
+                        backgroundColor: '#f9fafb',
+                        padding: '0.75rem',
+                        textAlign: 'left' as const,
+                        fontWeight: '600',
+                        borderBottom: '1px solid #e5e7eb'
+                      } } },
+                      td: { props: { style: { 
+                        padding: '0.75rem',
+                        borderBottom: '1px solid #e5e7eb'
+                      } } },
                     }
                   }}
                 >
                   {debouncedValue}
                 </Markdown>
               ) : (
-                <p style={{ color: '#9ca3af', fontStyle: 'italic' }}>
+                <p style={{ 
+                  color: '#9ca3af', 
+                  fontStyle: 'italic',
+                  textAlign: 'center',
+                  padding: '2rem',
+                  backgroundColor: '#f9fafb',
+                  borderRadius: '0.5rem',
+                  border: '1px dashed #d1d5db'
+                }}>
                   Keine Vorschau verfügbar. Beginnen Sie mit dem Schreiben, um eine Vorschau zu sehen.
                 </p>
               )}
