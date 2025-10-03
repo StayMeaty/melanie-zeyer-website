@@ -54,7 +54,7 @@ class TinaClientManager {
   }
 
   /**
-   * Initialize Tina client with error handling
+   * Initialize Tina client with error handling and race condition protection
    */
   private async initializeClient(): Promise<void> {
     if (this.isInitialized) {
@@ -66,7 +66,12 @@ class TinaClientManager {
     }
 
     this.initializationPromise = this._doInitialize();
-    return this.initializationPromise;
+    try {
+      await this.initializationPromise;
+    } finally {
+      // Clear promise after completion (success or failure)
+      this.initializationPromise = null;
+    }
   }
 
   private async _doInitialize(): Promise<void> {
@@ -74,6 +79,14 @@ class TinaClientManager {
       if (!TINA_CONFIG.enabled) {
         console.warn('Tina CMS ist deaktiviert - verwende VITE_USE_TINA_CMS=true zum Aktivieren');
         this.isInitialized = true;
+        return;
+      }
+
+      // Add a small delay to prevent rapid successive initialization attempts
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Double-check if already initialized (race condition protection)
+      if (this.isInitialized) {
         return;
       }
 
@@ -97,7 +110,7 @@ class TinaClientManager {
       // Client is already initialized from the import
       this.clientInstance = client;
       
-      // Log initialization mode
+      // Log initialization mode (only once)
       if (import.meta.env.DEV) {
         console.log('Tina CMS Client initialisiert (Development Mode)');
       } else {
@@ -145,7 +158,7 @@ class TinaClientManager {
   }
 
   /**
-   * Check client connection and availability
+   * Check client connection and availability with proper error handling
    */
   async checkConnection(): Promise<boolean> {
     if (!TINA_CONFIG.enabled) {
@@ -173,6 +186,9 @@ class TinaClientManager {
         // For now, just check if client structure is valid
         // In a full Tina setup, we'd try a simple query here
         return true;
+      }).catch(error => {
+        console.warn('Client initialization failed during connection check:', error);
+        return false;
       });
 
       return await Promise.race([connectionPromise, timeoutPromise]);
@@ -225,6 +241,18 @@ class TinaClientManager {
     this.clientInstance = null;
     this.isInitialized = false;
     this.initializationPromise = null;
+    console.log('Tina client reset completed');
+  }
+
+  /**
+   * Get current initialization status (for debugging)
+   */
+  getStatus(): { initialized: boolean; hasClient: boolean; isInitializing: boolean } {
+    return {
+      initialized: this.isInitialized,
+      hasClient: this.clientInstance !== null,
+      isInitializing: this.initializationPromise !== null
+    };
   }
 }
 

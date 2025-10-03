@@ -2,12 +2,14 @@
 // Serverless-compatible implementation for Netlify deployment
 
 // Add Buffer polyfill for browser environment
-if (typeof window !== 'undefined' && !(window as any).Buffer) {
+if (typeof window !== 'undefined' && !('Buffer' in window)) {
   // Simple Buffer polyfill for gray-matter in browser
-  (window as any).Buffer = {
-    isBuffer: () => false,
-    from: (str: string) => str,
-  };
+  Object.assign(window, {
+    Buffer: {
+      isBuffer: () => false,
+      from: (str: string) => str,
+    }
+  });
 }
 
 import matter from 'gray-matter';
@@ -83,6 +85,7 @@ class BlogCache {
   private allPostsCacheTime: number = 0;
   private genericCache = new Map<string, CacheEntry<unknown>>();
   private isLoadingAllPosts: boolean = false;
+  private loadingPromise: Promise<BlogPost[]> | null = null;
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   get(slug: string): BlogPost | null {
@@ -141,6 +144,14 @@ class BlogCache {
     this.isLoadingAllPosts = loading;
   }
 
+  getLoadingPromise(): Promise<BlogPost[]> | null {
+    return this.loadingPromise;
+  }
+
+  setLoadingPromise(promise: Promise<BlogPost[]> | null): void {
+    this.loadingPromise = promise;
+  }
+
   setAllPosts(posts: BlogPost[]): void {
     this.allPostsCache = posts;
     this.allPostsCacheTime = Date.now();
@@ -151,6 +162,7 @@ class BlogCache {
     this.allPostsCache = null;
     this.allPostsCacheTime = 0;
     this.isLoadingAllPosts = false;
+    this.loadingPromise = null;
   }
 
   clearImageCaches(): void {
@@ -360,37 +372,67 @@ export async function loadAllPosts(): Promise<BlogPost[]> {
     }
 
     // Check if already loading to prevent concurrent calls
-    if (blogCache.isLoadingPosts()) {
-      // Wait a bit and check cache again
-      await new Promise(resolve => setTimeout(resolve, 100));
-      const cachedAfterWait = blogCache.getAllPosts();
-      if (cachedAfterWait) {
-        return cachedAfterWait;
-      }
-      // If still loading, return empty array to prevent infinite loops
-      return [];
+    const existingPromise = blogCache.getLoadingPromise();
+    if (existingPromise) {
+      // Return the existing promise to prevent concurrent execution
+      return existingPromise;
     }
 
-    // Set loading flag
+    // Set loading flag and create new loading promise
     blogCache.setLoadingPosts(true);
+    const loadingPromise = doLoadAllPosts();
+    blogCache.setLoadingPromise(loadingPromise);
+
+    try {
+      const result = await loadingPromise;
+      return result;
+    } finally {
+      // Clear loading state regardless of success/failure
+      blogCache.setLoadingPosts(false);
+      blogCache.setLoadingPromise(null);
+    }
+  } catch (error) {
+    console.error('Fehler beim Laden aller Blog-Posts:', error);
+    return []; // Return empty array instead of throwing to prevent infinite loops
+  }
+}
+
+/**
+ * Internal function to perform the actual loading of posts
+ * @returns Array of all blog posts
+ */
+async function doLoadAllPosts(): Promise<BlogPost[]> {
 
     // Try to load from Tina CMS first if enabled
     let tinaPosts: BlogPost[] = [];
     const useTina = import.meta.env.VITE_USE_TINA_CMS === 'true';
     
-    // Check if we should skip Tina loading for admin pages
-    const isAdminPage = window.location.pathname.includes('/admin');
-    const skipTina = isAdminPage; // Skip on admin pages to prevent conflicts
-    
-    if (useTina && !skipTina) {
+    if (useTina) {
       try {
+        // Use lazy loading with proper error handling
         const { loadTinaBlogService } = await import('../utils/lazyTina');
         const tinaBlogService = await loadTinaBlogService();
-        const { loadPostsFromTina, isTinaAvailable } = tinaBlogService as any;
-        const tinaAvailable = await isTinaAvailable();
+        const { loadPostsFromTina, isTinaAvailable } = tinaBlogService as {
+          loadPostsFromTina: () => Promise<BlogPost[]>;
+          isTinaAvailable: () => Promise<boolean>;
+        };
+        
+        // Check availability with timeout to prevent hanging
+        const availabilityPromise = isTinaAvailable();
+        const timeoutPromise = new Promise<boolean>((_, reject) => 
+          setTimeout(() => reject(new Error('Tina availability check timeout')), 5000)
+        );
+        
+        const tinaAvailable = await Promise.race([availabilityPromise, timeoutPromise]);
         
         if (tinaAvailable) {
-          tinaPosts = await loadPostsFromTina();
+          // Load posts with timeout protection
+          const loadPromise = loadPostsFromTina();
+          const loadTimeoutPromise = new Promise<BlogPost[]>((_, reject) => 
+            setTimeout(() => reject(new Error('Tina posts loading timeout')), 10000)
+          );
+          
+          tinaPosts = await Promise.race([loadPromise, loadTimeoutPromise]);
           console.log(`${tinaPosts.length} Posts von Tina CMS geladen`);
         } else {
           console.warn('Tina CMS nicht verfügbar, verwende Fallback-Quellen');
@@ -398,8 +440,6 @@ export async function loadAllPosts(): Promise<BlogPost[]> {
       } catch (error) {
         console.warn('Tina CMS Laden fehlgeschlagen, verwende Fallback-Quellen:', error);
       }
-    } else if (skipTina) {
-      console.log('Tina CMS übersprungen (Admin-Modus oder temporär deaktiviert)');
     }
 
     // Load posts from localStorage (already parsed, no gray-matter needed)
@@ -474,16 +514,13 @@ export async function loadAllPosts(): Promise<BlogPost[]> {
       files: filePosts.length,
       total: filteredPosts.length
     };
-    console.log('Blog Posts geladen:', sourceStats);
+    
+    // Only log if we actually loaded posts to reduce noise
+    if (filteredPosts.length > 0) {
+      console.log('Blog Posts geladen:', sourceStats);
+    }
 
     return filteredPosts;
-  } catch (error) {
-    console.error('Fehler beim Laden aller Blog-Posts:', error);
-    return []; // Return empty array instead of throwing to prevent infinite loops
-  } finally {
-    // Always clear loading flag
-    blogCache.setLoadingPosts(false);
-  }
 }
 
 /**
