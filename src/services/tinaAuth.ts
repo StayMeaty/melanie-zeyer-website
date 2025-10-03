@@ -318,53 +318,40 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
    */
   const validateSession = useCallback(async (): Promise<boolean> => {
     const currentSession = getTinaSession();
-    
+
     if (!currentSession) {
-      // Only update state if it's currently set
-      if (session !== null) {
-        setSession(null);
-      }
+      setSession(null);
       return false;
     }
-    
+
     // For local development, session is always valid
     if (config.isLocalDevelopment && config.useLocalAuth) {
-      // Only update state if it's different
-      if (!session || session.tokenHash !== currentSession.tokenHash) {
-        setSession(currentSession);
-      }
+      setSession(currentSession);
       return true;
     }
-    
+
     // Validate session token hash matches current environment
     const currentTokenHash = import.meta.env.VITE_GITHUB_TOKEN_HASH;
-    
+
     if (!currentTokenHash || currentSession.tokenHash !== currentTokenHash) {
       logTinaSecurityEvent('session_token_mismatch', {});
       clearTinaSession();
-      if (session !== null) {
-        setSession(null);
-      }
+      setSession(null);
       return false;
     }
-    
+
     // Validate GitHub token
     const isValid = await provider.validateToken();
-    
+
     if (!isValid) {
       clearTinaSession();
-      if (session !== null) {
-        setSession(null);
-      }
+      setSession(null);
       return false;
     }
-    
-    // Only update state if it's different
-    if (!session || session.tokenHash !== currentSession.tokenHash) {
-      setSession(currentSession);
-    }
+
+    setSession(currentSession);
     return true;
-  }, [config.isLocalDevelopment, config.useLocalAuth, provider, session]);
+  }, [config.isLocalDevelopment, config.useLocalAuth, provider]);
   
   /**
    * Login function
