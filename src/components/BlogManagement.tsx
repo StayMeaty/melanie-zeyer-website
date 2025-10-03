@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BlogPost } from '../types/blog';
-import { loadAllPosts, clearPostCaches } from '../services/blogContent';
+import { clearPostCaches } from '../services/blogContent';
+import { useBlogData } from '../contexts/BlogDataContext';
 import BlogManagementDashboard from './BlogManagementDashboard';
 import BlogEditor from './BlogEditor';
 import BlogStatistics from './BlogStatistics';
@@ -26,57 +27,23 @@ interface TabConfig {
 const BlogManagement: React.FC<BlogManagementProps> = ({ initialView = 'overview' }) => {
   const navigate = useNavigate();
   const { slug } = useParams<{ slug?: string }>();
+  const { posts, isLoading, error: contextError, refreshPosts } = useBlogData();
   
   // State management
   const [currentView, setCurrentView] = useState<ViewType>(initialView);
-  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [localError, setLocalError] = useState<string | null>(null);
+  
+  // Combined error state
+  const error = contextError || localError;
   
   // Modal states
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<BlogPost | null>(null);
   const [showImageModal, setShowImageModal] = useState(false);
 
-  // Load posts from both markdown files and localStorage drafts
-  const loadPosts = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      // Load published posts from markdown files
-      const publishedPosts = await loadAllPosts();
-      
-      // Load drafts from localStorage
-      const draftsJson = localStorage.getItem('blog_drafts');
-      const drafts: BlogPost[] = draftsJson ? JSON.parse(draftsJson) : [];
-      
-      // Merge posts, giving priority to localStorage versions
-      const allPosts = [...publishedPosts];
-      drafts.forEach(draft => {
-        const existingIndex = allPosts.findIndex(p => p.slug === draft.slug);
-        if (existingIndex >= 0) {
-          allPosts[existingIndex] = draft; // Override with draft version
-        } else {
-          allPosts.push(draft); // Add new draft
-        }
-      });
-      
-      setPosts(allPosts);
-    } catch (err) {
-      console.error('Error loading posts:', err);
-      setError('Fehler beim Laden der Blog-Beiträge');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Load posts on mount
-  useEffect(() => {
-    loadPosts();
-  }, [loadPosts]);
+  // Posts are loaded from context - no separate loading needed
 
   // Load specific post when editing with slug
   useEffect(() => {
@@ -85,7 +52,7 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ initialView = 'overview
       if (post) {
         setEditingPost(post);
       } else {
-        setError(`Beitrag mit Slug "${slug}" nicht gefunden`);
+        setLocalError(`Beitrag mit Slug "${slug}" nicht gefunden`);
         setCurrentView('overview');
       }
     }
@@ -144,7 +111,7 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ initialView = 'overview
       clearPostCaches();
       
       // Refresh posts list
-      await loadPosts();
+      await refreshPosts();
       
       // Return to overview
       setCurrentView('overview');
@@ -152,9 +119,9 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ initialView = 'overview
       setSuccessMessage(post.status === 'published' ? 'Beitrag erfolgreich veröffentlicht!' : 'Entwurf gespeichert!');
     } catch (err) {
       console.error('Error saving post:', err);
-      setError('Fehler beim Speichern des Beitrags');
+      setLocalError('Fehler beim Speichern des Beitrags');
     }
-  }, [loadPosts]);
+  }, [refreshPosts]);
 
   const handleDelete = useCallback((post: BlogPost) => {
     setDeleteTarget(post);
@@ -175,16 +142,16 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ initialView = 'overview
       clearPostCaches();
       
       // Refresh posts list
-      await loadPosts();
+      await refreshPosts();
       
       setShowDeleteModal(false);
       setDeleteTarget(null);
       setSuccessMessage('Beitrag erfolgreich gelöscht!');
     } catch (err) {
       console.error('Error deleting post:', err);
-      setError('Fehler beim Löschen des Beitrags');
+      setLocalError('Fehler beim Löschen des Beitrags');
     }
-  }, [deleteTarget, loadPosts]);
+  }, [deleteTarget, refreshPosts]);
 
   const handleCancel = useCallback(() => {
     setCurrentView('overview');
@@ -192,8 +159,8 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ initialView = 'overview
   }, []);
 
   const handleRefresh = useCallback(() => {
-    loadPosts();
-  }, [loadPosts]);
+    refreshPosts();
+  }, [refreshPosts]);
 
   const handleExport = useCallback(() => {
     const dataStr = JSON.stringify(posts, null, 2);
@@ -221,18 +188,18 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ initialView = 'overview
           // Clear cache to ensure fresh data
           clearPostCaches();
           
-          await loadPosts();
+          await refreshPosts();
           setSuccessMessage('Blog-Daten erfolgreich importiert!');
         } else {
-          setError('Ungültiges Dateiformat');
+          setLocalError('Ungültiges Dateiformat');
         }
       } catch (err) {
         console.error('Error importing data:', err);
-        setError('Fehler beim Importieren der Daten');
+        setLocalError('Fehler beim Importieren der Daten');
       }
     };
     reader.readAsText(file);
-  }, [loadPosts]);
+  }, [refreshPosts]);
 
   const styles: Record<string, React.CSSProperties> = {
     container: {

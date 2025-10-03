@@ -7,8 +7,9 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Markdown from 'markdown-to-jsx';
 import { useTinaAuth } from '../services/tinaAuth';
 import { APP_COLORS } from '../types';
-import { loadAllPosts, clearPostCaches, generateSlug } from '../services/blogContent';
+import { clearPostCaches, generateSlug } from '../services/blogContent';
 import { BlogPost, BlogStatus, BlogCategory, BLOG_CATEGORIES, BLOG_CONFIG } from '../types/blog';
+import { BlogDataProvider, useBlogData } from '../contexts/BlogDataContext';
 
 // Rich Markdown Editor Component
 interface MarkdownEditorProps {
@@ -526,26 +527,7 @@ interface ContentDashboardProps {
 
 const ContentDashboard: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadPosts = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const allPosts = await loadAllPosts();
-        setPosts(allPosts);
-      } catch (err) {
-        setError('Fehler beim Laden der Blog-Beiträge');
-        console.error('Error loading posts:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadPosts();
-  }, []);
+  const { posts, isLoading, error } = useBlogData();
   
   const filteredPosts = posts.filter(post => 
     post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -701,29 +683,13 @@ const ContentDashboard: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
 
 // Posts Management Component
 const PostsManagement: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const { posts, isLoading, error, refreshPosts } = useBlogData();
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | BlogStatus>('all');
   const [categoryFilter, setCategoryFilter] = useState<'all' | BlogCategory>('all');
   const [sortBy, setSortBy] = useState<'date' | 'title' | 'status'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-
-  const loadPosts = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const allPosts = await loadAllPosts();
-      setPosts(allPosts);
-    } catch (err) {
-      setError('Fehler beim Laden der Blog-Beiträge');
-      console.error('Error loading posts:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const applyFiltersAndSort = useCallback(() => {
     let filtered = [...posts];
@@ -768,9 +734,7 @@ const PostsManagement: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
     setFilteredPosts(filtered);
   }, [posts, searchTerm, statusFilter, categoryFilter, sortBy, sortOrder]);
 
-  useEffect(() => {
-    loadPosts();
-  }, []);
+  // Posts are loaded from context - no need for separate loading effect
 
   useEffect(() => {
     applyFiltersAndSort();
@@ -790,7 +754,7 @@ const PostsManagement: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
       localStorage.setItem('blog_drafts', JSON.stringify(updatedDrafts));
       
       clearPostCaches();
-      await loadPosts();
+      await refreshPosts();
     } catch (error) {
       console.error('Error deleting post:', error);
       alert('Fehler beim Löschen des Beitrags');
@@ -829,7 +793,7 @@ const PostsManagement: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
       <div style={styles.errorContainer}>
         <div style={styles.errorIcon}>⚠️</div>
         <h4 style={styles.errorTitle}>{error}</h4>
-        <button style={styles.retryButton} onClick={loadPosts}>
+        <button style={styles.retryButton} onClick={refreshPosts}>
           Erneut versuchen
         </button>
       </div>
@@ -1928,7 +1892,7 @@ interface TinaAdminProps {
   className?: string;
 }
 
-const TinaAdmin: React.FC<TinaAdminProps> = ({ className = '' }) => {
+const TinaAdminCore: React.FC<TinaAdminProps> = ({ className = '' }) => {
   const { isAuthenticated, isLoading, login } = useTinaAuth();
   const [currentSection, setCurrentSection] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -2960,5 +2924,14 @@ if (typeof document !== 'undefined' && !document.getElementById('tina-admin-styl
   `;
   document.head.appendChild(style);
 }
+
+// Wrapper component with BlogDataContext provider
+const TinaAdmin: React.FC<TinaAdminProps> = (props) => {
+  return (
+    <BlogDataProvider>
+      <TinaAdminCore {...props} />
+    </BlogDataProvider>
+  );
+};
 
 export default TinaAdmin;
