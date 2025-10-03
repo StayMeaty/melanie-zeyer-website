@@ -3,34 +3,11 @@
  * Clean, user-friendly content management dashboard
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTinaAuth } from '../services/tinaAuth';
 import { APP_COLORS } from '../types';
-
-// Mock blog posts data for demonstration
-const mockBlogPosts = [
-  {
-    id: '1',
-    title: 'Willkommen auf meiner neuen Website',
-    status: 'published' as const,
-    date: '2024-03-15',
-    excerpt: 'Ein erster Einblick in meine Arbeit und Vision...'
-  },
-  {
-    id: '2', 
-    title: 'Die Kraft der Persönlichkeitsentwicklung',
-    status: 'draft' as const,
-    date: '2024-03-10',
-    excerpt: 'Wie Sie Ihr volles Potenzial entdecken können...'
-  },
-  {
-    id: '3',
-    title: 'Coaching im digitalen Zeitalter',
-    status: 'published' as const,
-    date: '2024-03-05',
-    excerpt: 'Moderne Ansätze für persönliches Wachstum...'
-  }
-];
+import { loadAllPosts } from '../services/blogContent';
+import { BlogPost } from '../types/blog';
 
 interface ContentDashboardProps {
   onNavigate: (section: string) => void;
@@ -38,16 +15,36 @@ interface ContentDashboardProps {
 
 const ContentDashboard: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const allPosts = await loadAllPosts();
+        setPosts(allPosts);
+      } catch (err) {
+        setError('Fehler beim Laden der Blog-Beiträge');
+        console.error('Error loading posts:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadPosts();
+  }, []);
   
-  const filteredPosts = mockBlogPosts.filter(post => 
+  const filteredPosts = posts.filter(post => 
     post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     post.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
   const stats = {
-    total: mockBlogPosts.length,
-    published: mockBlogPosts.filter(p => p.status === 'published').length,
-    drafts: mockBlogPosts.filter(p => p.status === 'draft').length
+    total: posts.length,
+    published: posts.filter(p => p.status === 'published').length,
+    drafts: posts.filter(p => p.status === 'draft').length
   };
   
   return (
@@ -124,27 +121,67 @@ const ContentDashboard: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
         </div>
         
         <div style={styles.postsList}>
-          {filteredPosts.map(post => (
-            <div key={post.id} className="post-card" style={styles.postCard}>
-              <div style={styles.postHeader}>
-                <h4 style={styles.postTitle}>{post.title}</h4>
-                <span style={{
-                  ...styles.statusBadge,
-                  ...(post.status === 'published' ? styles.statusPublished : styles.statusDraft)
-                }}>
-                  {post.status === 'published' ? 'Veröffentlicht' : 'Entwurf'}
-                </span>
-              </div>
-              <p style={styles.postExcerpt}>{post.excerpt}</p>
-              <div style={styles.postFooter}>
-                <span style={styles.postDate}>{new Date(post.date).toLocaleDateString('de-DE')}</span>
-                <div style={styles.postActions}>
-                  <button className="action-btn" style={styles.actionBtn}>Bearbeiten</button>
-                  <button className="action-btn" style={styles.actionBtn}>Vorschau</button>
+          {isLoading ? (
+            <div style={styles.loadingContainer}>
+              <div style={styles.loadingSpinner} />
+              <span style={styles.loadingText}>Blog-Beiträge werden geladen...</span>
+            </div>
+          ) : error ? (
+            <div style={styles.errorContainer}>
+              <div style={styles.errorIcon}>⚠️</div>
+              <h4 style={styles.errorTitle}>{error}</h4>
+              <p style={styles.errorText}>Überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.</p>
+              <button 
+                style={styles.retryButton}
+                onClick={() => window.location.reload()}
+              >
+                Erneut versuchen
+              </button>
+            </div>
+          ) : filteredPosts.length === 0 ? (
+            <div style={styles.emptyContainer}>
+              <div style={styles.emptyIcon}>📝</div>
+              <h4 style={styles.emptyTitle}>
+                {searchTerm ? 'Keine Beiträge gefunden' : 'Noch keine Blog-Beiträge'}
+              </h4>
+              <p style={styles.emptyText}>
+                {searchTerm 
+                  ? `Keine Beiträge entsprechen Ihrer Suche nach "${searchTerm}".`
+                  : 'Erstellen Sie Ihren ersten Blog-Beitrag, um loszulegen.'
+                }
+              </p>
+              {!searchTerm && (
+                <button 
+                  style={styles.createButton}
+                  onClick={() => onNavigate('new-post')}
+                >
+                  Ersten Beitrag erstellen
+                </button>
+              )}
+            </div>
+          ) : (
+            filteredPosts.map(post => (
+              <div key={post.id} className="post-card" style={styles.postCard}>
+                <div style={styles.postHeader}>
+                  <h4 style={styles.postTitle}>{post.title}</h4>
+                  <span style={{
+                    ...styles.statusBadge,
+                    ...(post.status === 'published' ? styles.statusPublished : styles.statusDraft)
+                  }}>
+                    {post.status === 'published' ? 'Veröffentlicht' : 'Entwurf'}
+                  </span>
+                </div>
+                <p style={styles.postExcerpt}>{post.excerpt}</p>
+                <div style={styles.postFooter}>
+                  <span style={styles.postDate}>{post.publishedAt.toLocaleDateString('de-DE')}</span>
+                  <div style={styles.postActions}>
+                    <button className="action-btn" style={styles.actionBtn}>Bearbeiten</button>
+                    <button className="action-btn" style={styles.actionBtn}>Vorschau</button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
@@ -708,6 +745,78 @@ const styles: Record<string, React.CSSProperties> = {
   placeholderText: {
     color: '#64748b',
     fontSize: '1rem',
+  },
+  
+  // Error states
+  errorContainer: {
+    textAlign: 'center' as const,
+    padding: '3rem 2rem',
+    backgroundColor: '#fef2f2',
+    borderRadius: '0.75rem',
+    border: '1px solid #fecaca',
+  },
+  errorIcon: {
+    fontSize: '3rem',
+    marginBottom: '1rem',
+  },
+  errorTitle: {
+    fontSize: '1.25rem',
+    fontWeight: '600',
+    color: '#dc2626',
+    marginBottom: '0.5rem',
+    margin: 0,
+  },
+  errorText: {
+    color: '#991b1b',
+    fontSize: '0.875rem',
+    marginBottom: '1.5rem',
+  },
+  retryButton: {
+    backgroundColor: '#dc2626',
+    color: 'white',
+    border: 'none',
+    padding: '0.5rem 1rem',
+    borderRadius: '0.375rem',
+    fontSize: '0.875rem',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s',
+  },
+  
+  // Empty states
+  emptyContainer: {
+    textAlign: 'center' as const,
+    padding: '4rem 2rem',
+    backgroundColor: '#f8fafc',
+    borderRadius: '0.75rem',
+    border: '1px solid #e2e8f0',
+  },
+  emptyIcon: {
+    fontSize: '4rem',
+    marginBottom: '1rem',
+  },
+  emptyTitle: {
+    fontSize: '1.5rem',
+    fontWeight: '600',
+    color: '#475569',
+    marginBottom: '0.5rem',
+    margin: 0,
+  },
+  emptyText: {
+    color: '#64748b',
+    fontSize: '1rem',
+    marginBottom: '2rem',
+    lineHeight: '1.5',
+  },
+  createButton: {
+    backgroundColor: APP_COLORS.primary,
+    color: 'white',
+    border: 'none',
+    padding: '0.75rem 1.5rem',
+    borderRadius: '0.5rem',
+    fontSize: '0.875rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s',
   },
 };
 
