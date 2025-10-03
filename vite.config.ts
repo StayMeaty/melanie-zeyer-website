@@ -69,7 +69,8 @@ export default defineConfig({
       'tinacms',
       '@tinacms/cli',
       'tinacms/dist/rich-text',
-      'tinacms/dist/react'
+      'tinacms/dist/react',
+      'async-lock'
     ]
   },
   server: {

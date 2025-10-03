@@ -3,7 +3,7 @@
  * Clean, user-friendly content management dashboard
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTinaAuth } from '../services/tinaAuth';
 import { APP_COLORS } from '../types';
 import { loadAllPosts, clearPostCaches, generateSlug } from '../services/blogContent';
@@ -200,14 +200,6 @@ const PostsManagement: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
   const [sortBy, setSortBy] = useState<'date' | 'title' | 'status'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  useEffect(() => {
-    loadPosts();
-  }, []);
-
-  useEffect(() => {
-    applyFiltersAndSort();
-  }, [posts, searchTerm, statusFilter, categoryFilter, sortBy, sortOrder]);
-
   const loadPosts = async () => {
     try {
       setIsLoading(true);
@@ -222,7 +214,7 @@ const PostsManagement: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
     }
   };
 
-  const applyFiltersAndSort = () => {
+  const applyFiltersAndSort = useCallback(() => {
     let filtered = [...posts];
 
     // Search filter
@@ -263,7 +255,15 @@ const PostsManagement: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
     });
 
     setFilteredPosts(filtered);
-  };
+  }, [posts, searchTerm, statusFilter, categoryFilter, sortBy, sortOrder]);
+
+  useEffect(() => {
+    loadPosts();
+  }, []);
+
+  useEffect(() => {
+    applyFiltersAndSort();
+  }, [posts, searchTerm, statusFilter, categoryFilter, sortBy, sortOrder, applyFiltersAndSort]);
 
   const handleDeletePost = async (postId: string) => {
     if (!confirm('Sind Sie sicher, dass Sie diesen Beitrag löschen möchten?')) {
@@ -827,7 +827,7 @@ const NewPostCreation: React.FC<ContentDashboardProps> = ({ onNavigate }) => {
 };
 
 // Media Management Component
-const MediaManagement: React.FC<ContentDashboardProps> = ({ onNavigate: _ }) => {
+const MediaManagement: React.FC<ContentDashboardProps> = () => {
   const [images, setImages] = useState<string[]>([]);
   // const [isLoading, setIsLoading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -1039,7 +1039,7 @@ const MediaManagement: React.FC<ContentDashboardProps> = ({ onNavigate: _ }) => 
 };
 
 // Settings Management Component
-const SettingsManagement: React.FC<ContentDashboardProps> = ({ onNavigate: _ }) => {
+const SettingsManagement: React.FC<ContentDashboardProps> = () => {
   const [settings, setSettings] = useState({
     site: {
       title: 'melaniezeyer.de',
@@ -1068,7 +1068,7 @@ const SettingsManagement: React.FC<ContentDashboardProps> = ({ onNavigate: _ }) 
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
 
-  const handleSettingChange = (section: string, field: string, value: any) => {
+  const handleSettingChange = (section: string, field: string, value: string | number | boolean) => {
     setSettings(prev => ({
       ...prev,
       [section]: {
@@ -1346,6 +1346,16 @@ const TinaAdmin: React.FC<TinaAdminProps> = ({ className = '' }) => {
   const [currentSection, setCurrentSection] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   const handleLogin = async () => {
     setLoginError(null);
@@ -1358,7 +1368,7 @@ const TinaAdmin: React.FC<TinaAdminProps> = ({ className = '' }) => {
   const handleNavigate = (section: string) => {
     setCurrentSection(section);
     // Close sidebar on mobile after navigation
-    if (window.innerWidth < 768) {
+    if (isMobile) {
       setSidebarOpen(false);
     }
   };
@@ -1434,13 +1444,15 @@ const TinaAdmin: React.FC<TinaAdminProps> = ({ className = '' }) => {
       {/* Header */}
       <header style={styles.header}>
         <div style={styles.headerLeft}>
-          <button
-            className="menu-button"
-            style={styles.menuButton}
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            ☰
-          </button>
+          {isMobile && (
+            <button
+              className="menu-button"
+              style={styles.menuButton}
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              ☰
+            </button>
+          )}
           <h1 style={styles.siteTitle}>melaniezeyer.de</h1>
         </div>
         <div style={styles.headerRight}>
@@ -1451,7 +1463,7 @@ const TinaAdmin: React.FC<TinaAdminProps> = ({ className = '' }) => {
       {/* Main Layout */}
       <div style={styles.layout}>
         {/* Sidebar */}
-        {sidebarOpen && (
+        {(!isMobile || sidebarOpen) && (
           <nav className={`sidebar ${sidebarOpen ? 'open' : ''}`} style={styles.sidebar}>
             <div style={styles.sidebarContent}>
               {[
@@ -1481,7 +1493,7 @@ const TinaAdmin: React.FC<TinaAdminProps> = ({ className = '' }) => {
         {/* Main Content */}
         <main className="main" style={{
           ...styles.main,
-          marginLeft: sidebarOpen ? '250px' : '0'
+          marginLeft: (!isMobile && sidebarOpen) ? '250px' : '0'
         }}>
           {renderContent()}
         </main>
@@ -1599,16 +1611,12 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '1rem',
   },
   menuButton: {
-    display: 'none',
     backgroundColor: 'transparent',
     border: 'none',
     fontSize: '1.25rem',
     cursor: 'pointer',
     padding: '0.5rem',
     borderRadius: '0.25rem',
-    '@media (max-width: 768px)': {
-      display: 'block',
-    },
   } as React.CSSProperties,
   siteTitle: {
     fontSize: '1.25rem',

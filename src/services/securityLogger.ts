@@ -85,8 +85,8 @@ export const logSecurityEvent = (
     sessionStorage.setItem(SECURITY_EVENTS_KEY, JSON.stringify([logEntry]));
   }
   
-  // Log to console in development
-  if (import.meta.env.DEV) {
+  // Log to console in development (only warnings and critical)
+  if (import.meta.env.DEV && severity !== 'info') {
     const severityEmoji = {
       info: 'ℹ️',
       warning: '⚠️',
