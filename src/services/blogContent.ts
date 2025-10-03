@@ -4,12 +4,10 @@
 // Add Buffer polyfill for browser environment
 if (typeof window !== 'undefined' && !('Buffer' in window)) {
   // Simple Buffer polyfill for gray-matter in browser
-  Object.assign(window, {
-    Buffer: {
-      isBuffer: () => false,
-      from: (str: string) => str,
-    }
-  });
+  (window as unknown as { Buffer: { isBuffer: () => boolean; from: (str: string) => string } }).Buffer = {
+    isBuffer: () => false,
+    from: (str: string) => str,
+  };
 }
 
 import matter from 'gray-matter';
