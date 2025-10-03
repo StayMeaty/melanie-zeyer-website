@@ -24,11 +24,20 @@ var getBackendConfig = () => {
       type: "filesystem"
     };
   }
+  const repo = process.env.VITE_GITHUB_REPO || "";
+  const token = process.env.VITE_GITHUB_TOKEN || "";
+  const branch = process.env.VITE_GITHUB_BRANCH || "main";
+  if (!repo || !token) {
+    console.warn("Tina: Missing repository or token configuration for GitHub backend");
+    return {
+      type: "filesystem"
+    };
+  }
   return {
     type: "github",
-    branch: process.env.VITE_GITHUB_BRANCH || "main",
-    repo: process.env.VITE_GITHUB_REPO || "",
-    token: process.env.VITE_GITHUB_TOKEN || "",
+    branch,
+    repo,
+    token,
     auth: {
       useLocalAuth: true
     }
@@ -50,24 +59,26 @@ var config_default = defineConfig({
     outputDir: "tina/__generated__",
     gqlTypesFile: "types.ts"
   },
-  // Media configuration for GitHub-based image storage
-  media: {
-    tina: {
-      mediaRoot: "content/blog/images",
-      publicFolder: "public",
-      static: false
-      // Use GitHub for media storage in production
-    },
-    // Override for local development
-    ...!process.env.VITE_GITHUB_TOKEN ? {
+  // Media configuration
+  media: (() => {
+    const isLocalDevelopment = !process.env.VITE_GITHUB_TOKEN;
+    if (isLocalDevelopment) {
+      return {
+        tina: {
+          mediaRoot: "public/content/blog/images",
+          publicFolder: "public",
+          static: true
+        }
+      };
+    }
+    return {
       tina: {
-        mediaRoot: "public/content/blog/images",
+        mediaRoot: "content/blog/images",
         publicFolder: "public",
-        static: true
-        // Use static files in local development
+        static: false
       }
-    } : {}
-  },
+    };
+  })(),
   // Build configuration
   build: {
     outputFolder: "admin",

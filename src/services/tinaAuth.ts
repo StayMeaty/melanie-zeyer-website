@@ -24,6 +24,8 @@ export interface TinaAuthConfig {
   branch: string;
   isLocalDevelopment: boolean;
   useLocalAuth: boolean;
+  useTinaCloud: boolean; // Flag for Tina Cloud mode
+  clientId: string | null; // Tina Cloud client ID
 }
 
 /**
@@ -68,8 +70,10 @@ interface TinaAuthContextType {
  * Get Tina authentication configuration from environment
  */
 export const getTinaConfig = (): TinaAuthConfig => {
-  const isLocalDevelopment = import.meta.env.DEV && !import.meta.env.VITE_GITHUB_TOKEN;
+  const clientId = import.meta.env.VITE_TINA_CLIENT_ID;
   const hasToken = Boolean(import.meta.env.VITE_GITHUB_TOKEN);
+  const useTinaCloud = Boolean(clientId);
+  const isLocalDevelopment = import.meta.env.DEV && !clientId && !hasToken;
   
   return {
     enabled: Boolean(import.meta.env.VITE_USE_TINA_CMS === 'true'),
@@ -78,6 +82,8 @@ export const getTinaConfig = (): TinaAuthConfig => {
     branch: import.meta.env.VITE_GITHUB_BRANCH || 'main',
     isLocalDevelopment,
     useLocalAuth: isLocalDevelopment,
+    useTinaCloud, // Flag for Tina Cloud mode
+    clientId, // Tina Cloud client ID
   };
 };
 
@@ -251,16 +257,30 @@ const getAuthProvider = (config: TinaAuthConfig): TinaAuthProvider => {
   
   return {
     name: 'github',
-    displayName: 'GitHub',
-    isConfigured: Boolean(config.hasToken && config.repository),
+    displayName: config.useTinaCloud ? 'Tina Cloud' : 'GitHub',
+    isConfigured: config.useTinaCloud ? Boolean(config.clientId && config.repository) : Boolean(config.hasToken && config.repository),
     validateToken: async () => {
+      if (config.useTinaCloud) {
+        // For Tina Cloud, validation is handled by OAuth flow
+        return Boolean(config.clientId && config.repository);
+      }
+      
+      // Legacy GitHub token validation
       if (!config.hasToken || !config.repository) {
         return false;
       }
       return validateGitHubToken(config.repository);
     },
     getAuthUrl: () => {
-      // GitHub OAuth URL for future OAuth flow implementation
+      if (config.useTinaCloud && config.clientId) {
+        // Tina Cloud OAuth URL
+        const redirectUri = `${window.location.origin}/admin/auth/callback`;
+        const state = generateOAuthState(); // Add CSRF protection
+        
+        return `https://app.tinajs.io/client/${config.clientId}/authorize?redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
+      }
+      
+      // Legacy GitHub OAuth URL
       const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
       if (!clientId) {
         return '';
@@ -344,7 +364,22 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
         return { success: true };
       }
       
-      // Validate provided token or environment token
+      // For Tina Cloud, authentication is handled by OAuth redirect
+      if (config.useTinaCloud) {
+        if (!config.clientId || !config.repository) {
+          return { 
+            success: false, 
+            error: 'Tina Cloud configuration incomplete. Please set VITE_TINA_CLIENT_ID and VITE_GITHUB_REPO.' 
+          };
+        }
+        
+        // Create session for Tina Cloud mode
+        const session = await createTinaSession('tina-cloud-oauth', config);
+        setSession(session);
+        return { success: true };
+      }
+      
+      // Legacy GitHub token mode
       const validation = await validateTokenSecurely(token, 'login');
       
       if (!validation.valid) {

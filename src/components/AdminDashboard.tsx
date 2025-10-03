@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../services/auth';
 import { getBlogStats } from '../services/blogContent';
-import { useTinaAuth, getTinaConfig } from '../services/tinaAuth';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface AdminDashboardProps {}
 
 const AdminDashboard: React.FC<AdminDashboardProps> = () => {
   const { user, logout } = useAuth();
-  const { isAuthenticated: isTinaAuthenticated, session: tinaSession } = useTinaAuth();
-  const tinaConfig = getTinaConfig();
+  // const { isAuthenticated: isTinaAuthenticated } = useTinaAuth();
   const [blogStats, setBlogStats] = useState<{
     totalPosts: number;
     totalCategories: number;

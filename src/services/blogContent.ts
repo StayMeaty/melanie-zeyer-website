@@ -2,7 +2,7 @@
 // Serverless-compatible implementation for Netlify deployment
 
 // Add Buffer polyfill for browser environment
-if (typeof window !== 'undefined' && typeof window.Buffer === 'undefined') {
+if (typeof window !== 'undefined' && !(window as any).Buffer) {
   // Simple Buffer polyfill for gray-matter in browser
   (window as any).Buffer = {
     isBuffer: () => false,

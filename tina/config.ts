@@ -26,19 +26,42 @@ const TWITTER_CARD_OPTIONS = [
 
 // Determine backend configuration based on environment
 const getBackendConfig = () => {
-  const isLocalDevelopment = process.env.NODE_ENV === 'development' && !process.env.VITE_GITHUB_TOKEN;
+  const clientId = process.env.VITE_TINA_CLIENT_ID;
+  const isLocalDevelopment = process.env.NODE_ENV === 'development' && !clientId && !process.env.VITE_GITHUB_TOKEN;
   
   if (isLocalDevelopment) {
-    // Use filesystem for local development without GitHub token
+    // Use filesystem for true local development without any cloud setup
     return {
       type: "filesystem" as const,
     };
   }
   
-  // Use GitHub backend for production or when token is available
+  // Use GitHub backend configuration
   const repo = process.env.VITE_GITHUB_REPO || "";
-  const token = process.env.VITE_GITHUB_TOKEN || "";
   const branch = process.env.VITE_GITHUB_BRANCH || "main";
+  
+  if (clientId) {
+    // Tina Cloud mode - token will be handled by Tina Cloud auth
+    if (!repo) {
+      console.warn('Tina: Missing repository configuration for Tina Cloud backend');
+      return {
+        type: "filesystem" as const,
+      };
+    }
+    
+    return {
+      type: "github" as const,
+      branch,
+      repo,
+      // No token needed - handled by Tina Cloud OAuth
+      auth: {
+        useLocalAuth: false, // Use Tina Cloud auth
+      },
+    };
+  }
+  
+  // Legacy GitHub token mode (for backwards compatibility)
+  const token = process.env.VITE_GITHUB_TOKEN || "";
   
   if (!repo || !token) {
     console.warn('Tina: Missing repository or token configuration for GitHub backend');
@@ -60,11 +83,11 @@ const getBackendConfig = () => {
 };
 
 export default defineConfig({
-  // Client ID for Tina Cloud (future enhancement)
+  // Client ID for Tina Cloud
   clientId: process.env.VITE_TINA_CLIENT_ID || null,
   
-  // Token for authentication
-  token: process.env.VITE_GITHUB_TOKEN || null,
+  // Token for authentication (only used in legacy mode when no clientId)
+  token: process.env.VITE_TINA_CLIENT_ID ? null : (process.env.VITE_GITHUB_TOKEN || null),
   
   // Backend configuration (filesystem for local, GitHub for production)
   backend: getBackendConfig(),

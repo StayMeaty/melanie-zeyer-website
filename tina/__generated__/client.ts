@@ -3,7 +3,9 @@ import { queries } from "./types";
 
 // Dynamic configuration based on environment
 const getClientConfig = () => {
-  const isLocalDevelopment = import.meta.env.DEV && !import.meta.env.VITE_GITHUB_TOKEN;
+  const clientId = import.meta.env.VITE_TINA_CLIENT_ID;
+  const tinaToken = import.meta.env.VITE_TINA_TOKEN;
+  const isLocalDevelopment = import.meta.env.DEV && !clientId && !import.meta.env.VITE_GITHUB_TOKEN && !tinaToken;
   
   if (isLocalDevelopment) {
     // Local development with filesystem backend
@@ -14,22 +16,21 @@ const getClientConfig = () => {
     };
   }
   
-  // Production or development with GitHub backend
-  const token = import.meta.env.VITE_GITHUB_TOKEN || '';
-  const clientId = import.meta.env.VITE_TINA_CLIENT_ID;
   const branch = import.meta.env.VITE_GITHUB_BRANCH || 'main';
   
   if (clientId) {
-    // Tina Cloud setup
+    // Tina Cloud setup - use read-only token if available, otherwise OAuth
     return {
       url: `https://content.tinajs.io/content/${clientId}/github/${branch}`,
-      token,
+      token: tinaToken || '', // Use Tina token for read operations when available
       queries,
     };
   }
   
-  // Self-hosted or alternative GraphQL endpoint
+  // Legacy GitHub token mode (for backwards compatibility)
+  const token = import.meta.env.VITE_GITHUB_TOKEN || '';
   const apiUrl = import.meta.env.VITE_TINA_API_URL || 'https://content.tinajs.io/content';
+  
   return {
     url: `${apiUrl}/${branch}`,
     token,

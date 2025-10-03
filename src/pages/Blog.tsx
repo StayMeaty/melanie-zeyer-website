@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { BlogPostSummary, BlogCategory, BLOG_CATEGORIES, BLOG_CONFIG, BlogPost } from '../types/blog';
+import { BlogPostSummary, BlogCategory, BLOG_CATEGORIES, BLOG_CONFIG } from '../types/blog';
 import { APP_CONFIG } from '../types';
 import BlogCard from '../components/BlogCard';
 import { loadAllPosts } from '../services/blogContent';
@@ -258,8 +258,8 @@ const Blog: React.FC = () => {
   };
 
   const getCategoryPostCount = (category: BlogCategory | 'all'): number => {
-    if (category === 'all') return mockPosts.length;
-    return mockPosts.filter(post => post.category === category).length;
+    if (category === 'all') return posts.length;
+    return posts.filter(post => post.category === category).length;
   };
 
   return (
