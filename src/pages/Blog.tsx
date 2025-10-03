@@ -1,64 +1,55 @@
-import React, { useState, useMemo } from 'react';
-import { BlogPostSummary, BlogCategory, BLOG_CATEGORIES, BLOG_CONFIG } from '../types/blog';
+import React, { useState, useMemo, useEffect } from 'react';
+import { BlogPostSummary, BlogCategory, BLOG_CATEGORIES, BLOG_CONFIG, BlogPost } from '../types/blog';
 import { APP_CONFIG } from '../types';
 import BlogCard from '../components/BlogCard';
-
-// Mock data for demonstration - in real implementation, this would come from a CMS or API
-const mockPosts: BlogPostSummary[] = [
-  {
-    id: '1',
-    title: 'Die Kraft der Selbstreflexion: Wie Sie Ihre Potentiale entdecken',
-    slug: 'kraft-der-selbstreflexion',
-    excerpt: 'Selbstreflexion ist der Schlüssel zu persönlichem Wachstum. Entdecken Sie praktische Methoden, um Ihre Stärken zu erkennen und Ihr volles Potenzial zu entfalten.',
-    category: 'persoenlichkeitsentwicklung',
-    tags: ['Selbstreflexion', 'Potenziale', 'Persönlichkeit'],
-    author: 'melanie',
-    authorData: { name: 'Melanie Zeyer', avatar: undefined },
-    publishedAt: new Date('2024-01-15'),
-    readingTime: 8,
-    featured: true,
-    viewCount: 245,
-    commentCount: 12,
-    status: 'published',
-  },
-  {
-    id: '2',
-    title: 'Work-Life-Balance: Mythos oder erreichbares Ziel?',
-    slug: 'work-life-balance-mythos-oder-ziel',
-    excerpt: 'In unserer schnelllebigen Welt scheint Work-Life-Balance unerreichbar. Doch mit den richtigen Strategien können Sie Beruf und Privatleben harmonisch verbinden.',
-    category: 'lifestyle',
-    tags: ['Work-Life-Balance', 'Stress', 'Zeitmanagement'],
-    author: 'melanie',
-    authorData: { name: 'Melanie Zeyer', avatar: undefined },
-    publishedAt: new Date('2024-01-10'),
-    readingTime: 6,
-    featured: false,
-    viewCount: 189,
-    commentCount: 8,
-    status: 'published',
-  },
-  {
-    id: '3',
-    title: 'Erfolgreich gründen: Die ersten Schritte in die Selbstständigkeit',
-    slug: 'erfolgreich-gruenden-erste-schritte',
-    excerpt: 'Der Schritt in die Selbstständigkeit ist aufregend und herausfordernd zugleich. Hier erfahren Sie, wie Sie Ihre Geschäftsidee erfolgreich umsetzen.',
-    category: 'business',
-    tags: ['Gründung', 'Selbstständigkeit', 'Unternehmen'],
-    author: 'melanie',
-    authorData: { name: 'Melanie Zeyer', avatar: undefined },
-    publishedAt: new Date('2024-01-05'),
-    readingTime: 12,
-    featured: true,
-    viewCount: 321,
-    commentCount: 15,
-    status: 'published',
-  },
-];
+import { loadAllPosts } from '../services/blogContent';
 
 const Blog: React.FC = () => {
+  const [posts, setPosts] = useState<BlogPostSummary[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<BlogCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Load posts from all sources (Tina, localStorage, markdown)
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const allPosts = await loadAllPosts();
+        
+        // Convert BlogPost to BlogPostSummary
+        const summaries: BlogPostSummary[] = allPosts.map(post => ({
+          id: post.id,
+          title: post.title,
+          slug: post.slug,
+          excerpt: post.excerpt,
+          category: post.category,
+          tags: post.tags,
+          author: post.author,
+          authorData: post.authorData,
+          publishedAt: new Date(post.date),
+          readingTime: post.readingTime,
+          featured: post.featured,
+          viewCount: post.viewCount || 0,
+          commentCount: post.commentCount || 0,
+          status: post.status,
+        }));
+        
+        setPosts(summaries);
+      } catch (err) {
+        console.error('Error loading blog posts:', err);
+        setError('Fehler beim Laden der Blog-Beiträge');
+        setPosts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPosts();
+  }, []);
 
   const styles: Record<string, React.CSSProperties> = {
     container: {
@@ -227,7 +218,7 @@ const Blog: React.FC = () => {
 
   // Filter and search logic
   const filteredPosts = useMemo(() => {
-    let filtered = [...mockPosts];
+    let filtered = [...posts];
 
     // Filter by category
     if (selectedCategory !== 'all') {
@@ -282,27 +273,37 @@ const Blog: React.FC = () => {
 
       <div style={window.innerWidth <= 768 ? styles.contentMobile : styles.content}>
         <main style={styles.main}>
-          <div style={styles.searchSection}>
-            <input
-              type="text"
-              placeholder="Blog durchsuchen..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              style={styles.searchInput}
-              onFocus={(e) => {
-                Object.assign(e.currentTarget.style, styles.searchInputFocus);
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = `${APP_CONFIG.colors.primary}20`;
-              }}
-            />
-          </div>
+          {isLoading ? (
+            <div style={styles.noResults}>
+              <p>Lade Blog-Beiträge...</p>
+            </div>
+          ) : error ? (
+            <div style={styles.noResults}>
+              <p>{error}</p>
+            </div>
+          ) : (
+            <>
+              <div style={styles.searchSection}>
+                <input
+                  type="text"
+                  placeholder="Blog durchsuchen..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  style={styles.searchInput}
+                  onFocus={(e) => {
+                    Object.assign(e.currentTarget.style, styles.searchInputFocus);
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = `${APP_CONFIG.colors.primary}20`;
+                  }}
+                />
+              </div>
 
-          <div style={styles.resultsCount}>
-            {filteredPosts.length} {filteredPosts.length === 1 ? 'Artikel' : 'Artikel'} gefunden
-          </div>
+              <div style={styles.resultsCount}>
+                {filteredPosts.length} {filteredPosts.length === 1 ? 'Artikel' : 'Artikel'} gefunden
+              </div>
 
-          {currentPosts.length > 0 ? (
+              {currentPosts.length > 0 ? (
             <>
               <div style={styles.postsGrid}>
                 {currentPosts.map(post => (
@@ -386,6 +387,8 @@ const Blog: React.FC = () => {
             <div style={styles.noResults}>
               <p>Keine Artikel gefunden. Versuchen Sie andere Suchbegriffe oder wählen Sie eine andere Kategorie.</p>
             </div>
+              )}
+            </>
           )}
         </main>
 

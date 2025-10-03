@@ -162,20 +162,6 @@ const TinaCMS = React.lazy(async () => {
                           📝 Blog Beiträge
                         </a>
                       </li>
-                      <li style={{ marginBottom: '0.5rem' }}>
-                        <a 
-                          href="/admin/cms" 
-                          style={{ 
-                            color: APP_COLORS.primary, 
-                            textDecoration: 'none',
-                            display: 'block',
-                            padding: '0.5rem',
-                            borderRadius: '0.25rem'
-                          }}
-                        >
-                          ⚙️ CMS Editor
-                        </a>
-                      </li>
                     </ul>
                   </div>
                 </div>

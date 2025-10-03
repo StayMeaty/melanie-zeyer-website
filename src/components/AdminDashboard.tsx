@@ -186,20 +186,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
               </div>
             </div>
           )}
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <a href="/admin/blog" style={styles.primaryLink}>
-              Klassisches Blog-Management →
-            </a>
-            <a href="/admin/tina" style={styles.secondaryLink}>
-              Tina CMS (Visual Editor) →
-            </a>
-          </div>
+          <a href="/admin/tina" style={styles.primaryLink}>
+            Blog-Management öffnen →
+          </a>
         </div>
 
         <div style={styles.card}>
-          <h2 style={styles.cardTitle}>Tina CMS Status</h2>
+          <h2 style={styles.cardTitle}>CMS Status</h2>
           <p style={styles.cardDescription}>
-            Visual Content Editor für eine verbesserte Blog-Bearbeitungsbenutzeroberfläche.
+            Tina CMS - Visual Content Editor für die Blog-Verwaltung.
           </p>
           <div style={styles.statsGrid}>
             <div style={styles.stat}>

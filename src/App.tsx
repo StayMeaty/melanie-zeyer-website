@@ -5,8 +5,7 @@ import {
   Layout, 
   AdminLogin, 
   ProtectedRoute, 
-  AdminDashboard, 
-  BlogManagement 
+  AdminDashboard
 } from './components';
 import { 
   Startseite, 
@@ -116,30 +115,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/blog"
-            element={
-              <ProtectedRoute>
-                <BlogManagement />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/blog/new"
-            element={
-              <ProtectedRoute>
-                <BlogManagement initialView="create" />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/blog/edit/:slug"
-            element={
-              <ProtectedRoute>
-                <BlogManagement initialView="edit" />
               </ProtectedRoute>
             }
           />

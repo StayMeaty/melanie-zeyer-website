@@ -14,7 +14,6 @@ export { default as BlogCard } from './BlogCard';
 export { default as AdminLogin } from './AdminLogin';
 export { default as ProtectedRoute } from './ProtectedRoute';
 export { default as AdminDashboard } from './AdminDashboard';
-export { default as BlogManagement } from './BlogManagement';
 export { default as SEOMetaEditor } from './SEOMetaEditor';
 export { default as TinaAuthStatus } from './TinaAuthStatus';
 // TinaAdmin and TinaEditorWrapper are lazy-loaded in App.tsx
