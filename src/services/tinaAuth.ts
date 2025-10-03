@@ -320,13 +320,19 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
     const currentSession = getTinaSession();
 
     if (!currentSession) {
-      setSession(null);
+      setSession(prev => prev === null ? prev : null);
       return false;
     }
 
     // For local development, session is always valid
     if (config.isLocalDevelopment && config.useLocalAuth) {
-      setSession(currentSession);
+      setSession(prev => {
+        // Only update if session has actually changed
+        if (prev && prev.tokenHash === currentSession.tokenHash && prev.expiresAt === currentSession.expiresAt) {
+          return prev;
+        }
+        return currentSession;
+      });
       return true;
     }
 
@@ -336,7 +342,7 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
     if (!currentTokenHash || currentSession.tokenHash !== currentTokenHash) {
       logTinaSecurityEvent('session_token_mismatch', {});
       clearTinaSession();
-      setSession(null);
+      setSession(prev => prev === null ? prev : null);
       return false;
     }
 
@@ -345,11 +351,17 @@ export const TinaAuthProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     if (!isValid) {
       clearTinaSession();
-      setSession(null);
+      setSession(prev => prev === null ? prev : null);
       return false;
     }
 
-    setSession(currentSession);
+    setSession(prev => {
+      // Only update if session has actually changed
+      if (prev && prev.tokenHash === currentSession.tokenHash && prev.expiresAt === currentSession.expiresAt) {
+        return prev;
+      }
+      return currentSession;
+    });
     return true;
   }, [config.isLocalDevelopment, config.useLocalAuth, provider]);
   
