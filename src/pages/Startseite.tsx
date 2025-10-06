@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { APP_CONFIG } from '../types';
-import { ContactForm } from '../components';
+import { ContactForm, DesiresSection } from '../components';
 
 const Startseite: React.FC = () => {
   const styles: Record<string, React.CSSProperties> = {
@@ -260,8 +260,11 @@ const Startseite: React.FC = () => {
         </div>
       </section>
 
-      <section style={{ 
-        display: 'grid', 
+      {/* Desires Section */}
+      <DesiresSection />
+
+      <section style={{
+        display: 'grid',
         gridTemplateColumns: '1fr 1fr',
         gap: '2rem',
         marginBottom: '4rem',

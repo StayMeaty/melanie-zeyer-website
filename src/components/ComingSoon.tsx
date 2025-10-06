@@ -3,6 +3,7 @@ import { APP_CONFIG } from '../types';
 import Logo from './Logo';
 import ParticleEffect from './ParticleEffect';
 import SparkleButton from './SparkleButton';
+import DesiresSection from './DesiresSection';
 
 interface ComingSoonProps {
   title?: string;
@@ -42,13 +43,19 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
       backgroundColor: APP_CONFIG.colors.background,
-      padding: '2rem',
-      paddingBottom: '4rem',
       position: 'relative',
       zIndex: 2,
+      paddingBottom: '5rem', // Space for fixed footer
+    },
+    heroSection: {
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem',
+      position: 'relative',
     },
     logoContainer: {
       marginBottom: '50px',
@@ -104,41 +111,47 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
     <div style={styles.container}>
       {/* Particle Effect - render behind everything */}
       <ParticleEffect logoPosition={logoPosition} />
-      
-      {showLogo && (
-        <div ref={logoRef} style={{...styles.logoContainer, position: 'relative', zIndex: 3}}>
-          <Logo alt="Melanie Logo" size={480} />
+
+      {/* Hero Section */}
+      <div style={styles.heroSection}>
+        {showLogo && (
+          <div ref={logoRef} style={{...styles.logoContainer, position: 'relative', zIndex: 3}}>
+            <Logo alt="Melanie Logo" size={480} />
+          </div>
+        )}
+
+        <h1 style={styles.heading}>
+          {title}
+        </h1>
+
+        <p style={styles.subtext}>
+          {subtitle}
+        </p>
+
+        <div style={{ marginTop: '2rem' }}>
+          <SparkleButton variant="secondary">
+            Bald verfügbar
+          </SparkleButton>
         </div>
-      )}
-      
-      <h1 style={styles.heading}>
-        {title}
-      </h1>
-      
-      <p style={styles.subtext}>
-        {subtitle}
-      </p>
-      
-      <div style={{ marginTop: '2rem' }}>
-        <SparkleButton variant="secondary">
-          Bald verfügbar
-        </SparkleButton>
       </div>
-      
+
+      {/* Desires Section */}
+      <DesiresSection />
+
       {/* Footer with Bask Tech logo */}
       <div style={styles.footer}>
-        <a 
-          href="https://www.bask-tech.com/" 
-          target="_blank" 
+        <a
+          href="https://www.bask-tech.com/"
+          target="_blank"
           rel="noopener noreferrer"
           style={styles.footerLink}
           onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
           onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
         >
           <span>Powered by</span>
-          <img 
-            src="/assets/bask-tech-logo.svg" 
-            alt="Bask Tech" 
+          <img
+            src="/assets/bask-tech-logo.svg"
+            alt="Bask Tech"
             style={styles.baskLogo}
           />
         </a>

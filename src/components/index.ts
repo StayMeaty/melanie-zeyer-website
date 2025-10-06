@@ -10,6 +10,8 @@ export { default as Layout } from './Layout';
 export { default as SparkleButton } from './SparkleButton';
 export { default as StripeCheckout } from './StripeCheckout';
 export { default as ContactForm } from './ContactForm';
+export { default as CookieBanner } from './CookieBanner';
+export { default as DesiresSection } from './DesiresSection';
 export { default as BlogCard } from './BlogCard';
 export { default as AdminLogin } from './AdminLogin';
 export { default as ProtectedRoute } from './ProtectedRoute';
