@@ -3,7 +3,6 @@ import { APP_CONFIG } from '../types';
 import Logo from './Logo';
 import ParticleEffect from './ParticleEffect';
 import SparkleButton from './SparkleButton';
-import DesiresSection from './DesiresSection';
 
 interface ComingSoonProps {
   title?: string;
@@ -134,9 +133,6 @@ const ComingSoon: React.FC<ComingSoonProps> = ({
           </SparkleButton>
         </div>
       </div>
-
-      {/* Desires Section */}
-      <DesiresSection />
 
       {/* Footer with Bask Tech logo */}
       <div style={styles.footer}>
