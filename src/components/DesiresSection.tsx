@@ -188,18 +188,74 @@ const DesiresSection: React.FC<DesiresSectionProps> = ({ id, className, disableP
     spacer: {
       height: '3rem',
     },
-    concludingParagraph: {
-      maxWidth: '800px',
-      margin: '0 auto',
-      textAlign: 'center',
-      fontSize: 'clamp(1.1rem, 2.5vw, 1.3rem)',
-      fontFamily: "'Arimo', sans-serif",
-      color: APP_CONFIG.colors.secondary,
-      lineHeight: '1.7',
+    // CTA Container
+    ctaContainer: {
+      maxWidth: '1000px',
+      margin: '4rem auto 0',
+      padding: '0 2rem',
     },
-    courseTitle: {
+    // CTA Card with Accent Glow
+    ctaCard: {
+      maxWidth: '900px',
+      margin: '0 auto 3rem',
+      padding: '3.5rem 3rem 3rem',
+      background: `linear-gradient(135deg, ${APP_CONFIG.colors.background} 0%, ${APP_CONFIG.colors.primary}05 100%)`,
+      borderRadius: '2rem',
+      border: `2px solid ${APP_CONFIG.colors.accent}`,
+      boxShadow: '0 8px 40px rgba(232, 205, 140, 0.15)',
+      position: 'relative',
+      textAlign: 'center',
+    },
+    ctaIntro: {
+      fontSize: 'clamp(1.15rem, 2.5vw, 1.35rem)',
+      color: APP_CONFIG.colors.secondary,
+      lineHeight: 1.8,
+      marginBottom: '0.5rem',
+      fontFamily: "'Arimo', sans-serif",
+    },
+    ctaCourseType: {
+      fontSize: 'clamp(1.4rem, 3.2vw, 1.8rem)',
+      color: APP_CONFIG.colors.primary,
+      fontWeight: '700',
+      lineHeight: 1.6,
+      marginBottom: '1rem',
+      fontFamily: "'Sumana', serif",
+      letterSpacing: '0.5px',
+    },
+    ctaCourseTitle: {
+      color: APP_CONFIG.colors.primary,
+      fontWeight: '700',
+      fontStyle: 'normal',
+      display: 'block',
+      margin: '1rem 0 0.5rem',
+      fontSize: 'clamp(1.2rem, 2.8vw, 1.5rem)',
+      fontFamily: "'Sumana', serif",
+      lineHeight: 1.5,
+    },
+    ctaCourseTitleSubtitle: {
+      color: APP_CONFIG.colors.primary,
+      fontWeight: '400',
+      fontStyle: 'normal',
+      display: 'block',
+      margin: '0 0 2.5rem',
+      fontSize: 'clamp(1.1rem, 2.5vw, 1.35rem)',
+      fontFamily: "'Sumana', serif",
+      lineHeight: 1.5,
+    },
+    ctaButton: {
+      display: 'inline-block',
+      padding: '1.1rem 2.8rem',
+      background: APP_CONFIG.colors.accent,
+      color: '#333',
+      borderRadius: '3rem',
       fontWeight: '600',
-      fontStyle: 'italic',
+      fontSize: '1.1rem',
+      textDecoration: 'none',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      boxShadow: '0 4px 20px rgba(232, 205, 140, 0.4)',
+      border: 'none',
+      cursor: 'pointer',
+      fontFamily: "'Arimo', sans-serif",
     },
   };
 
@@ -870,16 +926,35 @@ const DesiresSection: React.FC<DesiresSectionProps> = ({ id, className, disableP
 
           <div style={styles.spacer}></div>
 
-          <div style={styles.concludingParagraph}>
-            <p>
-              Dann ist der 8-Wochen-Live Onlinekurs{' '}
-              <span style={styles.courseTitle}>
-                „Eltern werden alt, du wirst frei. Raus aus einer belastenden
-                Elternbeziehung, rein in deine neue Freiheit: Löse dich aus Schuld,
-                Pflicht und Verstrickung"
-              </span>{' '}
-              genau das Richtige für dich.
-            </p>
+          {/* CTA Section */}
+          <div style={styles.ctaContainer}>
+            <div style={styles.ctaCard}>
+              <div style={styles.ctaIntro}>
+                Dann starte jetzt deinen Weg in die Freiheit mit dem
+              </div>
+              <div style={styles.ctaCourseType}>
+                8-Wochen-Live Onlinekurs
+              </div>
+              <div style={styles.ctaCourseTitle}>
+                „Eltern werden alt, du wirst frei.
+              </div>
+              <div style={styles.ctaCourseTitleSubtitle}>
+                Raus aus einer belastenden Elternbeziehung, rein in deine neue Freiheit: Löse dich aus Schuld, Pflicht und Verstrickung"
+              </div>
+              <button
+                style={styles.ctaButton}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                  e.currentTarget.style.boxShadow = '0 8px 30px rgba(232, 205, 140, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(232, 205, 140, 0.4)';
+                }}
+              >
+                Jetzt starten
+              </button>
+            </div>
           </div>
         </div>
       </section>
