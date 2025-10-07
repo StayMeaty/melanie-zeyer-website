@@ -1,11 +1,12 @@
 import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { 
-  ComingSoon, 
-  Layout, 
-  AdminLogin, 
-  ProtectedRoute, 
-  AdminDashboard
+import {
+  ComingSoon,
+  Layout,
+  AdminLogin,
+  ProtectedRoute,
+  AdminDashboard,
+  CookieBanner
 } from './components';
 import { 
   Startseite, 
@@ -84,6 +85,7 @@ function App() {
       <TinaAuthProvider>
         <Router>
         <RoutePreloader>
+        <CookieBanner />
         <Routes>
           {/* Landing page */}
           <Route path="/" element={<LandingPage />} />
