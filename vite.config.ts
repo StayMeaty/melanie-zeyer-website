@@ -55,7 +55,7 @@ export default defineConfig({
       // Tree shaking optimizations
       treeshake: {
         preset: 'recommended',
-        moduleSideEffects: false,
+        moduleSideEffects: 'no-external',
         propertyReadSideEffects: false,
         tryCatchDeoptimization: false
       }
