@@ -186,12 +186,12 @@ const DesiresSection: React.FC<DesiresSectionProps> = ({ id, className, disableP
       lineHeight: '1.6',
     },
     spacer: {
-      height: '3rem',
+      height: '1.5rem',
     },
     // CTA Container
     ctaContainer: {
       maxWidth: '1000px',
-      margin: '4rem auto 0',
+      margin: '2rem auto 0',
       padding: '0 2rem',
     },
     // CTA Card with Accent Glow

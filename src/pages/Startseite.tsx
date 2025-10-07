@@ -125,7 +125,7 @@ const Startseite: React.FC = () => {
       
       <section className="hero-section" style={styles.hero}>
         <h1 style={styles.title}>
-          Willkommen bei Melanie Zeyer
+          Willkommen bei MZ Coaching
         </h1>
         <p style={styles.subtitle}>
           Ihre Expertin für professionelle Beratung, individuelles Coaching und 
@@ -150,7 +150,7 @@ const Startseite: React.FC = () => {
 
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>
-          Warum Melanie Zeyer?
+          Warum MZ Coaching?
         </h2>
         <p style={styles.sectionContent}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod 

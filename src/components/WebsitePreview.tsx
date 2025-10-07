@@ -140,7 +140,7 @@ const WebsitePreview: React.FC = () => {
       <header style={styles.header}>
         <nav style={styles.nav}>
           <a href="#" style={styles.logo}>
-            Melanie Zeyer
+            MZ Coaching
           </a>
           <ul style={styles.navMenu}>
             <li>
@@ -165,7 +165,7 @@ const WebsitePreview: React.FC = () => {
       <main style={styles.main}>
         <section style={styles.hero}>
           <h1 style={styles.title}>
-            Willkommen bei Melanie Zeyer
+            Willkommen bei MZ Coaching
           </h1>
           <p style={styles.subtitle}>
             Ihre Expertin für professionelle Beratung und individuelle Lösungen

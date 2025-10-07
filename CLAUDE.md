@@ -1,10 +1,17 @@
-# Melanie Zeyer Website - Project Instructions
+# MZ Coaching Website - Project Instructions
 
-This document contains project-specific instructions and guidelines for AI assistance with the Melanie Zeyer website (melaniezeyer.de). These instructions supplement the global CLAUDE.md configuration.
+This document contains project-specific instructions and guidelines for AI assistance with the MZ Coaching website (melaniezeyer.de). These instructions supplement the global CLAUDE.md configuration.
 
 ## Project Context
 
-You are working on a **teaser/coming soon website** for melaniezeyer.de. This is a single-page application built with React, TypeScript, and Vite, deployed serverlessly on Netlify. The site features an elegant particle effect system and is designed to create anticipation for the full website launch.
+You are working on a **professional coaching website** for melaniezeyer.de. This is a single-page application built with React, TypeScript, and Vite, deployed serverlessly on Netlify. The site features an elegant particle effect system and comprehensive content for coaching services.
+
+## Brand Identity
+
+- **Company Name**: MZ Coaching
+- **Owner**: Melanie Zeyer (the person behind MZ Coaching)
+- **Domain**: melaniezeyer.de
+- **Focus**: Professional coaching, personal development, and transformative services
 
 ## Critical Requirements
 

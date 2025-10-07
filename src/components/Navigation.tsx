@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { APP_CONFIG } from '../types';
+import Logo from './Logo';
 
 const Navigation: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -28,6 +29,12 @@ const Navigation: React.FC = () => {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
+    },
+    logoContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.75rem',
+      textDecoration: 'none',
     },
     logo: {
       fontSize: '1.5rem',
@@ -119,8 +126,9 @@ const Navigation: React.FC = () => {
       <style>{mobileStyles}</style>
       <header style={styles.header}>
         <nav style={styles.nav}>
-          <NavLink to="/preview" style={styles.logo}>
-            Melanie Zeyer
+          <NavLink to="/preview" style={styles.logoContainer}>
+            <Logo size={40} alt="MZ Coaching Logo" />
+            <span style={styles.logo}>MZ Coaching</span>
           </NavLink>
           
           <ul 

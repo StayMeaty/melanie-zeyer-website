@@ -62,7 +62,7 @@ const Footer: React.FC = () => {
           style={styles.container}
         >
           <div style={styles.copyright}>
-            © {currentYear} Melanie Zeyer. Alle Rechte vorbehalten.
+            © {currentYear} MZ Coaching. Alle Rechte vorbehalten.
           </div>
           
           <div style={styles.links}>
