@@ -10,6 +10,21 @@ const Navigation: React.FC = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  const scrollToSection = (sectionId: string) => {
+    setIsMobileMenuOpen(false);
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const offset = 80; // Account for fixed header
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   const styles: Record<string, React.CSSProperties> = {
     header: {
       backgroundColor: '#FFFFFF',
@@ -131,13 +146,13 @@ const Navigation: React.FC = () => {
             <span style={styles.logo}>MZ Coaching</span>
           </NavLink>
           
-          <ul 
+          <ul
             className="nav-menu-desktop"
             style={styles.navMenu}
           >
             <li>
-              <NavLink 
-                to="/preview" 
+              <NavLink
+                to="/preview"
                 style={({ isActive }) => ({
                   ...styles.navLink,
                   ...(isActive ? styles.navLinkActive : {}),
@@ -148,52 +163,62 @@ const Navigation: React.FC = () => {
               </NavLink>
             </li>
             <li>
-              <NavLink 
-                to="/preview/ueber-mich" 
-                style={({ isActive }) => ({
-                  ...styles.navLink,
-                  ...(isActive ? styles.navLinkActive : {}),
-                })}
+              <a
+                href="#ueber-mich"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection('ueber-mich');
+                }}
+                style={styles.navLink}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = APP_CONFIG.colors.primary;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = APP_CONFIG.colors.secondary;
+                }}
               >
                 Über mich
-              </NavLink>
+              </a>
             </li>
             <li>
-              <NavLink 
-                to="/preview/kurse" 
-                style={({ isActive }) => ({
-                  ...styles.navLink,
-                  ...(isActive ? styles.navLinkActive : {}),
-                })}
+              <a
+                href="#angebot"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection('angebot');
+                }}
+                style={styles.navLink}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = APP_CONFIG.colors.primary;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = APP_CONFIG.colors.secondary;
+                }}
               >
-                Kurse
-              </NavLink>
+                Angebot
+              </a>
             </li>
             <li>
-              <NavLink 
-                to="/preview/coaching" 
-                style={({ isActive }) => ({
-                  ...styles.navLink,
-                  ...(isActive ? styles.navLinkActive : {}),
-                })}
-              >
-                Coaching
-              </NavLink>
-            </li>
-            <li>
-              <NavLink 
-                to="/preview/faq" 
-                style={({ isActive }) => ({
-                  ...styles.navLink,
-                  ...(isActive ? styles.navLinkActive : {}),
-                })}
+              <a
+                href="#faq"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection('faq');
+                }}
+                style={styles.navLink}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = APP_CONFIG.colors.primary;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = APP_CONFIG.colors.secondary;
+                }}
               >
                 FAQ
-              </NavLink>
+              </a>
             </li>
             <li>
-              <NavLink 
-                to="/preview/blog" 
+              <NavLink
+                to="/preview/blog"
                 style={({ isActive }) => ({
                   ...styles.navLink,
                   ...(isActive ? styles.navLinkActive : {}),
@@ -230,15 +255,15 @@ const Navigation: React.FC = () => {
             />
           </button>
 
-          <ul 
+          <ul
             style={{
               ...styles.navMenuMobile,
               ...(isMobileMenuOpen ? styles.navMenuMobileOpen : {}),
             }}
           >
             <li>
-              <NavLink 
-                to="/preview" 
+              <NavLink
+                to="/preview"
                 style={({ isActive }) => ({
                   ...styles.navLink,
                   ...(isActive ? styles.navLinkActive : {}),
@@ -250,56 +275,44 @@ const Navigation: React.FC = () => {
               </NavLink>
             </li>
             <li>
-              <NavLink 
-                to="/preview/ueber-mich" 
-                style={({ isActive }) => ({
-                  ...styles.navLink,
-                  ...(isActive ? styles.navLinkActive : {}),
-                })}
-                onClick={() => setIsMobileMenuOpen(false)}
+              <a
+                href="#ueber-mich"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection('ueber-mich');
+                }}
+                style={styles.navLink}
               >
                 Über mich
-              </NavLink>
+              </a>
             </li>
             <li>
-              <NavLink 
-                to="/preview/kurse" 
-                style={({ isActive }) => ({
-                  ...styles.navLink,
-                  ...(isActive ? styles.navLinkActive : {}),
-                })}
-                onClick={() => setIsMobileMenuOpen(false)}
+              <a
+                href="#angebot"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection('angebot');
+                }}
+                style={styles.navLink}
               >
-                Kurse
-              </NavLink>
+                Angebot
+              </a>
             </li>
             <li>
-              <NavLink 
-                to="/preview/coaching" 
-                style={({ isActive }) => ({
-                  ...styles.navLink,
-                  ...(isActive ? styles.navLinkActive : {}),
-                })}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Coaching
-              </NavLink>
-            </li>
-            <li>
-              <NavLink 
-                to="/preview/faq" 
-                style={({ isActive }) => ({
-                  ...styles.navLink,
-                  ...(isActive ? styles.navLinkActive : {}),
-                })}
-                onClick={() => setIsMobileMenuOpen(false)}
+              <a
+                href="#faq"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection('faq');
+                }}
+                style={styles.navLink}
               >
                 FAQ
-              </NavLink>
+              </a>
             </li>
             <li>
-              <NavLink 
-                to="/preview/blog" 
+              <NavLink
+                to="/preview/blog"
                 style={({ isActive }) => ({
                   ...styles.navLink,
                   ...(isActive ? styles.navLinkActive : {}),
